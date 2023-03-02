@@ -1,0 +1,246 @@
+.App {
+    text-align: center;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+.App-logo {
+    height: 40vmin;
+    pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .App-logo {
+        animation: App-logo-spin infinite 20s linear;
+    }
+}
+
+.App-header {
+    background-color: #282c34;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: calc(10px + 2vmin);
+    color: white;
+}
+
+.App-link {
+    color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.header-bar {
+    display: flex;
+    flex-flow: row-reverse wrap;
+    justify-content: space-between;
+    align-items: start;
+    width: 100%;
+    background: #EEEEEE;
+
+    .account-dropdown {
+        margin: .5em;
+        background: white;
+        padding: .5em 1em;
+        display: flex;
+        flex-flow: row nowrap;
+        align-items: center;
+        max-width: 15em;
+        width: 100%;
+        align-self: center;
+
+        .name {
+            margin: 0 .5em;
+        }
+
+        .username {
+            color: #536471;
+            margin: 0 .5em;
+        }
+
+        img {
+            width: 2em;
+            border-radius: 100%;
+        }
+
+        &:focus-within .account-options {
+            display: block;
+        }
+
+        &:hover .account-options {
+            display: block;
+        }
+
+        .account-options {
+            width: 100%;
+            max-width: 15em;
+            margin-top: 6em;
+            margin-left: -1em;
+            display: none;
+            position: absolute;
+            box-sizing: border-box;
+
+            button {
+                padding: 1em;
+                border: none;
+                width: 100%;
+            }
+        }
+    }
+
+    .search-area {
+        align-self: center;
+        width: 100%;
+        flex: 2 2 40em;
+        max-width: 40em;
+        margin: auto;
+        z-index: 2;
+
+        &:focus-within .results {
+            display: flex;
+            flex-flow: column nowrap;
+            align-items: center;
+        }
+
+        .results {
+            position: absolute;
+            max-width: 40em;
+            max-height: 50em;
+            display: none;
+            overflow: scroll;
+            background: #fff;
+            box-shadow: rgba(0, 0, 0, 0.35) 0px -50px 36px -28px inset;
+
+            .result-item {
+                width: 100%;
+                padding: 0.5em 1em;
+                display: flex;
+                flex-flow: row nowrap;
+                border-radius: .25em;
+                border: #EEEEEE 1px solid;
+                justify-content: space-between;
+
+                .result-details {
+                    .result-name {
+                        display: inline-block;
+                        font-weight: bold;
+                    }
+
+                    .status-buttons {
+                        justify-self: baseline;
+
+                        button {
+                            border: 1px solid #536471;
+                            border-radius: .5em;
+                            padding: .5em 1em;
+                            margin: 0 .5em;
+                        }
+                    }
+                }
+
+                .poster {
+                    height: 10em;
+                }
+            }
+        }
+
+        .search-bar {
+            width: 100%;
+            display: flex;
+            flex-flow: row nowrap;
+            align-items: stretch;
+            z-index: 300000;
+
+            .category-select {
+                display: inline-block;
+            }
+
+            .search-input {
+                display: inline-block;
+                flex: 2 1;
+            }
+
+            button {
+                display: inline-block;
+            }
+        }
+    }
+}
+
+.film-card {
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
+    justify-content: center;
+    row-gap: .5em;
+
+    .filter-select {
+        width: 100%;
+        max-width: 40em;
+    }
+
+    .film {
+        background: #EEEEEE;
+        margin: .5em 0;
+        width: 100%;
+        max-width: 40em;
+        padding: .5em 1em;
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: space-between;
+
+        button {
+            border: 1px solid #536471;
+            border-radius: .5em;
+            padding: .5em 1em;
+            margin: 0 .25em;
+        }
+
+        .status-plan-to-watch {
+            display: inline-block;
+            background: #d6eaf8;
+            padding: .25em .5em;
+            border-radius: .5em;
+        }
+
+        .status-completed {
+            display: inline-block;
+            background: #d6f8dc;
+            padding: .25em .5em;
+            border-radius: .5em;
+        }
+
+        .status-started {
+            display: inline-block;
+            background: #f8e5d6;
+            padding: .25em .5em;
+            border-radius: .5em;
+        }
+
+        .name {
+            font-weight: bold;
+        }
+
+        .overview {
+            margin: 0 .5em 0 0;
+        }
+
+        img {
+            border-radius: .5em;
+            object-fit: cover;
+            width: 5em;
+        }
+    }
+}
+
