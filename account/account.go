@@ -25,17 +25,17 @@ type User struct {
 }
 
 type Movie struct {
-	ID         int    `json:"ID"`
-	Name       string `json:"name"`
-	PosterPath string `json:"posterPath"`
+	ID         int    `json:"id"`
+	Name       string `json:"original_title"`
+	PosterPath string `json:"poster_path"`
 	Status     string `json:"status"`
 	Overview   string `json:"overview"`
 }
 
 type TV struct {
-	ID         int    `json:"ID"`
-	Name       string `json:"name"`
-	PosterPath string `json:"posterPath"`
+	ID         int    `json:"id"`
+	Name       string `json:"original_name"`
+	PosterPath string `json:"poster_path"`
 	Status     string `json:"status"`
 	Overview   string `json:"overview"`
 }
