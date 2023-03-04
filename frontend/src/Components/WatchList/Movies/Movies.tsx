@@ -2,6 +2,7 @@ import React, {useState} from "react";
 import Select from "react-select";
 import {useDispatch, useSelector} from "react-redux";
 import {set} from "../../../Store/userSlice";
+import {Movie} from "../../../Types/Movie";
 
 const options = [
     {value: 'all', label: 'All Movies'},
@@ -62,7 +63,7 @@ export function Movies() {
     }
 
     return (
-        <div className={"film-card"}>
+        <div className={"films"}>
             <h2>Your movies</h2>
             <Select options={options}
                     defaultValue={{value: 'all', label: 'All Movies'}}
@@ -70,40 +71,11 @@ export function Movies() {
                     className="filter-select"/>
 
             {user.movieList != null && !filterReturnsEmpty(filter) ?
-                Object.keys(user.movieList).map((key) => {
+                user.movieList.map((movie: Movie) => {
                     return (
-                        (filter === user.movieList[key as any].status || filter === "all") &&
-                        <div key={key} className="film">
-                            <div className={"movie-details"}>
-                                <div className={"name"}>{user.movieList[parseInt(key)].name}</div>
-                                <div
-                                    className={"status-" + user.movieList[key as any].status}>{user.movieList[parseInt(key)].status}</div>
-                                <div className={"overview"}>{user.movieList[parseInt(key)].overview}</div>
-
-                                <div className={"status-buttons"}>
-                                    <button>DELETE???</button>
-                                    {user.movieList[parseInt(key)].status !== "plan-to-watch" &&
-                                        <button className={"add-to-watchlist"}
-                                                onClick={() => addToWatchList(user.movieList[parseInt(key)].ID, "plan-to-watch")}>
-                                            Plan-to-watch
-                                        </button>
-                                    }
-                                    {user.movieList[key as any].status !== "started" &&
-                                        <button className={"started"}
-                                                onClick={() => addToWatchList(user.movieList[parseInt(key)].ID, "started")}>
-                                            Started
-                                        </button>
-                                    }
-                                    {user.movieList[parseInt(key)].status !== "completed" &&
-                                        <button className={"completed"}
-                                                onClick={() => addToWatchList(user.movieList[parseInt(key)].ID, "completed")}>
-                                            Completed
-                                        </button>
-                                    }
-                                </div>
-                            </div>
-                            <img src={"https://image.tmdb.org/t/p/w500/" + user.movieList[parseInt(key)].posterPath}/>
-                        </div>
+                        (filter === movie.status || filter === "all") &&
+                        <Movie key={movie.id}
+                               movie={movie}/>
                     )
                 }) : (
                     <div>No movies in this category :(</div>

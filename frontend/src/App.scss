@@ -15,7 +15,9 @@ code {
 * {
     box-sizing: border-box;
 }
-
+button{
+    cursor: pointer;
+}
 .App-logo {
     height: 40vmin;
     pointer-events: none;
@@ -177,60 +179,10 @@ code {
             display: none;
             overflow: scroll;
             background: #fff;
-            box-shadow: rgba(0, 0, 0, 0.35) 0px -20px 26px -18px inset;
+            box-shadow: rgba(0, 0, 0, 0.55) 0px -20px 26px -18px inset;
 
-            .result-item {
-                width: 100%;
-                padding: 0.5em 1em;
-                display: flex;
-                flex-flow: row nowrap;
-                border-radius: .25em;
-                border: #EEEEEE 1px solid;
-                justify-content: space-between;
-            }
-
-            .result-item-user{
-                width: 100%;
-                padding: 0.5em 1em;
-                display: flex;
-                flex-flow: row nowrap;
-                border-radius: .25em;
-                border: #EEEEEE 1px solid;
-
-                button.follow{
-                    margin:0;
-                }
-            }
-
-            .result-details {
-                margin-left: 1em;
-                display: block;
-
-                .result-name {
-                    display: block;
-                    font-weight: bold;
-                }
-
-                .status-buttons {
-                    justify-self: baseline;
-
-                    button {
-                        border: 1px solid #536471;
-                        border-radius: .5em;
-                        padding: .5em 1em;
-                        margin: 0 .5em;
-                    }
-                }
-            }
-
-            .overview {
-                margin: 0 .5em 0 0;
-            }
-
-            img {
-                border-radius: .5em;
-                object-fit: cover;
-                width: 5em;
+            .film{
+                background: none;
             }
         }
 
@@ -257,7 +209,7 @@ code {
     }
 }
 
-.film-card {
+.films {
     display: flex;
     flex-flow: column nowrap;
     align-items: center;
@@ -268,58 +220,65 @@ code {
         width: 100%;
         max-width: 40em;
     }
+}
 
-    .film {
-        background: #EEEEEE;
-        margin: .5em 0;
-        width: 100%;
-        max-width: 40em;
+.film {
+    background: #EEEEEE;
+    width: 100%;
+    max-width: 40em;
+    padding: .5em 1em;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+
+    button {
+        border: 1px solid #536471;
+        border-radius: .5em;
         padding: .5em 1em;
-        display: flex;
-        flex-flow: row nowrap;
-        justify-content: space-between;
+        margin: 0 .25em;
+    }
 
-        button {
-            border: 1px solid #536471;
-            border-radius: .5em;
-            padding: .5em 1em;
-            margin: 0 .25em;
-        }
+    .status-plan-to-watch {
+        display: inline-block;
+        background: #d6eaf8;
+        padding: .25em .5em;
+        border-radius: .5em;
+    }
 
-        .status-plan-to-watch {
-            display: inline-block;
-            background: #d6eaf8;
-            padding: .25em .5em;
-            border-radius: .5em;
-        }
+    .status-completed {
+        display: inline-block;
+        background: #d6f8dc;
+        padding: .25em .5em;
+        border-radius: .5em;
+    }
 
-        .status-completed {
-            display: inline-block;
-            background: #d6f8dc;
-            padding: .25em .5em;
-            border-radius: .5em;
-        }
+    .status-started {
+        display: inline-block;
+        background: #f8e5d6;
+        padding: .25em .5em;
+        border-radius: .5em;
+    }
 
-        .status-started {
-            display: inline-block;
-            background: #f8e5d6;
-            padding: .25em .5em;
-            border-radius: .5em;
-        }
+    .name {
+        font-weight: bold;
+    }
 
-        .name {
-            font-weight: bold;
-        }
+    .overview {
+        margin: 0 .5em 0 0;
+    }
 
-        .overview {
-            margin: 0 .5em 0 0;
-        }
+    img {
+        border-radius: .5em;
+        object-fit: cover;
+        width: 5em;
+        background: #61dafb;
+    }
 
-        img {
-            border-radius: .5em;
-            object-fit: cover;
-            width: 5em;
+    button.delete{
+        background: #f8e5d6;
+
+        &:hover{
+            background: #f8eee9;
         }
     }
 }
-

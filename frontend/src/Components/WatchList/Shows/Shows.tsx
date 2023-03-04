@@ -3,6 +3,7 @@ import Select from "react-select";
 import {useDispatch, useSelector} from "react-redux";
 import {User} from "../../../Types/User";
 import {set} from "../../../Store/userSlice";
+import {Show} from "../../../Types/Show";
 
 const options = [
     {value: 'all', label: 'All Shows'},
@@ -12,7 +13,6 @@ const options = [
 ]
 
 export function Shows() {
-    //const {user, setUser} = useContext<any>(UserContext);
     const [filter, setFilter] = useState<string | undefined>("all")
 
     const userState = useSelector((state: any) => state.user);
@@ -35,7 +35,7 @@ export function Shows() {
         return true
     }
 
-    function addToWatchList(id: Number, status: string) {
+    function addToWatchList(id: number, status: string) {
         fetch(process.env.REACT_APP_HOST + "/api/v1/tv/" + id + "/" + status, {
             method: "PUT",
             headers: {
@@ -53,7 +53,7 @@ export function Shows() {
 
                     let index = -1;
                     for (let i = 0; i < tempUser.tvList.length; i++) {
-                        if (tempUser.tvList[i].ID === result.ID) {
+                        if (tempUser.tvList[i].id === result.id) {
                             index = i;
                             break;
                         }
@@ -70,7 +70,7 @@ export function Shows() {
     }
 
     return (
-        <div className={"film-card"}>
+        <div className={"films"}>
             <h2>Your Shows</h2>
             <Select options={options}
                     defaultValue={{value: 'all', label: 'All Shows'}}
@@ -78,40 +78,11 @@ export function Shows() {
                     className="filter-select"/>
 
             {user.tvList != null && !filterReturnsEmpty(filter) ?
-                Object.keys(user.tvList).map((key) => {
+                user.tvList.map((show: Show) => {
                     return (
-                        (filter === user.tvList[parseInt(key)].status || filter === "all") &&
-                        <div key={key} className="film">
-                            <div>
-                                <div className={"name"}>{user.tvList[parseInt(key)].name}</div>
-                                <div
-                                    className={"status-" + user.tvList[parseInt(key)].status}>{user.tvList[parseInt(key)].status}</div>
-                                <div className={"overview"}>{user.tvList[parseInt(key)].overview}</div>
-
-                                <div className={"status-buttons"}>
-                                    <button>DELETE???</button>
-                                    {user.tvList[parseInt(key)].status !== "plan-to-watch" &&
-                                        <button className={"add-to-watchlist"}
-                                                onClick={() => addToWatchList(user.tvList[parseInt(key)].ID, "plan-to-watch")}>
-                                            Plan-to-watch
-                                        </button>
-                                    }
-                                    {user.tvList[parseInt(key)].status !== "started" &&
-                                        <button className={"started"}
-                                                onClick={() => addToWatchList(user.tvList[parseInt(key)].ID, "started")}>
-                                            Started
-                                        </button>
-                                    }
-                                    {user.tvList[parseInt(key)].status !== "completed" &&
-                                        <button className={"completed"}
-                                                onClick={() => addToWatchList(user.tvList[parseInt(key)].ID, "completed")}>
-                                            Completed
-                                        </button>
-                                    }
-                                </div>
-                            </div>
-                            <img src={"https://image.tmdb.org/t/p/w500/" + user.tvList[parseInt(key)].posterPath}/>
-                        </div>
+                        (filter === show.status || filter === "all") &&
+                        <Show key={show.id}
+                              show={show}/>
                     )
                 }) : (
                     <div>No shows in this category :(</div>

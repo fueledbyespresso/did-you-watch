@@ -4,6 +4,8 @@ import {SearchResult} from "./SearchResult";
 import {set} from "../../Store/userSlice";
 import {useDispatch, useSelector} from "react-redux";
 import {User} from "../../Types/User";
+import {Show} from "../../Types/Show";
+import {Movie} from "../../Types/Movie";
 
 const options = [
     {value: 'tv', label: 'TV'},
@@ -122,48 +124,41 @@ export function Search() {
 
             <div className="results">
                 {curCategory == "movie" && (
-                    movieResults != null && movieResults.results.length != 0 ?
-                        Object.keys(movieResults.results).map((key) => {
+                    movieResults !== null && movieResults.results.length !== 0 ?
+                        movieResults.results.map((movie: Movie) => {
                             return (
-                                <SearchResult key={key}
-                                              addToWatchlist={addToWatchList}
-                                              category={curCategory}
-                                              result={movieResults.results[key]}/>
+                                <Movie key={movie.id}
+                                       movie={movie}/>
                             )
-                        }) : (
-                            movieResults != null && movieResults.results.length == 0 && (
-                                <div>No results</div>
-                            )
-                        )
-                )}
+                }) : (
+                    movieResults !== null && movieResults.results.length === 0 && (
+                        <div>No results</div>
+                    )
+                ))}
                 {curCategory == "tv" && (
-                    TVResults != null && TVResults.results.length != 0 ?
-                        Object.keys(TVResults.results).map((key) => {
+                    TVResults !== null && TVResults.results.length !== 0 ?
+                        TVResults.results.map((show: Show) => {
                             return (
-                                <SearchResult key={key}
-                                              addToWatchlist={addToWatchList}
-                                              category={curCategory}
-                                              result={TVResults.results[key]}/>
-                            )
-                        }) : (
-                            TVResults != null && TVResults.results.length == 0 && (
-                                <div>No results</div>
-                            )
+                                <Show key={Number(show.id)}
+                                      show={show}/>
                         )
-                )}
-                {curCategory == "users" && (
-                    userResults != null && userResults.length != 0 ?
+                }) : (
+                    TVResults !== null && TVResults.results.length === 0 && (
+                        <div>No results</div>
+                    )
+                ))}
+                {curCategory === "users" && (
+                    userResults !== null && userResults.length !== 0 ?
                         userResults.map((user: User) => {
                             return (
                                 <User key={user.uid}
                                       user={user}/>
                             )
-                        }) : (
-                            userResults != null && userResults.length == 0 && (
+                    }) : (
+                    userResults !== null && userResults.length === 0 && (
                                 <div>No results</div>
-                            )
-                        )
-                )}
+                    )
+                ))}
             </div>
         </div>
     )
