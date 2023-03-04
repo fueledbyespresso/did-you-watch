@@ -1,4 +1,4 @@
-export interface Show {
+export type Show = {
     ID: Number,
     name: string,
     posterPath: string,

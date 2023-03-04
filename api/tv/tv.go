@@ -38,15 +38,6 @@ func searchForTV(db *database.DB) gin.HandlerFunc {
 			log.Println(err)
 		}
 
-		results := dataJSON["results"].([]any)
-
-		for _, value := range results {
-			id := value.(map[string]any)["id"]
-			name := value.(map[string]any)["name"]
-			posterPath := value.(map[string]any)["poster_path"]
-
-			fmt.Println(id, name, posterPath)
-		}
 		c.JSON(http.StatusOK, dataJSON)
 	}
 }

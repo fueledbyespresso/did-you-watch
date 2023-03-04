@@ -1,14 +1,17 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useEffect} from 'react';
 import firebase from "firebase/compat/app";
-import {AuthGoogle} from "./AuthGoogle";
 import {onAuthStateChanged} from "firebase/auth"
 import "./App.scss"
-import {HeaderBar} from "./Components/HeaderBar/HeaderBar";
-import {User} from "./interfaces/User";
-import {Movies} from "./Components/WatchList/Movies/Movies";
-import {Shows} from "./Components/WatchList/Shows/Shows";
+
 import {useDispatch, useSelector} from "react-redux";
 import {remove, set} from "./Store/userSlice";
+import {createBrowserRouter, RouterProvider} from "react-router-dom";
+import {Watchlist} from "./Pages/Watchlist";
+import {Home} from "./Pages/Home";
+import {ErrorPage} from "./Pages/ErrorPage";
+import {Account} from "./Pages/Account";
+import ProtectedRoute from "./Pages/ProtectedRoute";
+import {UserProfile} from "./Pages/UserProfile";
 
 // Configure Firebase.
 const config = {
@@ -23,20 +26,6 @@ const config = {
 
 function App() {
     firebase.initializeApp(config)
-    const store = useSelector((state: any) => state.user);
-
-    const [user, setUser] = useState<User>(store.user)
-    const [userExists, setUserExists] = useState<User>(store.userExists)
-
-    useEffect(() => {
-        setUser(store.user)
-        setUserExists(store.userExists)
-    }, [store]);
-
-    const value = useMemo(
-        () => ({user, setUser}),
-        [user]
-    );
     const dispatch = useDispatch()
 
     useEffect(() => {
@@ -52,7 +41,7 @@ function App() {
                 });
             }
         })
-    }, []);
+    }, [])
 
     function getAccount(idToken: string) {
         fetch(process.env.REACT_APP_HOST + "/account/v1/login", {
@@ -84,25 +73,25 @@ function App() {
             )
     }
 
-    function signOut() {
-        firebase.auth().signOut().then(r => console.log("signed out"))
-    }
+    const router = createBrowserRouter([{
+            path: "/",
+            element: <Home/>,
+            errorElement: <ErrorPage />,
+        }, {
+            path: "my-watchlist",
+            element: <Watchlist />,
+        }, {
+            path: "account",
+            element: <ProtectedRoute children={<Account/>}/>,
+        }, {
+            path: "user/:id",
+            element: <UserProfile/>
+        }
+    ]);
 
-    if (userExists) {
-        return (
-            <div className={"app"}>
-                <HeaderBar user={user} signOut={signOut} idToken={user.idToken}/>
-                <Movies/>
-                <Shows/>
-            </div>
-        )
-    }
     return (
-        <div>
-            <HeaderBar user={user} signOut={signOut} idToken={user.idToken}/>
-            <AuthGoogle auth={firebase.auth()}/>
-        </div>
-    );
+        <RouterProvider router={router}/>
+    )
 }
 
 export default App;

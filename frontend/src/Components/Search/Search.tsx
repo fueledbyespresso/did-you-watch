@@ -3,11 +3,12 @@ import Select from "react-select";
 import {SearchResult} from "./SearchResult";
 import {set} from "../../Store/userSlice";
 import {useDispatch, useSelector} from "react-redux";
-import {User} from "../../interfaces/User";
+import {User} from "../../Types/User";
 
 const options = [
     {value: 'tv', label: 'TV'},
     {value: 'movie', label: 'Movie'},
+    {value: 'users', label: 'Users'},
 ]
 
 export function Search() {
@@ -15,13 +16,10 @@ export function Search() {
     const [searchQuery, setSearchQuery] = useState<String>("")
     const [movieResults, setMovieResults] = useState<any>(null)
     const [TVResults, setTVResults] = useState<any>(null)
+    const [userResults, setUserResults] = useState<any>(null)
 
-    const userState = useSelector((state: any) => state.user);
-    const [user, setUser] = useState<User>(userState.user)
+    const store = useSelector((state: any) => state.user);
     const dispatch = useDispatch()
-    useEffect(() => {
-        setUser(userState.user)
-    }, [userState]);
 
     function submitSearch(searchCategory: string | null | undefined) {
         fetch(process.env.REACT_APP_HOST + "/api/v1/" + searchCategory + "/" + searchQuery, {
@@ -36,8 +34,10 @@ export function Search() {
                 (result) => {
                     if (searchCategory == "movie") {
                         setMovieResults(result)
-                    } else {
+                    } else if(searchCategory == "tv"){
                         setTVResults(result)
+                    } else if(searchCategory == "users"){
+                        setUserResults(result)
                     }
                 }, (error) => {
 
@@ -49,7 +49,7 @@ export function Search() {
         fetch(process.env.REACT_APP_HOST + "/api/v1/" + category + "/" + id + "/" + status, {
             method: "PUT",
             headers: {
-                'AuthToken': user.idToken
+                'AuthToken': store.user.idToken
             }
         })
             .then((res) => {
@@ -59,7 +59,7 @@ export function Search() {
             })
             .then(
                 (result) => {
-                    let tempUser = JSON.parse(JSON.stringify(user));
+                    let tempUser = JSON.parse(JSON.stringify(store.user));
                     if (category == "tv") {
                         let index = -1;
                         for (let i = 0; i < tempUser.tvList.length; i++) {
@@ -98,20 +98,26 @@ export function Search() {
     }
 
     return (
-        <div className={"search-area"} tabIndex={0}>
+        <div className={"search-area"} tabIndex={3}>
             <div className={"search-bar"}>
                 <Select options={options}
+                        tabIndex={1}
                         defaultValue={{value: 'tv', label: 'TV'}}
                         onChange={(values) => setCurCategory(values?.value)}
                         className="category-select"/>
 
                 <input className={"search-input"}
+                       tabIndex={2}
                        value={searchQuery as any}
                        onChange={event => setSearchQuery(event.target.value)}
                        onKeyDown={(e) => (e.key === 'Enter' ? submitSearch(curCategory) : null)}
-                       placeholder={"The Last of Us..."}/>
+                       placeholder={"The Last of Us..."}
+                autoFocus={true}/>
 
-                <button onClick={() => submitSearch(curCategory)}>Search</button>
+                <button tabIndex={3}
+                        onClick={() => submitSearch(curCategory)}>
+                    Search
+                </button>
             </div>
 
             <div className="results">
@@ -141,6 +147,19 @@ export function Search() {
                             )
                         }) : (
                             TVResults != null && TVResults.results.length == 0 && (
+                                <div>No results</div>
+                            )
+                        )
+                )}
+                {curCategory == "users" && (
+                    userResults != null && userResults.length != 0 ?
+                        userResults.map((user: User) => {
+                            return (
+                                <User key={user.uid}
+                                      user={user}/>
+                            )
+                        }) : (
+                            userResults != null && userResults.length == 0 && (
                                 <div>No results</div>
                             )
                         )

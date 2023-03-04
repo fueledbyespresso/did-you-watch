@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import Select from "react-select";
 import {useDispatch, useSelector} from "react-redux";
-import {User} from "../../../interfaces/User";
+import {User} from "../../../Types/User";
 import {set} from "../../../Store/userSlice";
 
 const options = [

@@ -1,13 +1,14 @@
 import React from "react";
-import {User} from "../../interfaces/User";
 import {Search} from "../Search/Search";
 import {AccountDropdown} from "../AccountDropdown/AccountDropdown";
+import {Link} from "react-router-dom";
 
-export function HeaderBar(props: { user: User, signOut: any, idToken: string }) {
+export function HeaderBar() {
     return (
         <div className={"header-bar"}>
-            <AccountDropdown signOut={props.signOut}/>
+            <AccountDropdown/>
             <Search/>
+            <Link to={"/"}>Did you watch?</Link>
         </div>
     )
 }

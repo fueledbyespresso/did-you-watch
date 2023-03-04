@@ -5,22 +5,45 @@ export function SearchResult(props: any) {
         props.addToWatchlist(id, planToWatch, category)
     }
 
+    if(props.category == "users"){
+        return (
+            <div className="result-item-user">
+                <img src={props.result.profilePicURL} className={"profile-pic"}
+                     alt={"profile-pic"}/>
+                <div className={"result-details"}>
+                    <div className={"result-name"}>{props.result.displayName}</div>
+                    <div className={"overview"}>{props.result.username}</div>
+
+                    <button className={"follow"}
+                            tabIndex={3}
+                            onClick={() => addToWatchList(props.result.id, "plan-to-watch", props.category)}>
+                        Follow
+                    </button>
+                </div>
+            </div>
+        )
+    }
+
     return (
         <div className="result-item">
             <div className={"result-details"}>
                 <div className={"result-name"}>{props.result.original_title || props.result.original_name}</div>
                 <div className={"release_date"}>{props.result.release_date || props.result.first_air_date}</div>
                 <div className={"overview"}>{props.result.overview}</div>
+
                 <div className={"status-buttons"}>
                     <button className={"add-to-watchlist"}
+                            tabIndex={3}
                             onClick={() => addToWatchList(props.result.id, "plan-to-watch", props.category)}>
                         Plan-to-watch
                     </button>
                     <button className={"started"}
+                            tabIndex={3}
                             onClick={() => addToWatchList(props.result.id, "started", props.category)}>
                         Started
                     </button>
                     <button className={"completed"}
+                            tabIndex={3}
                             onClick={() => addToWatchList(props.result.id, "completed", props.category)}>
                         Completed
                     </button>

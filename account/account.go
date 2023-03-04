@@ -16,6 +16,7 @@ type Error struct {
 }
 
 type User struct {
+	UID           string  `json:"uid"`
 	Username      string  `json:"username"`
 	DisplayName   string  `json:"displayName"`
 	ProfilePicURL string  `json:"profilePicURL"`
@@ -89,7 +90,7 @@ func handleLogin(db *database.DB) gin.HandlerFunc {
 			c.AbortWithStatusJSON(500, "Unable to verify token")
 			return
 		}
-		username, displayName, profilePicURL, movieList, tvList := getUser(user.UID, db)
+		username, displayName, profilePicURL, movieList, tvList := GetUser(user.UID, db)
 		if username == "" {
 			err := createUser(user.UID, user.Email, user.DisplayName, db)
 			if err != nil {
@@ -99,6 +100,7 @@ func handleLogin(db *database.DB) gin.HandlerFunc {
 		}
 
 		c.JSON(200, User{
+			UID:           user.UID,
 			Username:      username,
 			DisplayName:   displayName,
 			ProfilePicURL: profilePicURL,
@@ -110,6 +112,7 @@ func handleLogin(db *database.DB) gin.HandlerFunc {
 
 func createUser(uid string, email string, displayName string, db *database.DB) error {
 	username := getRandomName()
+	//todo get a new name if user with username already exists!!
 	if len(displayName) > 20 {
 		displayName = displayName[:20]
 	}
@@ -149,24 +152,22 @@ func updateUsername(uid string, username string, db *database.DB) (error, string
 	return nil, username, displayName, profilePicURL
 }
 
-func updateDisplayName(uid string, displayName string, db *database.DB) (error, string, string, string) {
+func updateDisplayName(uid string, displayName string, db *database.DB) (error, string) {
 	if len(displayName) > 20 {
 		displayName = displayName[:20]
 	}
 	row := db.Db.QueryRow(`UPDATE account SET display_name=$1 WHERE uid=$2
-									returning username, display_name, profile_picture_url`, displayName, uid)
+									returning display_name`, displayName, uid)
 
-	var username string
-	var profilePicURL string
-	err := row.Scan(&username, &displayName, &profilePicURL)
+	err := row.Scan(&displayName)
 
 	if err != nil {
-		return err, "", "", ""
+		return err, ""
 	}
-	return nil, username, displayName, profilePicURL
+	return nil, displayName
 }
 
-func getUser(uid string, db *database.DB) (string, string, string, []Movie, []TV) {
+func GetUser(uid string, db *database.DB) (string, string, string, []Movie, []TV) {
 	// Prepare the sql query for later
 	var username string
 	var displayName string
@@ -244,16 +245,14 @@ func handleChangeDisplayName(db *database.DB) gin.HandlerFunc {
 			return
 		}
 
-		err, username, newDisplayName, profilePicURL := updateDisplayName(user.UID, newDisplayName, db)
+		err, newDisplayName := updateDisplayName(user.UID, newDisplayName, db)
 		if err != nil {
 			c.AbortWithStatusJSON(500, "Unable to update username. Sorry.")
 			return
 		}
 
 		c.JSON(200, User{
-			Username:      username,
-			DisplayName:   newDisplayName,
-			ProfilePicURL: profilePicURL,
+			DisplayName: newDisplayName,
 		})
 	}
 }

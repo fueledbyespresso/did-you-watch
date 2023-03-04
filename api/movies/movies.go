@@ -37,18 +37,7 @@ func searchForMovie(db *database.DB) gin.HandlerFunc {
 		if err != nil {
 			log.Println(err)
 		}
-		/*
-			To read data
-			results := dataJSON["results"].([]any)
 
-			for _, value := range results {
-				id := value.(map[string]any)["id"]
-				name := value.(map[string]any)["name"]
-				posterPath := value.(map[string]any)["poster_path"]
-
-				fmt.Println(id, name, posterPath)
-			}
-		*/
 		c.JSON(http.StatusOK, dataJSON)
 	}
 }

@@ -1,15 +1,28 @@
 import React from "react";
 import {useSelector} from "react-redux";
+import {Link} from "react-router-dom";
+import firebase from "firebase/compat/app";
+import {AuthGoogle} from "../../AuthGoogle";
 
-export function AccountDropdown(props: { signOut: any }) {
+export function AccountDropdown() {
     const store = useSelector((state: any) => state.user);
-
-    if (store.userExists === false) {
-        return <div></div>
+    function signOut() {
+        console.log("signing out")
+        firebase.auth().signOut().then(r => console.log("signed out"))
     }
 
+    if(!store.userExists){
+        return (
+            <div className={"account-dropdown"} tabIndex={4}>
+                Login/Signup
+                <div className={"login"}>
+                    <AuthGoogle/>
+                </div>
+            </div>
+        )
+    }
     return (
-        <div className={"account-dropdown"}>
+        <div className={"account-dropdown"} tabIndex={4}>
             <img src={store.user.profilePicURL || undefined} alt={""}/>
             <div>
                 <div className={"name"}>{store.user.displayName}</div>
@@ -17,7 +30,8 @@ export function AccountDropdown(props: { signOut: any }) {
             </div>
 
             <div className={"account-options"}>
-                <button className={"sign-out"} onClick={() => props.signOut()}>Sign out</button>
+                <button className={"sign-out"} onClick={() => signOut()}>Sign out</button>
+                <Link className={"link-to-account"} to={"/account"}>Account</Link>
             </div>
         </div>
     )

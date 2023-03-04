@@ -1,7 +1,7 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit'
-import {User} from "../interfaces/User";
+import {User} from "../Types/User";
 
-type UserState = {
+export type UserState = {
     user: User,
     userExists: boolean
 }
@@ -30,7 +30,16 @@ export const userSlice = createSlice({
             state.userExists = true
         },
         remove: state => {
-            state = initialState
+            state.user ={
+                idToken: "",
+                uid: "",
+                displayName: "",
+                profilePicURL: "",
+                username: "",
+                movieList: [],
+                tvList: [],
+            }
+            state.userExists = false
         },
     }
 })
