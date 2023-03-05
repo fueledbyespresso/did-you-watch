@@ -9,7 +9,7 @@ import (
 
 func Routes(r *gin.RouterGroup, db *database.DB) {
 	r.GET("/user/:uid", handleGetUserByUID(db))
-	r.GET("/users/:username", handleSearchForUser(db))
+	r.GET("/search/users/:username", handleSearchForUser(db))
 }
 
 func handleGetUserByUID(db *database.DB) gin.HandlerFunc {

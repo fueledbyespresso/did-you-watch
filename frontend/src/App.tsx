@@ -12,6 +12,8 @@ import {ErrorPage} from "./Pages/ErrorPage";
 import {Account} from "./Pages/Account";
 import ProtectedRoute from "./Pages/ProtectedRoute";
 import {UserProfile} from "./Pages/UserProfile";
+import {TVShowPage} from "./Pages/TVShowPage";
+import {MoviePage} from "./Pages/MoviePage";
 
 // Configure Firebase.
 const config = {
@@ -86,6 +88,12 @@ function App() {
         }, {
             path: "user/:id",
             element: <UserProfile/>
+        }, {
+            path: "show/:id",
+            element: <TVShowPage/>
+        }, {
+            path: "movie/:id",
+            element: <MoviePage/>
         }
     ]);
 

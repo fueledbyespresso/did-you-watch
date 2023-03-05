@@ -8,7 +8,10 @@ export function HeaderBar() {
         <div className={"header-bar"}>
             <AccountDropdown/>
             <Search/>
-            <Link to={"/"}>Did you watch?</Link>
+            <div className={"links"}>
+                <Link to={"/"}>Did you watch?</Link>
+                <Link to={"/my-watchlist"}>My Watchlist</Link>
+            </div>
         </div>
     )
 }

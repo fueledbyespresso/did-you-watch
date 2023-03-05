@@ -46,9 +46,37 @@ button{
     display: flex;
     flex-flow: row-reverse wrap;
     justify-content: space-between;
-    align-items: start;
+    align-items: center;
     width: 100%;
     background: #EEEEEE;
+
+    .links{
+        padding: .5em 1em;
+        display: flex;
+        flex-flow: row nowrap;
+        gap: 1em;
+        color: #000;
+
+        a{
+            &:link {
+                text-decoration: none;
+            }
+
+            &:visited {
+                color: #000;
+                text-decoration: none;
+            }
+
+            &:active {
+                text-decoration: none;
+            }
+
+            &:hover{
+                text-decoration: none;
+                background: #c5e4ff;
+            }
+        }
+    }
 
     .account-dropdown {
         margin: .5em;
@@ -59,7 +87,6 @@ button{
         align-items: center;
         max-width: 15em;
         width: 100%;
-        align-self: center;
 
         .name {
             margin: 0 .5em;
@@ -158,9 +185,7 @@ button{
     }
 
     .search-area {
-        align-self: center;
         width: 100%;
-        flex: 2 2 40em;
         max-width: 40em;
         margin: auto;
         z-index: 2;
@@ -191,7 +216,7 @@ button{
             display: flex;
             flex-flow: row nowrap;
             align-items: stretch;
-            z-index: 300000;
+            z-index: 3;
 
             .category-select {
                 display: inline-block;
@@ -206,6 +231,22 @@ button{
                 display: inline-block;
             }
         }
+    }
+}
+
+@media screen and (max-width: 1400px) {
+    .header-bar {
+        flex-flow: column nowrap;
+        align-items: start;
+        justify-content: start;
+    }
+
+    * > {
+        width: 100%;
+    }
+
+    .account-dropdown{
+        align-self: end;
     }
 }
 
@@ -279,6 +320,115 @@ button{
 
         &:hover{
             background: #f8eee9;
+        }
+    }
+}
+
+.home{
+    h1{
+        text-align: center;
+    }
+}
+
+.trending-films{
+    width: 100%;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: center;
+    align-items: stretch;
+    max-width: 100em;
+    margin: auto;
+    gap: .5em;
+
+    .trending-film-container{
+        width: 15em;
+        border-radius: .5em;
+        .trending-film{
+            .name{
+                font-weight: bold;
+            }
+            a{
+                width: inherit;
+            }
+            img{
+                width: inherit;
+
+                object-fit: cover;
+                border-radius: .5em;
+            }
+            width: 100%;
+        }
+        &:hover{
+            img{
+                box-shadow: rgba(0, 0, 0, 0.25) 0 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+
+            }
+        }
+    }
+}
+
+.full-show-details{
+    max-width: 100em;
+    margin: 2em auto;
+    padding: 0 1em;
+
+    .show-details{
+        display: flex;
+        flex-flow: row wrap;
+        align-items: center;
+        -webkit-background-size: cover;
+        -moz-background-size: cover;
+        -o-background-size: cover;
+        background-size: cover;
+        img{
+            display: inline-block;
+            max-height: 30em;
+        }
+        .text-details{
+            height: inherit;
+            align-self: stretch;
+            color: white;
+            flex: 1 1 5em;
+            padding: 1em 1em;
+            min-width: 20em;
+            display: flex;
+            flex-flow: column nowrap;
+            justify-content: center;
+
+            .overview{
+                max-width: 50em;
+            }
+        }
+    }
+
+    .credits{
+        display: flex;
+        flex-flow: row wrap;
+
+        .cast-member{
+            flex: 1 2 10em;
+            max-width: 11em;
+
+            img{
+                display: inline-block;
+                height: auto;
+                width: 100%;
+            }
+        }
+    }
+
+    .seasons{
+        display: flex;
+        flex-flow: row wrap;
+
+        .season{
+            flex: 1 2 10em;
+            max-width: 11em;
+
+            img{
+                height: auto;
+                width: 100%;
+            }
         }
     }
 }

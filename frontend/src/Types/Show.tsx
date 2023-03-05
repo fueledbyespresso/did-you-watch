@@ -2,10 +2,10 @@ import {set, UserState} from "../Store/userSlice";
 import {useDispatch, useSelector} from "react-redux";
 import {User} from "./User";
 import React from "react";
+import {Link} from "react-router-dom";
 
 export type Show = {
     id: number,
-    name: string,
     poster_path: string,
     status: string,
     overview: string,
@@ -56,7 +56,7 @@ export function Show(props: { show: Show }) {
     return (
         <div className="film">
             <div className={"film-details"}>
-                <div className={"name"}>{props.show.original_name}</div>
+                <div className={"name"}><Link to={"/show/"+props.show.id}>{props.show.original_name}</Link></div>
                 <div className={"release-date"}>{props.show.first_air_date}</div>
                 <div className={"status-" + props.show.status}>{props.show.status}</div>
                 <div className={"overview"}>{props.show.overview}</div>
@@ -89,6 +89,19 @@ export function Show(props: { show: Show }) {
 
             <img src={"https://image.tmdb.org/t/p/w500/" + props.show.poster_path} className={"poster"}
                  alt={"show-poster"}/>
+        </div>
+    )
+}
+
+export function TrendingShow(props: {show: Show}) {
+    return (
+        <div className={"trending-film"}>
+            <Link to={"/show/"+props.show.id}>
+                <img src={"https://image.tmdb.org/t/p/w500/" + props.show.poster_path} className={"poster"}
+                     alt={"show-poster"}/>
+            </Link>
+            <div className={"name"}>{props.show.original_name}</div>
+            <div className={"air-date"}>{props.show.first_air_date}</div>
         </div>
     )
 }

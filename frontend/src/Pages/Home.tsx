@@ -1,9 +1,8 @@
 import {HeaderBar} from "../Components/HeaderBar/HeaderBar";
 import React, {useEffect, useState} from "react";
 import {Link} from "react-router-dom";
-import {useSelector} from "react-redux";
-import {Movie} from "../Types/Movie";
-import {Show} from "../Types/Show";
+import {Movie, TrendingMovie} from "../Types/Movie";
+import {Show, TrendingShow} from "../Types/Show";
 
 export function Home(){
     const [trending, setTrending] = useState<any>(null)
@@ -31,15 +30,14 @@ export function Home(){
     }
 
     return(
-        <div>
+        <div className={"home"}>
             <HeaderBar/>
-            <Link to={"/my-watchlist"}>My Watchlist</Link>
-            <div>
-                <h1>Trending this week</h1>
-                {trending != null &&  trending.results.map((trendingItem: any) =>
-                    <div key={trendingItem.id}>
-                        {trendingItem.media_type == "movie" && <Movie movie={trendingItem}/>}
-                        {trendingItem.media_type == "tv" && <Show show={trendingItem}/>}
+            <h1>Trending this week</h1>
+            <div className={"trending-films"}>
+                {trending !== null &&  trending.results.map((trendingItem: any) =>
+                    <div className={"trending-film-container"} key={trendingItem.id}>
+                        {trendingItem.media_type === "movie" && <TrendingMovie movie={trendingItem}/>}
+                        {trendingItem.media_type === "tv" && <TrendingShow show={trendingItem}/>}
                     </div>
                 )}
             </div>

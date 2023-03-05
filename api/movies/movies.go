@@ -16,7 +16,8 @@ import (
 // Routes All the routes created by the package nested in
 // api/v1/*
 func Routes(r *gin.RouterGroup, db *database.DB) {
-	r.GET("/movie/:query", searchForMovie(db))
+	r.GET("/search/movie/:query", searchForMovie(db))
+	r.GET("/movie/:id", getMovie(db))
 	r.PUT("/movie/:id/:status", addToWatchlist(db))
 	r.DELETE("/movie/:id", removeFromWatchlist(db))
 }
@@ -25,6 +26,27 @@ func searchForMovie(db *database.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		query := c.Param("query")
 		resp, err := http.Get("https://api.themoviedb.org/3/search/movie?api_key=" + os.Getenv("TMDB_API_KEY") + "&query=" + url.QueryEscape(query) + "&page=1")
+		if err != nil {
+			return
+		}
+		contents, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return
+		}
+		var dataJSON map[string]any
+		err = json.Unmarshal(contents, &dataJSON)
+		if err != nil {
+			log.Println(err)
+		}
+
+		c.JSON(http.StatusOK, dataJSON)
+	}
+}
+
+func getMovie(db *database.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		id := c.Param("id")
+		resp, err := http.Get("https://api.themoviedb.org/3/movie/" + url.QueryEscape(id) + "?api_key=" + os.Getenv("TMDB_API_KEY") + "&append_to_response=credits")
 		if err != nil {
 			return
 		}

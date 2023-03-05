@@ -20,11 +20,8 @@ export function Search() {
     const [TVResults, setTVResults] = useState<any>(null)
     const [userResults, setUserResults] = useState<any>(null)
 
-    const store = useSelector((state: any) => state.user);
-    const dispatch = useDispatch()
-
     function submitSearch(searchCategory: string | null | undefined) {
-        fetch(process.env.REACT_APP_HOST + "/api/v1/" + searchCategory + "/" + searchQuery, {
+        fetch(process.env.REACT_APP_HOST + "/api/v1/search/" + searchCategory + "/" + searchQuery, {
             method: "GET",
         })
             .then((res) => {
@@ -41,58 +38,6 @@ export function Search() {
                     } else if(searchCategory == "users"){
                         setUserResults(result)
                     }
-                }, (error) => {
-
-                }
-            )
-    }
-
-    function addToWatchList(id: string, status: string, category: string) {
-        fetch(process.env.REACT_APP_HOST + "/api/v1/" + category + "/" + id + "/" + status, {
-            method: "PUT",
-            headers: {
-                'AuthToken': store.user.idToken
-            }
-        })
-            .then((res) => {
-                if (res.ok) {
-                    return res.json()
-                }
-            })
-            .then(
-                (result) => {
-                    let tempUser = JSON.parse(JSON.stringify(store.user));
-                    if (category == "tv") {
-                        let index = -1;
-                        for (let i = 0; i < tempUser.tvList.length; i++) {
-                            if (tempUser.tvList[i].ID === result.ID) {
-                                index = i;
-                                break;
-                            }
-                        }
-                        if (index > -1) {
-                            tempUser.tvList[index] = result
-                        } else {
-                            tempUser.tvList.push(result)
-                        }
-                    } else if (category == "movie") {
-                        let index = -1;
-                        console.log(tempUser)
-                        for (let i = 0; i < tempUser.movieList.length; i++) {
-                            if (tempUser.movieList[i].ID === result.ID) {
-                                index = i;
-                                break;
-                            }
-                        }
-                        if (index > -1) {
-                            tempUser.movieList[index] = result
-                        } else {
-                            tempUser.movieList.push(result)
-                        }
-                    }
-
-                    dispatch(set(tempUser))
-                    console.log(result)
                 }, (error) => {
 
                 }
@@ -123,7 +68,7 @@ export function Search() {
             </div>
 
             <div className="results">
-                {curCategory == "movie" && (
+                {curCategory === "movie" && (
                     movieResults !== null && movieResults.results.length !== 0 ?
                         movieResults.results.map((movie: Movie) => {
                             return (
@@ -135,7 +80,7 @@ export function Search() {
                         <div>No results</div>
                     )
                 ))}
-                {curCategory == "tv" && (
+                {curCategory === "tv" && (
                     TVResults !== null && TVResults.results.length !== 0 ?
                         TVResults.results.map((show: Show) => {
                             return (

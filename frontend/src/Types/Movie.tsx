@@ -1,6 +1,7 @@
 import {useDispatch, useSelector} from "react-redux";
 import {set, UserState} from "../Store/userSlice";
 import React from "react";
+import {Link} from "react-router-dom";
 
 export type Movie = {
     id: number,
@@ -54,7 +55,7 @@ export function Movie(props: { movie: Movie }) {
     return (
         <div className="film">
             <div className={"film-details"}>
-                <div className={"name"}>{props.movie.original_title}</div>
+                <div className={"name"}><Link to={"/movie/"+props.movie.id}>{props.movie.original_title}</Link></div>
                 <div className={"release-date"}>{props.movie.release_date}</div>
                 <div className={"status-" + props.movie.status}>{props.movie.status}</div>
                 <div className={"overview"}>{props.movie.overview}</div>
@@ -87,6 +88,19 @@ export function Movie(props: { movie: Movie }) {
 
             <img src={"https://image.tmdb.org/t/p/w500/" + props.movie.poster_path} className={"poster"}
                  alt={"show-poster"}/>
+        </div>
+    )
+}
+
+export function TrendingMovie(props: { movie: Movie }){
+    return (
+        <div className={"trending-film"}>
+            <Link to={"/movie/"+props.movie.id}>
+                <img src={"https://image.tmdb.org/t/p/w500/" + props.movie.poster_path} className={"poster"}
+                                      alt={"movie-poster"}/>
+            </Link>
+            <div className={"name"}><Link to={"/movie/"+props.movie.id}>{props.movie.original_title}</Link></div>
+            <div className={"air-date"}>{props.movie.release_date}</div>
         </div>
     )
 }

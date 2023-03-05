@@ -4,12 +4,13 @@ import {useParams} from "react-router-dom";
 
 
 export function UserProfile(){
-    const { id } = useParams();
+    const {id} = useParams();
     const [curUser, setCurUser] = useState<any>("")
 
     useEffect(() => {
         setCurUser(id)
-    }, [])
+    }, [id])
+
     return(
         <div className={"user-profile"}>
             <HeaderBar/>
