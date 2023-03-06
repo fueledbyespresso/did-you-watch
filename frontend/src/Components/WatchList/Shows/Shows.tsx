@@ -18,6 +18,7 @@ export function Shows() {
     const userState = useSelector((state: any) => state.user);
     const [user, setUser] = useState<User>(userState.user)
     const dispatch = useDispatch()
+    const [toggleCompact, setToggleCompact] = useState(false)
 
     useEffect(() => {
         setUser(userState.user)
@@ -70,23 +71,28 @@ export function Shows() {
     }
 
     return (
-        <div className={"films"}>
+        <div className={"films-section"}>
             <h2>Your Shows</h2>
             <Select options={options}
                     defaultValue={{value: 'all', label: 'All Shows'}}
                     onChange={(values) => setFilter(values?.value)}
                     className="filter-select"/>
-
-            {user.tvList != null && !filterReturnsEmpty(filter) ?
-                user.tvList.map((show: Show) => {
-                    return (
-                        (filter === show.status || filter === "all") &&
-                        <Show key={show.id}
-                              show={show}/>
-                    )
-                }) : (
-                    <div>No shows in this category :(</div>
-                )}
+            <button onClick={()=>setToggleCompact(!toggleCompact)}>
+                Compact Mode
+            </button>
+            <div className={!toggleCompact ? "films" : "films-compact"}>
+                {user.tvList != null && !filterReturnsEmpty(filter) ?
+                    user.tvList.map((show: Show) => {
+                        return (
+                            (filter === show.status || filter === "all") &&
+                            <Show key={show.id}
+                                  compact={toggleCompact}
+                                  show={show}/>
+                        )
+                    }) : (
+                        <div>No shows in this category :(</div>
+                    )}
+            </div>
         </div>
     )
 }

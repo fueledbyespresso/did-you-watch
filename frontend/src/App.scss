@@ -1,5 +1,5 @@
 body {
-    margin: 0;
+    margin: 0 0 2em 0;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
@@ -18,27 +18,25 @@ code {
 button{
     cursor: pointer;
 }
-.App-logo {
-    height: 40vmin;
-    pointer-events: none;
-}
 
-@media (prefers-reduced-motion: no-preference) {
-    .App-logo {
-        animation: App-logo-spin infinite 20s linear;
+a{
+    &:link {
+        color: inherit;
+        text-decoration: none;
     }
-}
 
-.App-link {
-    color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-    from {
-        transform: rotate(0deg);
+    &:visited {
+        color: inherit;
+        text-decoration: none;
     }
-    to {
-        transform: rotate(360deg);
+
+    &:active {
+        color: inherit;
+        text-decoration: none;
+    }
+
+    &:hover{
+        text-decoration: none;
     }
 }
 
@@ -55,9 +53,15 @@ button{
         display: flex;
         flex-flow: row nowrap;
         gap: 1em;
-        color: #000;
+        justify-content: center;
+
+        .logo{
+            background: #cddae1;
+            border-radius: .5em;
+        }
 
         a{
+            padding: .5em;
             &:link {
                 text-decoration: none;
             }
@@ -73,7 +77,16 @@ button{
 
             &:hover{
                 text-decoration: none;
-                background: #c5e4ff;
+                background: #ff8000;
+                color: white;
+            }
+            &.active{
+                border-radius: 10em;
+                background: #ff8000;
+                color: white;
+                padding: .5em 1em;
+                font-weight: bold;
+                text-decoration: underline;
             }
         }
     }
@@ -133,7 +146,7 @@ button{
         .account-options {
             width: 100%;
             max-width: 15em;
-            margin-top: 8.5em;
+            margin-top: 6em;
             margin-left: -1em;
             display: none;
             position: absolute;
@@ -162,24 +175,6 @@ button{
                 width: 100%;
                 font-size: .9em;
                 color: inherit;
-
-                &:link {
-                    text-decoration: none;
-                }
-
-                &:visited {
-                    text-decoration: none;
-                }
-
-                &:active {
-                    text-decoration: none;
-                }
-
-                &:hover{
-                    text-decoration: none;
-
-                    background: #d0d0d7;
-                }
             }
         }
     }
@@ -234,15 +229,49 @@ button{
     }
 }
 
-@media screen and (max-width: 1400px) {
-    .header-bar {
-        flex-flow: column nowrap;
-        align-items: start;
-        justify-content: start;
+.result-item-user{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-self: start;
+
+    img{
+        height: 6em;
     }
 
-    * > {
-        width: 100%;
+    .result-details{
+        padding: 0 1em;
+    }
+}
+
+@media screen and (max-width: 1400px) {
+    .header-bar {
+        align-items: center;
+        justify-content: space-between;
+
+        .links {
+            width: 100%;
+        }
+        .search-area{
+            margin:0;
+            width: auto;
+            flex: 1 2;
+            max-width: none;
+        }
+        .account-dropdown{
+            padding: 0;
+            background: none;
+            width: auto;
+            .account-name-username{
+                display: none;
+            }
+
+            .account-options{
+                margin-top:5em;
+                width: 5em;
+                right: 0;
+            }
+        }
     }
 
     .account-dropdown{
@@ -250,23 +279,45 @@ button{
     }
 }
 
-.films {
+.films-section{
     display: flex;
     flex-flow: column nowrap;
-    align-items: center;
     justify-content: center;
-    row-gap: .5em;
-
+    align-items: center;
+    h2{
+        text-align: center;
+    }
     .filter-select {
         width: 100%;
         max-width: 40em;
+        margin-bottom: 1em;
+    }
+    .films {
+        display: flex;
+        flex-flow: column  nowrap;
+        row-gap: .5em;
+        max-width: 40em;
+    }
+    .films-compact{
+        display: flex;
+        flex-flow: row  wrap;
+        justify-content: center;
+        gap: 1em;
+
+        .film{
+            border-radius: .5em;
+            flex: 1 2 15em;
+            max-width: 17em;
+            .status-buttons{
+                display: flex;
+                flex-flow: column wrap;
+            }
+        }
     }
 }
 
 .film {
     background: #EEEEEE;
-    width: 100%;
-    max-width: 40em;
     padding: .5em 1em;
     display: flex;
     flex-flow: row nowrap;
@@ -343,6 +394,7 @@ button{
     .trending-film-container{
         width: 15em;
         border-radius: .5em;
+
         .trending-film{
             .name{
                 font-weight: bold;
@@ -351,12 +403,10 @@ button{
                 width: inherit;
             }
             img{
-                width: inherit;
-
+                width: 100%;
                 object-fit: cover;
                 border-radius: .5em;
             }
-            width: 100%;
         }
         &:hover{
             img{
@@ -376,11 +426,13 @@ button{
         display: flex;
         flex-flow: row wrap;
         align-items: center;
+        justify-content: center;
         -webkit-background-size: cover;
         -moz-background-size: cover;
         -o-background-size: cover;
         background-size: cover;
         img{
+            background: #e9e9ed;
             display: inline-block;
             max-height: 30em;
         }
@@ -401,6 +453,14 @@ button{
         }
     }
 
+    button.toggle-full-cast{
+        text-decoration: underline;
+        border:none;
+        padding: .5em 1em;
+        border-radius: .5em;
+        margin: 0 1em;
+    }
+
     .credits{
         display: flex;
         flex-flow: row wrap;
@@ -408,11 +468,17 @@ button{
         .cast-member{
             flex: 1 2 10em;
             max-width: 11em;
+            display: flex;
+            flex-flow: column nowrap;
 
             img{
                 display: inline-block;
                 height: auto;
+                background: #e9e9ed;
                 width: 100%;
+            }
+            .name{
+                padding: 0 .5em;
             }
         }
     }
@@ -429,6 +495,24 @@ button{
                 height: auto;
                 width: 100%;
             }
+        }
+    }
+}
+
+.account-page{
+    h1{
+      text-align: center;
+    }
+    .account-details-section{
+        margin:auto;
+        max-width: 60em;
+        .current-avatar{
+            img{
+                display: inline-block;
+            }
+        }
+        img{
+            width: 10em;
         }
     }
 }

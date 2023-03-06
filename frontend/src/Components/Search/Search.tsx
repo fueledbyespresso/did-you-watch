@@ -1,8 +1,5 @@
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import Select from "react-select";
-import {SearchResult} from "./SearchResult";
-import {set} from "../../Store/userSlice";
-import {useDispatch, useSelector} from "react-redux";
 import {User} from "../../Types/User";
 import {Show} from "../../Types/Show";
 import {Movie} from "../../Types/Movie";
@@ -73,6 +70,7 @@ export function Search() {
                         movieResults.results.map((movie: Movie) => {
                             return (
                                 <Movie key={movie.id}
+                                       compact={false}
                                        movie={movie}/>
                             )
                 }) : (
@@ -85,6 +83,7 @@ export function Search() {
                         TVResults.results.map((show: Show) => {
                             return (
                                 <Show key={Number(show.id)}
+                                      compact={false}
                                       show={show}/>
                         )
                 }) : (

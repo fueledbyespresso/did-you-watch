@@ -136,13 +136,13 @@ func addToWatchlist(db *database.DB) gin.HandlerFunc {
 
 func removeFromWatchlist(db *database.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		tvID := c.Param("id")
+		id := c.Param("id")
 		user := account.GetUserRecord(c)
 		if user == nil {
 			return
 		}
 
-		err := db.Db.QueryRow("DELETE FROM tv_user_bridge WHERE user_id=$1 AND tv_id=$2", user.UID, tvID).Scan()
+		_, err := db.Db.Query("DELETE FROM tv_user_bridge WHERE user_id=$1 AND tv_id=$2", user.UID, id)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusBadRequest, "Unable to remove from watchlist")
 			return

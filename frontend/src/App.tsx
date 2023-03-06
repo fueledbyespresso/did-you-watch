@@ -80,8 +80,11 @@ function App() {
             element: <Home/>,
             errorElement: <ErrorPage />,
         }, {
-            path: "my-watchlist",
-            element: <Watchlist />,
+            path: "my-movies",
+            element: <Watchlist category={"movies"}/>,
+        }, {
+            path: "my-shows",
+            element: <Watchlist category={"shows"}/>,
         }, {
             path: "account",
             element: <ProtectedRoute children={<Account/>}/>,

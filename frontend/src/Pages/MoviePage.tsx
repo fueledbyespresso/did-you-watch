@@ -42,7 +42,10 @@ export function MoviePage(){
                          background: `linear-gradient( rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.65) ),url("https://image.tmdb.org/t/p/original/`+ show.backdrop_path+ `") no-repeat center center`,
                          backgroundSize: "cover"
                      }}>
-                    <img src={"https://image.tmdb.org/t/p/w500/" +show.poster_path}
+
+                    <img src={show.poster_path !== null ?
+                         "https://image.tmdb.org/t/p/w500/" +show.poster_path :
+                         "https://did-you-watch-avatars.s3.us-west-2.amazonaws.com/placeholder.jpg"}
                          className={"poster"}
                          alt={"show-poster"}/>
                     <div className={"text-details"}>
@@ -52,11 +55,13 @@ export function MoviePage(){
                     </div>
                 </div>
                 
-                <h2>Cast</h2>
-                <button className={"toggle-full-cast"}
-                        onClick={()=>setDisplayAllCast(!displayAllCast)}>
-                    Toggle Full Cast
-                </button>
+                <h2>Cast
+                    <button className={"toggle-full-cast"}
+                            onClick={()=>setDisplayAllCast(!displayAllCast)}>
+                        Toggle Full Cast
+                    </button>
+                </h2>
+
                 <div className={"credits"}>
                     {show.credits.cast.map((cast: any, i: number) => {
                         if (!displayAllCast && i > 17) {
@@ -64,10 +69,14 @@ export function MoviePage(){
                         }
                         return (
                             <div className={"cast-member"} key={cast.id}>
-                                <img src={"https://image.tmdb.org/t/p/w500/" +cast.profile_path} className={"poster"}
+                                <img src={ cast.profile_path !== null ?
+                                     "https://image.tmdb.org/t/p/w500/" +cast.profile_path :
+                                     "https://did-you-watch-avatars.s3.us-west-2.amazonaws.com/placeholder.jpg"}
+                                     className={"poster"}
                                      alt={"show-poster"}/>
-                                <div>{cast.name}</div>
-                                <div>{cast.character}</div>
+                                <div className={"name"}>
+                                    <b>{cast.name}</b> playing {cast.character}
+                                </div>
                             </div>
                         )
                     })}

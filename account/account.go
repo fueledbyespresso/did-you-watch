@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"google.golang.org/api/option"
 	"os"
+	"strconv"
 )
 
 type Error struct {
@@ -44,8 +45,10 @@ type TV struct {
 // oauth/v1/*
 func Routes(r *gin.RouterGroup, db *database.DB) {
 	r.GET("/login", handleLogin(db))
-	r.PUT("/username", handleChangeUsername(db))
-	r.PUT("/displayName", handleChangeDisplayName(db))
+	r.PUT("/username/:newUsername", handleChangeUsername(db))
+	r.PUT("/displayName/:newDisplayName", handleChangeDisplayName(db))
+	r.PUT("/avatar/:avatarID", handleChangeAvatar(db))
+	r.GET("/avatars", getAvatars(db))
 }
 
 func GetUserRecord(c *gin.Context) *auth.UserRecord {
@@ -112,7 +115,21 @@ func handleLogin(db *database.DB) gin.HandlerFunc {
 
 func createUser(uid string, email string, displayName string, db *database.DB) error {
 	username := getRandomName()
-	//todo get a new name if user with username already exists!!
+
+	var count int
+	nameIsUnique := false
+	for nameIsUnique {
+		err := db.Db.QueryRow(`SELECT count(*) FROM account WHERE upper(username) = upper($1)`, username).Scan(&count)
+		if err != nil {
+			return err
+		}
+		if count > 0 {
+			nameIsUnique = true
+		} else {
+			username = getRandomName()
+		}
+	}
+
 	if len(displayName) > 20 {
 		displayName = displayName[:20]
 	}
@@ -135,38 +152,6 @@ func createUser(uid string, email string, displayName string, db *database.DB) e
 	return nil
 }
 
-func updateUsername(uid string, username string, db *database.DB) (error, string, string, string) {
-	if len(username) > 20 {
-		username = username[:20]
-	}
-	row := db.Db.QueryRow(`UPDATE account SET username=$1 WHERE uid=$2
-											returning username, display_name, profile_picture_url`, username, uid)
-
-	var displayName string
-	var profilePicURL string
-	err := row.Scan(&username, &displayName, &profilePicURL)
-
-	if err != nil {
-		return err, "", "", ""
-	}
-	return nil, username, displayName, profilePicURL
-}
-
-func updateDisplayName(uid string, displayName string, db *database.DB) (error, string) {
-	if len(displayName) > 20 {
-		displayName = displayName[:20]
-	}
-	row := db.Db.QueryRow(`UPDATE account SET display_name=$1 WHERE uid=$2
-									returning display_name`, displayName, uid)
-
-	err := row.Scan(&displayName)
-
-	if err != nil {
-		return err, ""
-	}
-	return nil, displayName
-}
-
 func GetUser(uid string, db *database.DB) (string, string, string, []Movie, []TV) {
 	// Prepare the sql query for later
 	var username string
@@ -175,14 +160,15 @@ func GetUser(uid string, db *database.DB) (string, string, string, []Movie, []TV
 	var movieList []Movie
 	var tvList []TV
 
-	err := db.Db.QueryRow(`SELECT username, display_name, profile_picture_url 
-									FROM account WHERE uid = $1`, uid).Scan(&username, &displayName, &profilePicURL)
+	err := db.Db.QueryRow(`SELECT username, display_name, a.image_url FROM account
+       JOIN avatar a on a.id = account.profile_picture_url
+       WHERE uid = $1`, uid).Scan(&username, &displayName, &profilePicURL)
 	PanicOnErr(err)
 
 	query, err := db.Db.Query(`SELECT movie.id, movie.name, COALESCE(poster_path, ''), COALESCE(movie.overview, ''), status
 										FROM movie JOIN movie_user_bridge mub on movie.id = mub.movie_id
 										JOIN account a on a.uid = mub.user_id
-											WHERE uid=$1 ORDER BY status, name`, uid)
+											WHERE uid=$1 ORDER BY name`, uid)
 	PanicOnErr(err)
 	for query.Next() {
 		var movie Movie
@@ -197,7 +183,7 @@ func GetUser(uid string, db *database.DB) (string, string, string, []Movie, []TV
 	query, err = db.Db.Query(`SELECT tv.id, tv.name, COALESCE(poster_path, ''), COALESCE(tv.overview, '') , status
 										FROM tv JOIN tv_user_bridge mub on tv.id = mub.tv_id
 										JOIN account a on a.uid = mub.user_id
-											WHERE uid=$1 ORDER BY status, tv.name`, uid)
+											WHERE uid=$1 ORDER BY tv.name`, uid)
 	PanicOnErr(err)
 	for query.Next() {
 		var show TV
@@ -213,7 +199,18 @@ func GetUser(uid string, db *database.DB) (string, string, string, []Movie, []TV
 
 func handleChangeUsername(db *database.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		newUsername := c.DefaultQuery("username", "")
+		newUsername := c.Param("newUsername")
+
+		var count int
+		err := db.Db.QueryRow(`SELECT count(*) FROM account WHERE upper(username) = upper($1)`, newUsername).Scan(&count)
+		if err != nil {
+			c.AbortWithStatusJSON(500, "Could not check if username was unique.")
+			return
+		}
+		if count != 0 {
+			c.AbortWithStatusJSON(400, "Username must be unique")
+			return
+		}
 
 		user := GetUserRecord(c)
 		if user == nil {
@@ -221,9 +218,18 @@ func handleChangeUsername(db *database.DB) gin.HandlerFunc {
 			return
 		}
 
-		err, newUsername, displayName, profilePicURL := updateUsername(user.UID, newUsername, db)
+		if len(newUsername) > 20 {
+			newUsername = newUsername[:20]
+		}
+		row := db.Db.QueryRow(`UPDATE account SET username=$1 WHERE uid=$2
+											returning username, display_name, profile_picture_url`, newUsername, user.UID)
+
+		var displayName string
+		var profilePicURL string
+		err = row.Scan(&newUsername, &displayName, &profilePicURL)
 		if err != nil {
-			c.AbortWithStatusJSON(500, "Unable to update username. Sorry.")
+			fmt.Println(err)
+			c.AbortWithStatusJSON(500, "Unable to update username.")
 			return
 		}
 
@@ -237,7 +243,18 @@ func handleChangeUsername(db *database.DB) gin.HandlerFunc {
 
 func handleChangeDisplayName(db *database.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		newDisplayName := c.DefaultQuery("displayName", "")
+		newDisplayName := c.Param("newDisplayName")
+
+		var count int
+		err := db.Db.QueryRow(`SELECT count(*) FROM account WHERE upper(username) = upper($1)`, newDisplayName).Scan(&count)
+		if err != nil {
+			c.AbortWithStatusJSON(500, "Could not check if display name was unique.")
+			return
+		}
+		if count != 0 {
+			c.AbortWithStatusJSON(400, "Display name must be unique")
+			return
+		}
 
 		user := GetUserRecord(c)
 		if user == nil {
@@ -245,14 +262,93 @@ func handleChangeDisplayName(db *database.DB) gin.HandlerFunc {
 			return
 		}
 
-		err, newDisplayName := updateDisplayName(user.UID, newDisplayName, db)
+		if len(newDisplayName) > 20 {
+			newDisplayName = newDisplayName[:20]
+		}
+		row := db.Db.QueryRow(`UPDATE account SET display_name=$1 WHERE uid=$2
+											returning display_name, username, profile_picture_url`, newDisplayName, user.UID)
+
+		var username string
+		var profilePicURL string
+		err = row.Scan(&newDisplayName, &username, &profilePicURL)
 		if err != nil {
-			c.AbortWithStatusJSON(500, "Unable to update username. Sorry.")
+			fmt.Println(err)
+			c.AbortWithStatusJSON(500, "Unable to update display name.")
 			return
 		}
 
 		c.JSON(200, User{
-			DisplayName: newDisplayName,
+			Username:      username,
+			DisplayName:   newDisplayName,
+			ProfilePicURL: profilePicURL,
+		})
+	}
+}
+
+func getAvatars(db *database.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		query, err := db.Db.Query(`SELECT id, image_url FROM avatar`)
+		if err != nil {
+			c.AbortWithStatusJSON(500, "Unable to get avatars.")
+			return
+		}
+		avatars := make(map[int]string)
+		var id int
+		var url string
+		for query.Next() {
+			err = query.Scan(&id, &url)
+			if err != nil {
+				c.AbortWithStatusJSON(500, "Unable to get avatars.")
+				return
+			}
+			avatars[id] = url
+		}
+
+		c.JSON(200, avatars)
+	}
+}
+func handleChangeAvatar(db *database.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		newAvatarID, err := strconv.Atoi(c.Param("avatarID"))
+		if err != nil {
+			c.AbortWithStatusJSON(400, "Invalid ID. Must be integer.")
+			return
+		}
+
+		var count int
+		err = db.Db.QueryRow(`SELECT count(*) FROM avatar WHERE id=$1`, newAvatarID).Scan(&count)
+		if err != nil {
+			c.AbortWithStatusJSON(500, "Could not check if avatar exists.")
+			return
+		}
+		if count == 0 {
+			c.AbortWithStatusJSON(400, "Avatar does not exist.")
+			return
+		}
+
+		user := GetUserRecord(c)
+		if user == nil {
+			c.AbortWithStatusJSON(500, "Unable to verify token")
+			return
+		}
+
+		row := db.Db.QueryRow(`UPDATE account SET profile_picture_url=$1 WHERE uid=$2
+											returning display_name, username, (SELECT image_url FROM avatar WHERE id=$1)`, newAvatarID, user.UID)
+
+		var username string
+		var displayName string
+		var profilePicURL string
+		err = row.Scan(&displayName, &username, &profilePicURL)
+		if err != nil {
+			fmt.Println(err)
+			c.AbortWithStatusJSON(500, "Unable to update display name.")
+			return
+		}
+
+		c.JSON(200, User{
+			Username:      username,
+			DisplayName:   displayName,
+			ProfilePicURL: profilePicURL,
 		})
 	}
 }

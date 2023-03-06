@@ -13,7 +13,7 @@ export type Show = {
     first_air_date: string
 }
 
-export function Show(props: { show: Show }) {
+export function Show(props: { show: Show, compact: boolean }) {
     const user = useSelector((state: {user:UserState }) => state.user).user;
     const dispatch = useDispatch()
 
@@ -42,7 +42,7 @@ export function Show(props: { show: Show }) {
                     if (index > -1) {
                         tempUser.tvList[index] = result
                     } else {
-                        tempUser.tvList.push(result)
+                        tempUser.tvList.unshift(result)
                     }
 
                     dispatch(set(tempUser))
@@ -53,16 +53,47 @@ export function Show(props: { show: Show }) {
             )
     }
 
+    function deleteFromWatchlist(id: number) {
+        fetch(process.env.REACT_APP_HOST + "/api/v1/tv/" + id, {
+            method: "DELETE",
+            headers: {
+                'AuthToken': user.idToken
+            }
+        })
+            .then((res) => {
+                if (res.ok) {
+                    return res.json()
+                }
+            })
+            .then(
+                (result) => {
+                    let tempUser = JSON.parse(JSON.stringify(user));
+                    for (let i = 0; i < tempUser.tvList.length; i++) {
+                        if (tempUser.tvList[i].id === id) {
+                            tempUser.tvList.splice(i, 1)
+
+                            break;
+                        }
+                    }
+
+                    dispatch(set(tempUser))
+                    console.log(result)
+                }, (error) => {
+
+                }
+            )
+    }
     return (
         <div className="film">
             <div className={"film-details"}>
                 <div className={"name"}><Link to={"/show/"+props.show.id}>{props.show.original_name}</Link></div>
                 <div className={"release-date"}>{props.show.first_air_date}</div>
                 <div className={"status-" + props.show.status}>{props.show.status}</div>
-                <div className={"overview"}>{props.show.overview}</div>
+                <div className={"overview"}>{!props.compact && props.show.overview}</div>
 
                 <div className={"status-buttons"}>
-                    <button className={"delete"}>DELETE???</button>
+                    <button onClick={() => deleteFromWatchlist(props.show.id)}
+                            className={"delete"}>Remove</button>
                     {props.show.status !== "plan-to-watch" &&
                         <button className={"add-to-watchlist"}
                                 tabIndex={3}
@@ -86,8 +117,10 @@ export function Show(props: { show: Show }) {
                     }
                 </div>
             </div>
-
-            <img src={"https://image.tmdb.org/t/p/w500/" + props.show.poster_path} className={"poster"}
+            <img src={(props.show.poster_path === "" || props.show.poster_path === null) ?
+                 "https://did-you-watch-avatars.s3.us-west-2.amazonaws.com/placeholder.jpg":
+                 "https://image.tmdb.org/t/p/w500/" + props.show.poster_path}
+                 className={"poster"}
                  alt={"show-poster"}/>
         </div>
     )

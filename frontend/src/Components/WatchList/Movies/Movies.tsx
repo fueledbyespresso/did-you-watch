@@ -15,6 +15,7 @@ export function Movies() {
     const [filter, setFilter] = useState<string | undefined>("all")
     const user = useSelector((state: any) => state.user).user;
     const dispatch = useDispatch()
+    const [toggleCompact, setToggleCompact] = useState(false)
 
     function filterReturnsEmpty(filter: string | undefined) {
         if (filter == "all") {
@@ -63,23 +64,28 @@ export function Movies() {
     }
 
     return (
-        <div className={"films"}>
+        <div className={"films-section"}>
             <h2>Your movies</h2>
             <Select options={options}
                     defaultValue={{value: 'all', label: 'All Movies'}}
                     onChange={(values) => setFilter(values?.value)}
                     className="filter-select"/>
-
-            {user.movieList != null && !filterReturnsEmpty(filter) ?
-                user.movieList.map((movie: Movie) => {
-                    return (
-                        (filter === movie.status || filter === "all") &&
-                        <Movie key={movie.id}
-                               movie={movie}/>
-                    )
-                }) : (
-                    <div>No movies in this category :(</div>
-                )}
+            <button onClick={()=>setToggleCompact(!toggleCompact)}>
+                Compact Mode
+            </button>
+            <div className={!toggleCompact ? "films" : "films-compact"}>
+                {user.movieList != null && !filterReturnsEmpty(filter) ?
+                    user.movieList.map((movie: Movie) => {
+                        return (
+                            (filter === movie.status || filter === "all") &&
+                            <Movie key={movie.id}
+                                   compact={toggleCompact}
+                                   movie={movie}/>
+                        )
+                    }) : (
+                        <div>No movies in this category :(</div>
+                    )}
+            </div>
         </div>
     )
 }

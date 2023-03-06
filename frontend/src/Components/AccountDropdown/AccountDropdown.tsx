@@ -24,14 +24,13 @@ export function AccountDropdown() {
     return (
         <div className={"account-dropdown"} tabIndex={4}>
             <img src={store.user.profilePicURL || undefined} alt={""}/>
-            <div>
+            <div className={"account-name-username"}>
                 <div className={"name"}>{store.user.displayName}</div>
                 <div className={"username"}>{store.user.username}</div>
             </div>
 
             <div className={"account-options"}>
                 <button className={"sign-out"} onClick={() => signOut()}>Sign out</button>
-                <Link className={"link-to-account"} to={"/account"}>Account</Link>
             </div>
         </div>
     )
