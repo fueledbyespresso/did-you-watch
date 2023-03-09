@@ -3,7 +3,7 @@ import firebase from "firebase/compat/app";
 import {onAuthStateChanged} from "firebase/auth"
 import "./App.scss"
 
-import {useDispatch, useSelector} from "react-redux";
+import {useDispatch} from "react-redux";
 import {remove, set} from "./Store/userSlice";
 import {createBrowserRouter, RouterProvider} from "react-router-dom";
 import {Watchlist} from "./Pages/Watchlist";

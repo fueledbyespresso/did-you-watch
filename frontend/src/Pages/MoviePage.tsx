@@ -1,6 +1,5 @@
 import {useParams} from "react-router-dom";
 import React, {useEffect, useState} from "react";
-import {HeaderBar} from "../Components/HeaderBar/HeaderBar";
 
 export function MoviePage(){
     const {id} = useParams();

@@ -1,8 +1,6 @@
-import {HeaderBar} from "../Components/HeaderBar/HeaderBar";
 import React, {useEffect, useState} from "react";
-import {Link} from "react-router-dom";
-import {Movie, TrendingMovie} from "../Types/Movie";
-import {Show, TrendingShow} from "../Types/Show";
+import {TrendingMovie} from "../Types/Movie";
+import {TrendingShow} from "../Types/Show";
 
 export function Home(){
     const [trending, setTrending] = useState<any>(null)

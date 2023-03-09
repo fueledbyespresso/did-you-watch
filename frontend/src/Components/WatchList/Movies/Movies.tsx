@@ -1,7 +1,6 @@
 import React, {useState} from "react";
 import Select from "react-select";
 import {useDispatch, useSelector} from "react-redux";
-import {set} from "../../../Store/userSlice";
 import {Movie} from "../../../Types/Movie";
 
 const options = [
