@@ -1,22 +1,54 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+* {
+    box-sizing: border-box;
+}
 body {
-    margin: 0 0 2em 0;
+    margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
+    font-family: 'Inter', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    background: #ffffff;
 }
+
+
+body,
+input,
+select,
+button {
+    font-family: 'Inter', sans-serif;
+}
+
 
 code {
     font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
 
-* {
-    box-sizing: border-box;
-}
 button{
     cursor: pointer;
+}
+
+.dark{
+    min-height: 100vh;
+    background: #1d1e20;
+    color: #dadadb;
+    .header-bar{
+        background: #525259;
+        .account-dropdown{
+            background: #1d1e20;
+        }
+        .search-area .results .film{
+            background: #525259;
+        }
+    }
+
+    .film{
+        box-shadow: none;
+        background: #525259;
+    }
 }
 
 a{
@@ -52,22 +84,19 @@ a{
         padding: .5em 1em;
         display: flex;
         flex-flow: row nowrap;
-        gap: 1em;
+        gap: .5em;
         justify-content: center;
 
-        .logo{
-            background: #cddae1;
-            border-radius: .5em;
-        }
-
         a{
-            padding: .5em;
+            padding: .5em 1em;
+            transition: border, border-radius,background .25s ease;
+
             &:link {
                 text-decoration: none;
             }
 
             &:visited {
-                color: #000;
+                color: inherit;
                 text-decoration: none;
             }
 
@@ -77,16 +106,23 @@ a{
 
             &:hover{
                 text-decoration: none;
-                background: #ff8000;
+                background: #ff6200;
                 color: white;
             }
             &.active{
                 border-radius: 10em;
-                background: #ff8000;
+                background: #ff6200;
                 color: white;
-                padding: .5em 1em;
-                font-weight: bold;
                 text-decoration: underline;
+            }
+            &.logo{
+                background: #5a5c5e;
+                color: white;
+                border-radius: .5em;
+
+                &:hover{
+                    border-radius: 10em;
+                }
             }
         }
     }
@@ -98,10 +134,11 @@ a{
         display: flex;
         flex-flow: row nowrap;
         align-items: center;
-        max-width: 15em;
+        max-width: 17em;
         width: 100%;
 
         .name {
+            font-weight: bold;
             margin: 0 .5em;
         }
 
@@ -126,8 +163,8 @@ a{
         .login{
             background: #EEEEEE;
             width: 100%;
-            max-width: 15em;
-            margin-top: 12.5em;
+            max-width: inherit;
+            margin-top: 10.5em;
             margin-left: -1em;
             display: none;
             position: absolute;
@@ -145,7 +182,7 @@ a{
 
         .account-options {
             width: 100%;
-            max-width: 15em;
+            max-width: inherit;
             margin-top: 6em;
             margin-left: -1em;
             display: none;
@@ -181,7 +218,7 @@ a{
 
     .search-area {
         width: 100%;
-        max-width: 40em;
+        max-width: 45em;
         margin: auto;
         z-index: 2;
 
@@ -193,7 +230,7 @@ a{
 
         .results {
             position: absolute;
-            max-width: 40em;
+            max-width: 45em;
             max-height: 50em;
             width: 100%;
             display: none;
@@ -257,19 +294,29 @@ a{
             width: auto;
             flex: 1 2;
             max-width: none;
+
+            .results{
+                max-width: none;
+            }
         }
         .account-dropdown{
             padding: 0;
             background: none;
             width: auto;
+
+            .login{
+                right: 0;
+            }
+            .sign-up{
+                margin-top:10.5em;
+            }
             .account-name-username{
                 display: none;
             }
 
             .account-options{
-                margin-top:5em;
+                margin-top:4.5em;
                 width: 5em;
-                right: 0;
             }
         }
     }
@@ -284,20 +331,23 @@ a{
     flex-flow: column nowrap;
     justify-content: center;
     align-items: center;
+    padding-bottom: 5em;
+
     h2{
         text-align: center;
     }
     .filter-select {
         width: 100%;
-        max-width: 40em;
+        max-width: 45em;
         margin-bottom: 1em;
     }
     .films {
         display: flex;
         flex-flow: column  nowrap;
         row-gap: .5em;
-        max-width: 40em;
+        max-width: 45em;
     }
+
     .films-compact{
         display: flex;
         flex-flow: row  wrap;
@@ -306,8 +356,29 @@ a{
 
         .film{
             border-radius: .5em;
-            flex: 1 2 15em;
-            max-width: 17em;
+            flex: 1 2 11em;
+            max-width: 12em;
+            display: flex;
+            flex-flow: column nowrap;
+            justify-content: space-between;
+
+            .film-details{
+                display: flex;
+                flex-flow: column nowrap;
+
+                .text-details{
+                    .name{
+                        .status{
+                            display: block;
+                            margin: 0;
+                        }
+                    }
+                }
+
+                img{
+                    width: 100%;
+                }
+            }
             .status-buttons{
                 display: flex;
                 flex-flow: column wrap;
@@ -317,60 +388,103 @@ a{
 }
 
 .film {
-    background: #EEEEEE;
-    padding: .5em 1em;
-    display: flex;
-    flex-flow: row nowrap;
-    justify-content: space-between;
+    box-shadow: rgba(100, 100, 111, 0.2) 0 7px 29px 0;
+    border: 1px solid #e1e1e1;
+    background: #FFF;
+    border-radius: .5em;
 
-    button {
-        border: 1px solid #536471;
-        border-radius: .5em;
+    & > *{
         padding: .5em 1em;
-        margin: 0 .25em;
+    }
+    .film-details{
+        display: flex;
+        flex-flow: row nowrap;
+        .text-details{
+            button {
+                border: 1px solid #536471;
+                border-radius: .5em;
+                padding: .5em 1em;
+                margin: 0 .25em;
+            }
+
+            .name{
+                font-weight: bold;
+                margin: .5em 0;
+
+                .status{
+                    background: #5a5c5e;
+                    border-radius: 5em;
+                    color: #fff;
+                    padding: .25em 1em;
+                    margin: 0 1em;
+                    display: inline-block;
+                }
+            }
+
+            .overview{
+                margin-right: .5em;
+                margin-bottom: .5em;
+            }
+        }
+        img {
+            border-radius: .5em;
+            object-fit: cover;
+            width: 6em;
+            background: #61dafb;
+        }
     }
 
-    .status-plan-to-watch {
-        display: inline-block;
-        background: #d6eaf8;
-        padding: .25em .5em;
-        border-radius: .5em;
-    }
+    .status-buttons{
+        background: #e0e0e0;
+        width: 100%;
+        &::before{
+            display: inline-block;
+            content: "My Watchlist:";
+            color: #282828;
+            font-weight: bold;
+            margin-right: .5em;
+        }
+        button{
+            background: #fff;
+            border: none;
+            padding: .5em 1em;
+        }
+        button:disabled, button[disabled]{
+            cursor: default;
+            text-decoration: underline;
+            background: cadetblue;
 
-    .status-completed {
-        display: inline-block;
-        background: #d6f8dc;
-        padding: .25em .5em;
-        border-radius: .5em;
-    }
+            &.plan-to-watch {
+                color: #fff;
+                background: #ff6200;
+            }
 
-    .status-started {
-        display: inline-block;
-        background: #f8e5d6;
-        padding: .25em .5em;
-        border-radius: .5em;
-    }
+            &.completed {
+                color: #fff;
+                background: #099f24;
+            }
 
-    .name {
-        font-weight: bold;
-    }
+            &.started {
+                color: #fff;
+                background: #c4ae24;
+            }
+            &.rewatching {
+                color: #fff;
+                background: #2149c2;
+            }
+            &.dropped {
+                color: #fff;
+                background: #9f0303;
+            }
+        }
 
-    .overview {
-        margin: 0 .5em 0 0;
-    }
+        button.delete{
+            background: #ff0f0f;
+            color: white;
 
-    img {
-        border-radius: .5em;
-        object-fit: cover;
-        width: 5em;
-        background: #61dafb;
-    }
-
-    button.delete{
-        background: #f8e5d6;
-
-        &:hover{
-            background: #f8eee9;
+            &:hover{
+                background: #ed5e68;
+            }
         }
     }
 }
@@ -411,7 +525,6 @@ a{
         &:hover{
             img{
                 box-shadow: rgba(0, 0, 0, 0.25) 0 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
-
             }
         }
     }
@@ -419,8 +532,8 @@ a{
 
 .full-show-details{
     max-width: 100em;
-    margin: 2em auto;
-    padding: 0 1em;
+    padding: 0 1em 5em;
+    margin: 2em auto 0;
 
     .show-details{
         display: flex;
@@ -513,6 +626,57 @@ a{
         }
         img{
             width: 10em;
+        }
+    }
+}
+
+.user-page{
+    max-width: 45em;
+    margin: 2em auto auto;
+
+    .banner{
+        display: flex;
+        flex-flow: row wrap;
+        align-items: center;
+        background: #625fd2;
+        h1{
+            color: #fff;
+            margin: auto;
+            display: inline-block;
+            text-align: center;
+        }
+
+        img{
+            height: 10em;
+        }
+    }
+    .filter-select {
+        width: 100%;
+        max-width: 45em;
+        margin-bottom: 1em;
+    }
+    .films {
+        display: flex;
+        flex-flow: column  nowrap;
+        row-gap: .5em;
+        max-width: 45em;
+    }
+
+    .films-compact{
+        display: flex;
+        flex-flow: row  wrap;
+        justify-content: center;
+        gap: 1em;
+
+        .film{
+            border-radius: .5em;
+            flex: 1 2 15em;
+            max-width: 17em;
+
+            .status-buttons{
+                display: flex;
+                flex-flow: column wrap;
+            }
         }
     }
 }
