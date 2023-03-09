@@ -15,7 +15,7 @@ export function AccountDropdown() {
         return (
             <div className={"account-dropdown"} tabIndex={4}>
                 Login/Signup
-                <div className={"login"}>
+                <div className={"login sign-up"}>
                     <AuthGoogle/>
                 </div>
             </div>

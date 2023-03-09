@@ -68,7 +68,7 @@ func addToWatchlist(db *database.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tvID := c.Param("id")
 		status := c.Param("status")
-		if status != "plan-to-watch" && status != "completed" && status != "started" {
+		if status != "plan-to-watch" && status != "completed" && status != "started" && status != "dropped" && status != "rewatching" {
 			c.AbortWithStatusJSON(http.StatusBadRequest, "Invalid status")
 			return
 		}

@@ -35,11 +35,10 @@ export function MoviePage(){
 
     return(
         <div>
-            <HeaderBar/>
             <div className={"full-show-details"}>
                 <div className={"show-details"}
                      style={{
-                         background: `linear-gradient( rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.65) ),url("https://image.tmdb.org/t/p/original/`+ show.backdrop_path+ `") no-repeat center center`,
+                         background: `linear-gradient( rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.65) ),url("https://image.tmdb.org/t/p/original/`+ show.backdrop_path+ `") no-repeat center bottom fixed`,
                          backgroundSize: "cover"
                      }}>
 

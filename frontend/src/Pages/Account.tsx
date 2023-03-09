@@ -1,9 +1,7 @@
 import {HeaderBar} from "../Components/HeaderBar/HeaderBar";
 import {useDispatch, useSelector} from "react-redux";
-import {remove, set, UserState} from "../Store/userSlice";
+import {set, UserState} from "../Store/userSlice";
 import {useEffect, useState} from "react";
-import {onAuthStateChanged} from "firebase/auth";
-import firebase from "firebase/compat/app/dist/compat/app";
 
 export function Account(){
     const user = useSelector((state: {user:UserState }) => state.user).user;
@@ -132,9 +130,35 @@ export function Account(){
             )
     }
 
+    function toggleDarkMode() {
+        fetch(process.env.REACT_APP_HOST + "/account/v1/toggleDarkMode", {
+            method: "PUT",
+            headers: {
+                'AuthToken': user.idToken
+            }
+        })
+            .then(async (res) => {
+                if (res.ok) {
+                    return res.json()
+                } else {
+                    throw new Error(await res.text())
+                }
+            })
+            .then(
+                (result) => {
+                    let tempUser = JSON.parse(JSON.stringify(user));
+                    tempUser.darkMode = result
+                    dispatch(set(tempUser))
+                    console.log("Dark mode toggled. Dark mode on:"+result)
+                    setError(null)
+                }, (error: Error) => {
+                    console.log(error.message)
+                    setError(error.message)
+                }
+            )
+    }
     return(
-        <div  className={"account-page"}>
-            <HeaderBar/>
+        <div className={"account-page"}>
             <h1>Account</h1>
             <div className={"account-details-section"}>
                 {!changeAvatarMode ?
@@ -199,6 +223,7 @@ export function Account(){
                         <button onClick={()=>setEditUsernameMode(false)}>Cancel Edit</button>
                     </div>
                 }
+                <button onClick={()=>toggleDarkMode()}>{user.darkMode ? "Enable Light Mode": "Enable Dark Mode"}</button>
                 <div>
                     {error}
                 </div>

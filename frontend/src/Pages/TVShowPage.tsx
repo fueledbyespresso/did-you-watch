@@ -3,7 +3,7 @@ import React, {useEffect, useState} from "react";
 import {HeaderBar} from "../Components/HeaderBar/HeaderBar";
 
 export function TVShowPage(){
-    const {id} = useParams();
+    const {id} = useParams()
     const [show, setShow] = useState<any>(null)
     const [displayAllCast, setDisplayAllCast] = useState<boolean>(false)
 
@@ -35,11 +35,10 @@ export function TVShowPage(){
 
     return(
         <div>
-            <HeaderBar/>
             <div className={"full-show-details"}>
                 <div className={"show-details"}
                      style={{
-                         background: `linear-gradient( rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.65) ),url("https://image.tmdb.org/t/p/original/`+ show.backdrop_path+ `") no-repeat center center`,
+                         background: `linear-gradient( rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.65) ),url("https://image.tmdb.org/t/p/original/`+ show.backdrop_path+ `") no-repeat center top fixed`,
                          backgroundSize: "cover"
                      }}>
                     <img src={show.poster_path !== null ?
@@ -72,7 +71,7 @@ export function TVShowPage(){
                                      className={"poster"}
                                      alt={"show-poster"}/>
                                 <div className={"name"}>
-                                    <b>{cast.name}</b> playing {cast.character}
+                                    <b>{cast.name}</b> playing {cast.roles.length > 0 ? cast.roles[0].character:"Unknown"}
                                 </div>
                             </div>
                         )

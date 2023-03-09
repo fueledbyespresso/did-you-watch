@@ -69,7 +69,7 @@ func addToWatchlist(db *database.DB) gin.HandlerFunc {
 		movieID := c.Param("id")
 		status := c.Param("status")
 		fmt.Println(status)
-		if status != "plan-to-watch" && status != "completed" && status != "started" {
+		if status != "plan-to-watch" && status != "completed" && status != "started" && status != "dropped" && status != "rewatching" {
 			c.AbortWithStatusJSON(http.StatusBadRequest, "Invalid status")
 			return
 		}

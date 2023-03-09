@@ -23,6 +23,7 @@ type User struct {
 	ProfilePicURL string  `json:"profilePicURL"`
 	MovieList     []Movie `json:"movieList"`
 	TVList        []TV    `json:"tvList"`
+	DarkMode      bool    `json:"darkMode"`
 }
 
 type Movie struct {
@@ -45,6 +46,7 @@ type TV struct {
 // oauth/v1/*
 func Routes(r *gin.RouterGroup, db *database.DB) {
 	r.GET("/login", handleLogin(db))
+	r.PUT("/toggleDarkMode", toggleDarkMode(db))
 	r.PUT("/username/:newUsername", handleChangeUsername(db))
 	r.PUT("/displayName/:newDisplayName", handleChangeDisplayName(db))
 	r.PUT("/avatar/:avatarID", handleChangeAvatar(db))
@@ -93,7 +95,7 @@ func handleLogin(db *database.DB) gin.HandlerFunc {
 			c.AbortWithStatusJSON(500, "Unable to verify token")
 			return
 		}
-		username, displayName, profilePicURL, movieList, tvList := GetUser(user.UID, db)
+		username, displayName, profilePicURL, movieList, tvList, darkMode := GetUser(user.UID, db)
 		if username == "" {
 			err := createUser(user.UID, user.Email, user.DisplayName, db)
 			if err != nil {
@@ -109,6 +111,7 @@ func handleLogin(db *database.DB) gin.HandlerFunc {
 			ProfilePicURL: profilePicURL,
 			MovieList:     movieList,
 			TVList:        tvList,
+			DarkMode:      darkMode,
 		})
 	}
 }
@@ -118,12 +121,13 @@ func createUser(uid string, email string, displayName string, db *database.DB) e
 
 	var count int
 	nameIsUnique := false
-	for nameIsUnique {
+	for !nameIsUnique {
+		fmt.Println(username)
 		err := db.Db.QueryRow(`SELECT count(*) FROM account WHERE upper(username) = upper($1)`, username).Scan(&count)
 		if err != nil {
 			return err
 		}
-		if count > 0 {
+		if count == 0 {
 			nameIsUnique = true
 		} else {
 			username = getRandomName()
@@ -152,29 +156,32 @@ func createUser(uid string, email string, displayName string, db *database.DB) e
 	return nil
 }
 
-func GetUser(uid string, db *database.DB) (string, string, string, []Movie, []TV) {
+func GetUser(uid string, db *database.DB) (string, string, string, []Movie, []TV, bool) {
 	// Prepare the sql query for later
 	var username string
 	var displayName string
 	var profilePicURL string
-	var movieList []Movie
-	var tvList []TV
+	var darkMode bool
+	movieList := []Movie{}
+	tvList := []TV{}
 
-	err := db.Db.QueryRow(`SELECT username, display_name, a.image_url FROM account
+	err := db.Db.QueryRow(`SELECT username, display_name, a.image_url, dark_mode FROM account
        JOIN avatar a on a.id = account.profile_picture_url
-       WHERE uid = $1`, uid).Scan(&username, &displayName, &profilePicURL)
+       WHERE uid = $1`, uid).Scan(&username, &displayName, &profilePicURL, &darkMode)
 	PanicOnErr(err)
 
 	query, err := db.Db.Query(`SELECT movie.id, movie.name, COALESCE(poster_path, ''), COALESCE(movie.overview, ''), status
 										FROM movie JOIN movie_user_bridge mub on movie.id = mub.movie_id
 										JOIN account a on a.uid = mub.user_id
 											WHERE uid=$1 ORDER BY name`, uid)
-	PanicOnErr(err)
+	if err != nil {
+		return "", "", "", []Movie{}, []TV{}, false
+	}
 	for query.Next() {
 		var movie Movie
 		err = query.Scan(&movie.ID, &movie.Name, &movie.PosterPath, &movie.Overview, &movie.Status)
 		if err != nil {
-			return "", "", "", nil, nil
+			return "", "", "", []Movie{}, []TV{}, false
 		}
 
 		movieList = append(movieList, movie)
@@ -189,12 +196,30 @@ func GetUser(uid string, db *database.DB) (string, string, string, []Movie, []TV
 		var show TV
 		err = query.Scan(&show.ID, &show.Name, &show.PosterPath, &show.Overview, &show.Status)
 		if err != nil {
-			return "", "", "", nil, nil
+			return "", "", "", []Movie{}, []TV{}, false
 		}
 		tvList = append(tvList, show)
 	}
 
-	return username, displayName, profilePicURL, movieList, tvList
+	return username, displayName, profilePicURL, movieList, tvList, darkMode
+}
+
+func toggleDarkMode(db *database.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		user := GetUserRecord(c)
+		if user == nil {
+			c.AbortWithStatusJSON(500, "Unable to verify token")
+			return
+		}
+		var darkMode bool
+		err := db.Db.QueryRow(`UPDATE account SET dark_mode=NOT dark_mode WHERE uid=$1 returning dark_mode`, user.UID).Scan(&darkMode)
+		if err != nil {
+			c.AbortWithStatusJSON(500, "Unable to toggle dark mode")
+			return
+		}
+
+		c.JSON(200, darkMode)
+	}
 }
 
 func handleChangeUsername(db *database.DB) gin.HandlerFunc {

@@ -13,6 +13,7 @@ const initialState: UserState = {
         displayName: "",
         profilePicURL: "",
         username: "",
+        darkMode: localStorage.getItem('darkTheme') === "true",
         movieList: [],
         tvList: [],
     },
@@ -28,6 +29,7 @@ export const userSlice = createSlice({
         set: (state, action: PayloadAction<User>) => {
             state.user = action.payload
             state.userExists = true
+            localStorage.setItem('darkTheme', state.user.darkMode.toString())
         },
         remove: state => {
             state.user ={
@@ -36,6 +38,7 @@ export const userSlice = createSlice({
                 displayName: "",
                 profilePicURL: "",
                 username: "",
+                darkMode: false,
                 movieList: [],
                 tvList: [],
             }

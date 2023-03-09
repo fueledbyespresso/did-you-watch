@@ -8,7 +8,6 @@ import {Show} from "../Types/Show";
 export function Watchlist(props: {category: string}){
     return(
         <div className={"watchlist"}>
-            <HeaderBar/>
             {props.category === "movies" && <Movies/>}
             {props.category === "shows" && <Shows/>}
         </div>

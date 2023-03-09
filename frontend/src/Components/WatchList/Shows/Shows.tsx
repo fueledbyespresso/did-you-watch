@@ -10,6 +10,8 @@ const options = [
     {value: 'plan-to-watch', label: 'Plan to Watch'},
     {value: 'completed', label: 'Completed'},
     {value: 'started', label: 'Started'},
+    {value: 'rewatching', label: 'Rewatching'},
+    {value: 'dropped', label: 'Dropped'},
 ]
 
 export function Shows() {
@@ -34,40 +36,6 @@ export function Shows() {
             }
         }
         return true
-    }
-
-    function addToWatchList(id: number, status: string) {
-        fetch(process.env.REACT_APP_HOST + "/api/v1/tv/" + id + "/" + status, {
-            method: "PUT",
-            headers: {
-                'AuthToken': user.idToken
-            }
-        })
-            .then((res) => {
-                if (res.ok) {
-                    return res.json()
-                }
-            })
-            .then(
-                (result) => {
-                    let tempUser = JSON.parse(JSON.stringify(user));
-
-                    let index = -1;
-                    for (let i = 0; i < tempUser.tvList.length; i++) {
-                        if (tempUser.tvList[i].id === result.id) {
-                            index = i;
-                            break;
-                        }
-                    }
-                    if (index > -1) {
-                        tempUser.tvList[index] = result
-                    }
-
-                    dispatch(set(tempUser))
-                }, (error) => {
-
-                }
-            )
     }
 
     return (

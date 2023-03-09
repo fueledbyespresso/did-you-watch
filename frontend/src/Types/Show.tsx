@@ -1,7 +1,7 @@
 import {set, UserState} from "../Store/userSlice";
 import {useDispatch, useSelector} from "react-redux";
 import {User} from "./User";
-import React from "react";
+import React, {useEffect, useState} from "react";
 import {Link} from "react-router-dom";
 
 export type Show = {
@@ -13,9 +13,29 @@ export type Show = {
     first_air_date: string
 }
 
+const status_types = [
+    {value: 'plan-to-watch', label: 'Plan to Watch'},
+    {value: 'completed', label: 'Completed'},
+    {value: 'started', label: 'Started'},
+    {value: 'rewatching', label: 'Rewatching'},
+    {value: 'dropped', label: 'Dropped'},
+]
+
 export function Show(props: { show: Show, compact: boolean }) {
     const user = useSelector((state: {user:UserState }) => state.user).user;
     const dispatch = useDispatch()
+    const [curShowStatus, setCurShowStatus] = useState<string|null>(null)
+
+    useEffect(() => {
+        let matchingShow = user.tvList.filter(obj => {
+            return obj.id === props.show.id
+        })
+        if(matchingShow.length > 0){
+            setCurShowStatus(matchingShow[0].status)
+        }
+    }, [user]);
+
+
 
     function addShowToWatchlist(id: number, status: string) {
         fetch(process.env.REACT_APP_HOST + "/api/v1/tv/" + id + "/" + status, {
@@ -46,7 +66,6 @@ export function Show(props: { show: Show, compact: boolean }) {
                     }
 
                     dispatch(set(tempUser))
-                    console.log(result)
                 }, (error) => {
 
                 }
@@ -77,51 +96,48 @@ export function Show(props: { show: Show, compact: boolean }) {
                     }
 
                     dispatch(set(tempUser))
-                    console.log(result)
                 }, (error) => {
 
                 }
             )
     }
+
     return (
         <div className="film">
             <div className={"film-details"}>
-                <div className={"name"}><Link to={"/show/"+props.show.id}>{props.show.original_name}</Link></div>
-                <div className={"release-date"}>{props.show.first_air_date}</div>
-                <div className={"status-" + props.show.status}>{props.show.status}</div>
-                <div className={"overview"}>{!props.compact && props.show.overview}</div>
-
-                <div className={"status-buttons"}>
-                    <button onClick={() => deleteFromWatchlist(props.show.id)}
-                            className={"delete"}>Remove</button>
-                    {props.show.status !== "plan-to-watch" &&
-                        <button className={"add-to-watchlist"}
-                                tabIndex={3}
-                                onClick={() => addShowToWatchlist(props.show.id, "plan-to-watch")}>
-                            Plan-to-watch
-                        </button>
-                    }
-                    {props.show.status !== "started" &&
-                        <button className={"started"}
-                                tabIndex={3}
-                                onClick={() => addShowToWatchlist(props.show.id, "started")}>
-                            Started
-                        </button>
-                    }
-                    {props.show.status !== "completed" &&
-                        <button className={"completed"}
-                                tabIndex={3}
-                                onClick={() => addShowToWatchlist(props.show.id, "completed")}>
-                            Completed
-                        </button>
-                    }
+                <div className={"text-details"}>
+                    <div className={"name"}>
+                        <Link to={"/show/"+props.show.id}>
+                            {props.show.original_name}
+                        </Link>
+                        <div className={"status"}>{props.show.status}</div>
+                    </div>
+                    <div>
+                        {user.tvList.some(e => e.id === props.show.id) && "In watchlist"}
+                    </div>
+                    <div className={"release-date"}>{props.show.first_air_date}</div>
+                    <div className={"overview"}>{!props.compact && props.show.overview}</div>
                 </div>
+                <img src={(props.show.poster_path === "" || props.show.poster_path === null) ?
+                    "https://did-you-watch-avatars.s3.us-west-2.amazonaws.com/placeholder.jpg":
+                    "https://image.tmdb.org/t/p/w500/" + props.show.poster_path}
+                     className={"poster"}
+                     alt={"show-poster"}/>
             </div>
-            <img src={(props.show.poster_path === "" || props.show.poster_path === null) ?
-                 "https://did-you-watch-avatars.s3.us-west-2.amazonaws.com/placeholder.jpg":
-                 "https://image.tmdb.org/t/p/w500/" + props.show.poster_path}
-                 className={"poster"}
-                 alt={"show-poster"}/>
+
+            <div className={"status-buttons"}>
+                {status_types.map((status) => (
+                    <button className={status.value}
+                            key={status.value}
+                            tabIndex={3}
+                            disabled={curShowStatus === status.value}
+                            onClick={() => addShowToWatchlist(props.show.id, status.value)}>
+                        {status.label}
+                    </button>
+                ))}
+                <button onClick={() => deleteFromWatchlist(props.show.id)}
+                        className={"delete"}>Remove</button>
+            </div>
         </div>
     )
 }

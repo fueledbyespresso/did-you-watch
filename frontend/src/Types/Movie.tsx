@@ -1,6 +1,6 @@
 import {useDispatch, useSelector} from "react-redux";
 import {set, UserState} from "../Store/userSlice";
-import React from "react";
+import React, {useState} from "react";
 import {Link} from "react-router-dom";
 
 export type Movie = {
@@ -12,11 +12,21 @@ export type Movie = {
     release_date: string
 }
 
+const status_types = [
+    {value: 'plan-to-watch', label: 'Plan to Watch'},
+    {value: 'completed', label: 'Completed'},
+    {value: 'started', label: 'Started'},
+    {value: 'rewatching', label: 'Rewatching'},
+    {value: 'dropped', label: 'Dropped'},
+]
+
 export function Movie(props: { movie: Movie, compact: boolean }) {
     const user = useSelector((state: {user:UserState }) => state.user).user;
     const dispatch = useDispatch()
+    const [loading, setLoading] = useState<boolean>(false)
 
     function addMovieToWatchlist(id: number, status: string) {
+        setLoading(true)
         fetch(process.env.REACT_APP_HOST + "/api/v1/movie/" + id + "/" + status, {
             method: "PUT",
             headers: {
@@ -45,9 +55,9 @@ export function Movie(props: { movie: Movie, compact: boolean }) {
                     }
 
                     dispatch(set(tempUser))
-                    console.log(result)
+                    setLoading(false)
                 }, (error) => {
-
+                    setLoading(false)
                 }
             )
     }
@@ -83,39 +93,40 @@ export function Movie(props: { movie: Movie, compact: boolean }) {
     return (
         <div className="film">
             <div className={"film-details"}>
-                <div className={"name"}><Link to={"/movie/"+props.movie.id}>{props.movie.original_title}</Link></div>
-                <div className={"release-date"}>{props.movie.release_date}</div>
-                <div className={"status-" + props.movie.status}>{props.movie.status}</div>
-                <div className={"overview"}>{!props.compact && props.movie.overview}</div>
-
-                <div className={"status-buttons"}>
-                    <button onClick={() => deleteFromWatchlist(props.movie.id)}
-                            className={"delete"}>Remove</button>
-                    <button className={"add-to-watchlist"}
-                            tabIndex={3}
-                            disabled={props.movie.status === "plan-to-watch"}
-                            onClick={() => addMovieToWatchlist(props.movie.id, "plan-to-watch")}>
-                        Plan-to-watch
-                    </button>
-                    <button className={"started"}
-                            tabIndex={3}
-                            disabled={props.movie.status === "started"}
-                            onClick={() => addMovieToWatchlist(props.movie.id, "started")}>
-                        Started
-                    </button>
-                    <button className={"completed"}
-                            tabIndex={3}
-                            disabled={props.movie.status === "completed"}
-                            onClick={() => addMovieToWatchlist(props.movie.id, "completed")}>
-                        Completed
-                    </button>
+                <div className={"text-details"}>
+                    <div className={"name"}>
+                        <Link to={"/movie/"+props.movie.id}>
+                            {props.movie.original_title}
+                            <div className={"status"}>{props.movie.status}</div>
+                        </Link>
+                    </div>
+                    <div>
+                        {user.movieList.some(e => e.id === props.movie.id) && "In watchlist"}
+                    </div>
+                    <div className={"release-date"}>{props.movie.release_date}</div>
+                    <div className={"overview"}>{!props.compact && props.movie.overview}</div>
                 </div>
+                <img src={(props.movie.poster_path === "" || props.movie.poster_path === null) ?
+                    "https://did-you-watch-avatars.s3.us-west-2.amazonaws.com/placeholder.jpg" :
+                    "https://image.tmdb.org/t/p/w500/" + props.movie.poster_path}
+                     className={"poster"}
+                     alt={"show-poster"}/>
             </div>
-            <img src={(props.movie.poster_path === "" || props.movie.poster_path === null) ?
-                 "https://did-you-watch-avatars.s3.us-west-2.amazonaws.com/placeholder.jpg" :
-                 "https://image.tmdb.org/t/p/w500/" + props.movie.poster_path}
-                 className={"poster"}
-                 alt={"show-poster"}/>
+
+            <div className={"status-buttons"}>
+                {status_types.map((status) => (
+                    <button className={status.value}
+                            key={status.value}
+                            tabIndex={3}
+                            disabled={props.movie.status === status.value}
+                            onClick={() => addMovieToWatchlist(props.movie.id, status.value)}>
+                        {status.label}
+                    </button>
+                ))}
+                <button onClick={() => deleteFromWatchlist(props.movie.id)}
+                        className={"delete"}>Remove</button>
+                {loading && <button>Loading...</button>}
+            </div>
         </div>
     )
 }

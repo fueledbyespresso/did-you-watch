@@ -31,7 +31,6 @@ export function Home(){
 
     return(
         <div className={"home"}>
-            <HeaderBar/>
             <h1>Trending this week</h1>
             <div className={"trending-films"}>
                 {trending !== null &&  trending.results.map((trendingItem: any) =>

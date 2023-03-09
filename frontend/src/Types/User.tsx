@@ -1,5 +1,6 @@
 import {Movie} from "./Movie";
 import {Show} from "./Show";
+import {Link} from "react-router-dom";
 
 export type User = {
     idToken: string
@@ -7,6 +8,7 @@ export type User = {
     displayName: string
     profilePicURL: string
     username: string
+    darkMode: boolean
     movieList: Movie[]
     tvList: Show[]
 }
@@ -17,7 +19,7 @@ export function User(props: { user: User }) {
             <img src={props.user.profilePicURL} className={"profile-pic"}
                  alt={"profile-pic"}/>
             <div className={"result-details"}>
-                <div className={"result-name"}><b>{props.user.displayName}</b></div>
+                <div className={"result-name"}><Link to={"/user/"+props.user.uid}><b>{props.user.displayName}</b></Link></div>
                 <div className={"overview"}>{props.user.username}</div>
 
                 <button className={"follow"}

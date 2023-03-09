@@ -11,10 +11,17 @@ import {Home} from "./Pages/Home";
 import {ErrorPage} from "./Pages/ErrorPage";
 import {Account} from "./Pages/Account";
 import ProtectedRoute from "./Pages/ProtectedRoute";
-import {UserProfile} from "./Pages/UserProfile";
 import {TVShowPage} from "./Pages/TVShowPage";
 import {MoviePage} from "./Pages/MoviePage";
-
+import {Root} from "./Components/Root/Root";
+import {UserPage} from "./Pages/UserPage";
+// TODO Add a calendar page.
+// TODO Add actor page
+// TODO Add more sorting features
+// TODO Style buttons better
+// TODO Add follow
+// TODO Add rankings
+// TODO Add profile background
 // Configure Firebase.
 const config = {
     apiKey: "AIzaSyADzX4PIUGtH6ULopSUj-W843b-QMvERQ4",
@@ -32,7 +39,9 @@ function App() {
 
     useEffect(() => {
         onAuthStateChanged(firebase.auth() as any, (firebaseUser) => {
-            if (firebaseUser == null) {
+            console.log(firebaseUser)
+            if (firebaseUser === null) {
+                console.log("no user logged in")
                 dispatch(remove())
             } else {
                 firebase.auth().currentUser?.getIdToken(true)
@@ -43,6 +52,9 @@ function App() {
                 });
             }
         })
+        setInterval(() => {
+            firebase.auth().currentUser?.getIdToken(true)
+        }, 300000);
     }, [])
 
     function getAccount(idToken: string) {
@@ -65,10 +77,10 @@ function App() {
                         displayName: result.displayName,
                         profilePicURL: result.profilePicURL,
                         username: result.username,
+                        darkMode: result.darkMode,
                         movieList: result.movieList,
                         tvList: result.tvList
                     }))
-
                 }, (error) => {
                     console.log(error)
                 }
@@ -76,9 +88,12 @@ function App() {
     }
 
     const router = createBrowserRouter([{
-            path: "/",
+        path: "/",
+        element: <Root/>,
+        errorElement: <ErrorPage/>,
+        children: [{
+            path: "",
             element: <Home/>,
-            errorElement: <ErrorPage />,
         }, {
             path: "my-movies",
             element: <Watchlist category={"movies"}/>,
@@ -89,15 +104,16 @@ function App() {
             path: "account",
             element: <ProtectedRoute children={<Account/>}/>,
         }, {
-            path: "user/:id",
-            element: <UserProfile/>
-        }, {
             path: "show/:id",
             element: <TVShowPage/>
         }, {
             path: "movie/:id",
             element: <MoviePage/>
-        }
+        }, {
+            path: "user/:id",
+            element: <UserPage/>
+        }],
+    }
     ]);
 
     return (
