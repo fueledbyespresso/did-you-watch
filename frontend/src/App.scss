@@ -252,6 +252,10 @@ a{
                 background: none;
                 box-shadow: none;
                 border-radius: 0;
+
+                .film-details .text-details .name .status{
+                    display: none;
+                }
             }
         }
 
@@ -429,6 +433,8 @@ a{
     .film-details{
         display: flex;
         flex-flow: row nowrap;
+        justify-content: space-between;
+
         .text-details{
             button {
                 border: 1px solid #536471;
@@ -565,7 +571,7 @@ a{
 .full-show-details{
     max-width: 100em;
     padding: 0 1em 5em;
-    margin: 2em auto 0;
+    margin: 1em auto 0;
 
     .show-details{
         display: flex;
