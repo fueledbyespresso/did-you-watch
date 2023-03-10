@@ -17,27 +17,18 @@ import {Root} from "./Components/Root/Root";
 import {UserPage} from "./Pages/UserPage";
 import {ActorPage} from "./Pages/ActorPage";
 // TODO Add a calendar page.
-// TODO Add actor page
 // TODO Add more sorting features
 // TODO Style buttons better
-// TODO Add follow
+// TODO Add follow other people
 // TODO Add rankings
 // TODO Add profile background
 // TODO Add compact mode to other user page
-// TODO Redirect user to their own watchlist when they navigate to their profile
+// TODO Redirect user to their own watchlist when they navigate to their own profile
 // TODO Make overview expandable when too long
 
 // Configure Firebase.
 // noinspection SpellCheckingInspection
-const config = {
-    apiKey: "AIzaSyADzX4PIUGtH6ULopSUj-W843b-QMvERQ4",
-    authDomain: "didyou-watch.firebaseapp.com",
-    projectId: "didyou-watch",
-    storageBucket: "didyou-watch.appspot.com",
-    messagingSenderId: "480007967702",
-    appId: "1:480007967702:web:3084ac2d6218dee6c0ca77",
-    measurementId: "G-RHRERR0P1Y"
-}
+const config = JSON.parse(process.env.REACT_APP_FIREBASE_CONFIG||"")
 
 function App() {
     firebase.initializeApp(config)

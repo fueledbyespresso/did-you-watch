@@ -32,7 +32,7 @@ export function Movies() {
 
     return (
         <div className={"films-section"}>
-            <h2>Your movies</h2>
+            <h2>Movies</h2>
             <Select options={options}
                     defaultValue={{value: 'all', label: 'All Movies'}}
                     onChange={(values) => setFilter(values?.value)}

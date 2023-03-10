@@ -173,7 +173,12 @@ a{
         }
 
         .sign-up{
-            margin-top: 10em;
+            margin-top: 0;
+            top:0;
+
+            label[for="ui-sign-in-name-input"]::before{
+                content: "Displayname or ";
+            }
         }
 
         &:focus-within .account-options {
