@@ -248,7 +248,10 @@ a{
             box-shadow: rgba(0, 0, 0, 0.55) 0px -20px 26px -18px inset;
 
             .film{
+                width: 100%;
                 background: none;
+                box-shadow: none;
+                border-radius: 0;
             }
         }
 
