@@ -119,9 +119,9 @@ a{
                 background: #5a5c5e;
                 color: white;
                 border-radius: .5em;
-
+                transition: border .25s ease;
                 &:hover{
-                    border-radius: 10em;
+                    border-radius: 0;
                 }
             }
         }
@@ -169,7 +169,11 @@ a{
             display: none;
             position: absolute;
             box-sizing: border-box;
-            z-index: 2;
+            z-index: 3;
+        }
+
+        .sign-up{
+            margin-top: 10em;
         }
 
         &:focus-within .account-options {
@@ -308,7 +312,7 @@ a{
                 right: 0;
             }
             .sign-up{
-                margin-top:10.5em;
+                margin-top:10em;
             }
             .account-name-username{
                 display: none;
@@ -324,6 +328,24 @@ a{
     .account-dropdown{
         align-self: end;
     }
+
+    .actor-page{
+        .details{
+            justify-content: center;
+
+            .text-details{
+                padding-top:0 !important;
+
+                h1{
+                    text-align: center;
+                }
+            }
+        }
+        .headshot{
+            margin-top: 1em;
+            border-radius: .5em;
+        }
+    }
 }
 
 .films-section{
@@ -331,7 +353,7 @@ a{
     flex-flow: column nowrap;
     justify-content: center;
     align-items: center;
-    padding-bottom: 5em;
+    padding: 1em 1em 5em;
 
     h2{
         text-align: center;
@@ -437,6 +459,7 @@ a{
     .status-buttons{
         background: #e0e0e0;
         width: 100%;
+
         &::before{
             display: inline-block;
             content: "My Watchlist:";
@@ -676,6 +699,59 @@ a{
             .status-buttons{
                 display: flex;
                 flex-flow: column wrap;
+            }
+        }
+    }
+}
+
+.actor-page{
+    margin: auto;
+    max-width: 100em;
+    padding: 2em 1em 5em ;
+
+    .details{
+        display: flex;
+        flex-flow: row wrap;
+        align-items: center;
+        background: #f6f6f6;
+
+
+        .text-details{
+            padding: 2em;
+            max-width: 65em;
+
+            h2{
+                display: inline-block;
+            }
+        }
+        .headshot{
+            text-align: center;
+            height: 30em;
+        }
+    }
+
+    .credits{
+        display: flex;
+        flex-flow: row wrap;
+        gap: .5em;
+
+
+        h2{
+            width: 100%;
+        }
+
+        .credit{
+            border-radius: .5em;
+            overflow: hidden;
+            flex: 1 2 10em;
+            width: 11em;
+
+            .poster{
+                width: 100%;
+            }
+
+            .title{
+                font-weight: bold;
             }
         }
     }

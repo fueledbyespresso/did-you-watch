@@ -1,4 +1,4 @@
-import {useParams} from "react-router-dom";
+import {Link, useParams} from "react-router-dom";
 import React, {useEffect, useState} from "react";
 
 export function TVShowPage(){
@@ -40,6 +40,7 @@ export function TVShowPage(){
                          background: `linear-gradient( rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.65) ),url("https://image.tmdb.org/t/p/original/`+ show.backdrop_path+ `") no-repeat center top fixed`,
                          backgroundSize: "cover"
                      }}>
+
                     <img src={show.poster_path !== null ?
                         "https://image.tmdb.org/t/p/w500/" +show.poster_path :
                         "https://did-you-watch-avatars.s3.us-west-2.amazonaws.com/placeholder.jpg"}
@@ -64,11 +65,13 @@ export function TVShowPage(){
                         }
                         return (
                             <div className={"cast-member"} key={cast.id}>
-                                <img src={ cast.profile_path !== null ?
-                                    "https://image.tmdb.org/t/p/w500/" +cast.profile_path :
-                                    "https://did-you-watch-avatars.s3.us-west-2.amazonaws.com/placeholder.jpg"}
-                                     className={"poster"}
-                                     alt={"show-poster"}/>
+                                <Link to={"/actor/"+cast.id}>
+                                    <img src={ cast.profile_path !== null ?
+                                        "https://image.tmdb.org/t/p/w500/" +cast.profile_path :
+                                        "https://did-you-watch-avatars.s3.us-west-2.amazonaws.com/placeholder.jpg"}
+                                         className={"poster"}
+                                         alt={"show-poster"}/>
+                                </Link>
                                 <div className={"name"}>
                                     <b>{cast.name}</b> playing {cast.roles.length > 0 ? cast.roles[0].character:"Unknown"}
                                 </div>

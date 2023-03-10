@@ -11,7 +11,7 @@ export function UserPage(){
 
     useEffect(() => {
         getUser()
-    }, [])
+    }, [id])
 
     function getUser() {
         fetch(process.env.REACT_APP_HOST + "/api/v1/user/"+id, {

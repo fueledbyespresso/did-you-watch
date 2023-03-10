@@ -2,6 +2,7 @@ package main
 
 import (
 	"did-you-watch/account"
+	"did-you-watch/api/actors"
 	"did-you-watch/api/movies"
 	"did-you-watch/api/trending"
 	"did-you-watch/api/tv"
@@ -40,6 +41,7 @@ func createServer(dbConnection *database.DB) *gin.Engine {
 	tv.Routes(v1, dbConnection)
 	users.Routes(v1, dbConnection)
 	trending.Routes(v1)
+	actors.Routes(v1)
 
 	r.Use(static.Serve("/", static.LocalFile("./frontend/build", true)))
 

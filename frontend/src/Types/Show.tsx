@@ -35,7 +35,6 @@ export function Show(props: { show: Show, compact: boolean }) {
     }, [user]);
 
 
-
     function addShowToWatchlist(id: number, status: string) {
         fetch(process.env.REACT_APP_HOST + "/api/v1/tv/" + id + "/" + status, {
             method: "PUT",

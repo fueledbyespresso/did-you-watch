@@ -15,6 +15,7 @@ import {TVShowPage} from "./Pages/TVShowPage";
 import {MoviePage} from "./Pages/MoviePage";
 import {Root} from "./Components/Root/Root";
 import {UserPage} from "./Pages/UserPage";
+import {ActorPage} from "./Pages/ActorPage";
 // TODO Add a calendar page.
 // TODO Add actor page
 // TODO Add more sorting features
@@ -22,7 +23,12 @@ import {UserPage} from "./Pages/UserPage";
 // TODO Add follow
 // TODO Add rankings
 // TODO Add profile background
+// TODO Add compact mode to other user page
+// TODO Redirect user to their own watchlist when they navigate to their profile
+// TODO Make overview expandable when too long
+
 // Configure Firebase.
+// noinspection SpellCheckingInspection
 const config = {
     apiKey: "AIzaSyADzX4PIUGtH6ULopSUj-W843b-QMvERQ4",
     authDomain: "didyou-watch.firebaseapp.com",
@@ -39,7 +45,6 @@ function App() {
 
     useEffect(() => {
         onAuthStateChanged(firebase.auth() as any, (firebaseUser) => {
-            console.log(firebaseUser)
             if (firebaseUser === null) {
                 console.log("no user logged in")
                 dispatch(remove())
@@ -48,7 +53,7 @@ function App() {
                     .then((idToken) => {
                         getAccount(idToken)
                     }).catch((error) => {
-                    console.log(error)
+                        console.log(error)
                 });
             }
         })
@@ -112,6 +117,9 @@ function App() {
         }, {
             path: "user/:id",
             element: <UserPage/>
+        }, {
+            path: "actor/:id",
+            element: <ActorPage/>
         }],
     }
     ]);

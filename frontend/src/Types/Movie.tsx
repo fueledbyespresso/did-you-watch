@@ -1,6 +1,6 @@
 import {useDispatch, useSelector} from "react-redux";
 import {set, UserState} from "../Store/userSlice";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Link} from "react-router-dom";
 
 export type Movie = {
@@ -24,7 +24,16 @@ export function Movie(props: { movie: Movie, compact: boolean }) {
     const user = useSelector((state: {user:UserState }) => state.user).user;
     const dispatch = useDispatch()
     const [loading, setLoading] = useState<boolean>(false)
+    const [curMovieStatus, setCurMovieStatus] = useState<string|null>(null)
 
+    useEffect(() => {
+        let matchingShow = user.movieList.filter(obj => {
+            return obj.id === props.movie.id
+        })
+        if(matchingShow.length > 0){
+            setCurMovieStatus(matchingShow[0].status)
+        }
+    }, [user]);
     function addMovieToWatchlist(id: number, status: string) {
         setLoading(true)
         fetch(process.env.REACT_APP_HOST + "/api/v1/movie/" + id + "/" + status, {
@@ -118,7 +127,7 @@ export function Movie(props: { movie: Movie, compact: boolean }) {
                     <button className={status.value}
                             key={status.value}
                             tabIndex={3}
-                            disabled={props.movie.status === status.value}
+                            disabled={curMovieStatus === status.value}
                             onClick={() => addMovieToWatchlist(props.movie.id, status.value)}>
                         {status.label}
                     </button>
