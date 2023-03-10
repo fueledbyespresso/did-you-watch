@@ -39,8 +39,10 @@ export function UserPage(){
         <div className={"user-page"}>
             <div className={"banner"}
                  style={{
-                background: `linear-gradient( rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.65) ),url("`+ user.profilePicURL+ `") no-repeat center bottom fixed`,
-                backgroundSize: "cover"
+                        backgroundImage: `linear-gradient( rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.65) ),url("`+ user.profilePicURL+ `")`,
+                        backgroundRepeat: "no-repeat",
+                        backgroundPosition: "center",
+                        backgroundSize: "cover"
             }}>
                 <img src={user.profilePicURL} alt={""}/>
                 <h1>{user.username}</h1>
@@ -53,10 +55,10 @@ export function UserPage(){
 
             <div className={"films"}>
                 {tab ==="shows" && user.tvList.map(show => (
-                    <Show show={show} compact={false}/>
+                    <Show show={show} compact={false} key={show.id}/>
                 ))}
                 {tab ==="movies" && user.movieList.map(movie => (
-                    <Movie movie={movie} compact={false}/>
+                    <Movie movie={movie} compact={false} key={movie.id}/>
                 ))}
             </div>
         </div>
