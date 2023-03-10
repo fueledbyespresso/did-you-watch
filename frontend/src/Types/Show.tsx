@@ -23,6 +23,7 @@ const status_types = [
 export function Show(props: { show: Show, compact: boolean }) {
     const user = useSelector((state: {user:UserState }) => state.user).user;
     const dispatch = useDispatch()
+    const [loading, setLoading] = useState<boolean>(false)
     const [curShowStatus, setCurShowStatus] = useState<string|null>(null)
 
     useEffect(() => {
@@ -36,6 +37,7 @@ export function Show(props: { show: Show, compact: boolean }) {
 
 
     function addShowToWatchlist(id: number, status: string) {
+        setLoading(true)
         fetch(process.env.REACT_APP_HOST + "/api/v1/tv/" + id + "/" + status, {
             method: "PUT",
             headers: {
@@ -62,15 +64,18 @@ export function Show(props: { show: Show, compact: boolean }) {
                     } else {
                         tempUser.tvList.unshift(result)
                     }
+                    setLoading(false)
 
                     dispatch(set(tempUser))
                 }, (error) => {
-
+                    setLoading(false)
                 }
             )
     }
 
     function deleteFromWatchlist(id: number) {
+        setLoading(true)
+
         fetch(process.env.REACT_APP_HOST + "/api/v1/tv/" + id, {
             method: "DELETE",
             headers: {
@@ -92,7 +97,7 @@ export function Show(props: { show: Show, compact: boolean }) {
                             break;
                         }
                     }
-
+                    setLoading(false)
                     dispatch(set(tempUser))
                 }, (error) => {
 
@@ -135,6 +140,7 @@ export function Show(props: { show: Show, compact: boolean }) {
                 ))}
                 <button onClick={() => deleteFromWatchlist(props.show.id)}
                         className={"delete"}>Remove</button>
+                {loading && <button>Loading...</button>}
             </div>
         </div>
     )

@@ -52,7 +52,7 @@ export function ActorPage(){
                      className={"headshot"}
                      alt={"actor-headshot"}/>
                 <div className={"text-details"}>
-                    <h1 className={"name"}>{actor?.name}</h1>
+                    <h1 className={"name"}>{actor?.name} ({new Date().getFullYear() - actor.birthday.substring(0,4)-1})</h1>
                     <div className={"biography"}>
                         <h2>Biography</h2>
                         <div>{actor?.biography}</div>
