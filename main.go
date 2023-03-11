@@ -60,5 +60,5 @@ func main() {
 
 	r := createServer(dbConnection)
 
-	_ = r.Run("localhost:5000")
+	_ = r.Run()
 }
