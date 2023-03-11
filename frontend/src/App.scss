@@ -96,10 +96,8 @@ a {
 
     .links {
         padding: .5em 1em;
-        display: flex;
-        flex-flow: row nowrap;
-        gap: .5em;
-        justify-content: center;
+        white-space: nowrap;
+        overflow: scroll;
 
         a {
             padding: .5em 1em;
@@ -560,15 +558,14 @@ a {
 
 .watchlist-film {
     display: flex;
-    flex-flow: row wrap;
+    flex-flow: row nowrap;
     gap: 1em;
     background: #EEEEEE;
     min-width: 15em;
 
     img {
         width: 5em;
-        height: auto;
-        max-height: 10em;
+        height: inherit;
         object-fit: cover;
     }
 
@@ -587,7 +584,7 @@ a {
         .status-buttons {
             button {
                 background: #EEEEEE;
-                padding: .5em 1em;
+                padding: .5em;
                 border: 1px solid #5a5c5e;
                 border-radius: .5em;
                 margin: .1em;
