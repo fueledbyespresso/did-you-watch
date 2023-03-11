@@ -3,8 +3,8 @@ import {Shows} from "../Components/WatchList/Shows/Shows";
 import React from "react";
 
 
-export function Watchlist(props: {category: string}){
-    return(
+export function Watchlist(props: { category: string }) {
+    return (
         <div className={"watchlist"}>
             {props.category === "movies" && <Movies/>}
             {props.category === "shows" && <Shows/>}

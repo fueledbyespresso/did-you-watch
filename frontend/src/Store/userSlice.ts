@@ -32,7 +32,7 @@ export const userSlice = createSlice({
             localStorage.setItem('darkTheme', state.user.darkMode.toString())
         },
         remove: state => {
-            state.user ={
+            state.user = {
                 idToken: "",
                 uid: "",
                 displayName: "",

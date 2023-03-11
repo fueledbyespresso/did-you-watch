@@ -19,7 +19,8 @@ export function User(props: { user: User }) {
             <img src={props.user.profilePicURL} className={"profile-pic"}
                  alt={"profile-pic"}/>
             <div className={"result-details"}>
-                <div className={"result-name"}><Link to={"/user/"+props.user.uid}><b>{props.user.displayName}</b></Link></div>
+                <div className={"result-name"}><Link
+                    to={"/user/" + props.user.uid}><b>{props.user.displayName}</b></Link></div>
                 <div className={"overview"}>{props.user.username}</div>
 
                 <button className={"follow"}

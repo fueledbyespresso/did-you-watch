@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import {TrendingMovie} from "../Types/Movie";
 import {TrendingShow} from "../Types/Show";
 
-export function Home(){
+export function Home() {
     const [trending, setTrending] = useState<any>(null)
 
     useEffect(() => {
@@ -27,11 +27,11 @@ export function Home(){
             )
     }
 
-    return(
+    return (
         <div className={"home"}>
             <h1>Trending this week</h1>
             <div className={"trending-films"}>
-                {trending !== null &&  trending.results.map((trendingItem: any) =>
+                {trending !== null && trending.results.map((trendingItem: any) =>
                     <div className={"trending-film-container"} key={trendingItem.id}>
                         {trendingItem.media_type === "movie" && <TrendingMovie movie={trendingItem}/>}
                         {trendingItem.media_type === "tv" && <TrendingShow show={trendingItem}/>}

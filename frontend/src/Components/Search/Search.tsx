@@ -30,9 +30,9 @@ export function Search() {
                 (result) => {
                     if (searchCategory == "movie") {
                         setMovieResults(result)
-                    } else if(searchCategory == "tv"){
+                    } else if (searchCategory == "tv") {
                         setTVResults(result)
-                    } else if(searchCategory == "users"){
+                    } else if (searchCategory == "users") {
                         setUserResults(result)
                     }
                 }, (error) => {
@@ -56,7 +56,7 @@ export function Search() {
                        onChange={event => setSearchQuery(event.target.value)}
                        onKeyDown={(e) => (e.key === 'Enter' ? submitSearch(curCategory) : null)}
                        placeholder={"The Last of Us..."}
-                autoFocus={true}/>
+                       autoFocus={true}/>
 
                 <button tabIndex={3}
                         onClick={() => submitSearch(curCategory)}>
@@ -72,11 +72,11 @@ export function Search() {
                                 <Movie key={movie.id}
                                        movie={movie}/>
                             )
-                }) : (
-                    movieResults !== null && movieResults.results.length === 0 && (
-                        <div>No results</div>
-                    )
-                ))}
+                        }) : (
+                            movieResults !== null && movieResults.results.length === 0 && (
+                                <div>No results</div>
+                            )
+                        ))}
                 {curCategory === "tv" && (
                     TVResults !== null && TVResults.results.length !== 0 ?
                         TVResults.results.map((show: Show) => {
@@ -84,12 +84,12 @@ export function Search() {
                                 <Show key={Number(show.id)}
                                       searchResult={true}
                                       show={show}/>
-                        )
-                }) : (
-                    TVResults !== null && TVResults.results.length === 0 && (
-                        <div>No results</div>
-                    )
-                ))}
+                            )
+                        }) : (
+                            TVResults !== null && TVResults.results.length === 0 && (
+                                <div>No results</div>
+                            )
+                        ))}
                 {curCategory === "users" && (
                     userResults !== null && userResults.length !== 0 ?
                         userResults.map((user: User) => {
@@ -97,11 +97,11 @@ export function Search() {
                                 <User key={user.uid}
                                       user={user}/>
                             )
-                    }) : (
-                    userResults !== null && userResults.length === 0 && (
+                        }) : (
+                            userResults !== null && userResults.length === 0 && (
                                 <div>No results</div>
-                    )
-                ))}
+                            )
+                        ))}
             </div>
         </div>
     )

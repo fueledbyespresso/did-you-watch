@@ -1,7 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+
 * {
     box-sizing: border-box;
 }
+
 body {
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -27,39 +29,43 @@ code {
     monospace;
 }
 
-button{
+button {
     cursor: pointer;
 }
 
-.dark{
+.dark {
     min-height: 100vh;
     background: #1d1e20;
     color: #dadadb;
-    .header-bar{
+
+    .header-bar {
         background: #525259;
-        .account-dropdown{
+
+        .account-dropdown {
             background: #1d1e20;
         }
-        .search-area .results .film{
+
+        .search-area .results .film {
             background: #525259;
         }
     }
 
-    .film{
+    .film {
         box-shadow: none;
-        border:none;
+        border: none;
         background: #383838;
-        .status-buttons{
+
+        .status-buttons {
             background: #440c0c;
 
-            &::before{
+            &::before {
                 color: inherit;
             }
         }
     }
 }
 
-a{
+a {
     &:link {
         color: inherit;
         text-decoration: none;
@@ -75,7 +81,7 @@ a{
         text-decoration: none;
     }
 
-    &:hover{
+    &:hover {
         text-decoration: none;
     }
 }
@@ -88,16 +94,16 @@ a{
     width: 100%;
     background: #EEEEEE;
 
-    .links{
+    .links {
         padding: .5em 1em;
         display: flex;
         flex-flow: row nowrap;
         gap: .5em;
         justify-content: center;
 
-        a{
+        a {
             padding: .5em 1em;
-            transition: border, border-radius,background .25s ease;
+            transition: border, border-radius, background .25s ease;
 
             &:link {
                 text-decoration: none;
@@ -112,23 +118,26 @@ a{
                 text-decoration: none;
             }
 
-            &:hover{
+            &:hover {
                 text-decoration: none;
                 background: #ff6200;
                 color: white;
             }
-            &.active{
+
+            &.active {
                 border-radius: 10em;
                 background: #ff6200;
                 color: white;
                 text-decoration: underline;
             }
-            &.logo{
+
+            &.logo {
                 background: #5a5c5e;
                 color: white;
                 border-radius: .5em;
                 transition: border .25s ease;
-                &:hover{
+
+                &:hover {
                     border-radius: 0;
                 }
             }
@@ -168,7 +177,7 @@ a{
             display: block;
         }
 
-        .login{
+        .login {
             background: #EEEEEE;
             width: 100%;
             max-width: inherit;
@@ -180,11 +189,11 @@ a{
             z-index: 3;
         }
 
-        .sign-up{
+        .sign-up {
             margin-top: 0;
-            top:0;
+            top: 0;
 
-            label[for="ui-sign-in-name-input"]::before{
+            label[for="ui-sign-in-name-input"]::before {
                 content: "Displayname or ";
             }
         }
@@ -213,16 +222,16 @@ a{
                 height: 3em;
                 border: none;
                 width: 100%;
-                margin:0;
+                margin: 0;
                 padding: 0;
             }
 
-            a{
+            a {
                 box-sizing: border-box;
                 text-align: center;
                 display: block;
                 background: #e9e9ed;
-                margin:0;
+                margin: 0;
                 line-height: 3em;
                 height: 3em;
                 border: none;
@@ -255,13 +264,13 @@ a{
             background: #fff;
             box-shadow: rgba(0, 0, 0, 0.55) 0px -20px 26px -18px inset;
 
-            .film{
+            .film {
                 width: 100%;
                 background: none;
                 box-shadow: none;
                 border-radius: 0;
 
-                .film-details .text-details .name .status{
+                .film-details .text-details .name .status {
                     display: none;
                 }
             }
@@ -290,17 +299,17 @@ a{
     }
 }
 
-.result-item-user{
+.result-item-user {
     display: flex;
     justify-content: center;
     align-items: center;
     align-self: start;
 
-    img{
+    img {
         height: 6em;
     }
 
-    .result-details{
+    .result-details {
         padding: 0 1em;
     }
 }
@@ -313,91 +322,98 @@ a{
         .links {
             width: 100%;
         }
-        .search-area{
-            margin:0;
+
+        .search-area {
+            margin: 0;
             width: auto;
             flex: 1 2;
             max-width: none;
 
-            .results{
+            .results {
                 max-width: none;
             }
         }
-        .account-dropdown{
+
+        .account-dropdown {
             padding: 0;
             background: none;
             width: auto;
 
-            .login{
+            .login {
                 right: 0;
             }
-            .sign-up{
-                margin-top:10em;
+
+            .sign-up {
+                margin-top: 10em;
             }
-            .account-name-username{
+
+            .account-name-username {
                 display: none;
             }
 
-            .account-options{
-                margin-top:4.5em;
+            .account-options {
+                margin-top: 4.5em;
                 width: 5em;
             }
         }
     }
 
-    .account-dropdown{
+    .account-dropdown {
         align-self: end;
     }
 
-    .actor-page{
-        .details{
+    .actor-page {
+        .details {
             justify-content: center;
 
-            .text-details{
-                padding-top:0 !important;
+            .text-details {
+                padding-top: 0 !important;
 
-                h1{
+                h1 {
                     text-align: center;
                 }
             }
         }
-        .headshot{
+
+        .headshot {
             margin-top: 1em;
             border-radius: .5em;
         }
     }
 }
 
-.films-section{
+.films-section {
     display: flex;
     flex-flow: column nowrap;
     justify-content: center;
     align-items: center;
     padding: 1em 1em 5em;
 
-    h2{
+    h2 {
         text-align: center;
     }
+
     .filter-select {
         width: 100%;
         max-width: 45em;
         margin-bottom: 1em;
     }
+
     .films {
         display: flex;
-        flex-flow: row  wrap;
+        flex-flow: row wrap;
         gap: .5em;
         margin: auto;
         justify-content: center;
     }
 
-    .films-compact{
+    .films-compact {
         display: flex;
-        flex-flow: row  wrap;
+        flex-flow: row wrap;
         justify-content: center;
         gap: 1em;
 
-        .film{
+        .film {
             border-radius: .5em;
             flex: 1 2 11em;
             max-width: 12em;
@@ -405,24 +421,25 @@ a{
             flex-flow: column nowrap;
             justify-content: space-between;
 
-            .film-details{
+            .film-details {
                 display: flex;
                 flex-flow: column nowrap;
 
-                .text-details{
-                    .name{
-                        .status{
+                .text-details {
+                    .name {
+                        .status {
                             display: block;
                             margin: 0;
                         }
                     }
                 }
 
-                img{
+                img {
                     width: 100%;
                 }
             }
-            .status-buttons{
+
+            .status-buttons {
                 display: flex;
                 flex-flow: column wrap;
             }
@@ -436,15 +453,16 @@ a{
     background: #FFF;
     border-radius: .5em;
 
-    & > *{
+    & > * {
         padding: .5em 1em;
     }
-    .film-details{
+
+    .film-details {
         display: flex;
         flex-flow: row nowrap;
         justify-content: space-between;
 
-        .text-details{
+        .text-details {
             button {
                 border: 1px solid #536471;
                 border-radius: .5em;
@@ -452,11 +470,11 @@ a{
                 margin: 0 .25em;
             }
 
-            .name{
+            .name {
                 font-weight: bold;
                 margin: .5em 0;
 
-                .status{
+                .status {
                     background: #5a5c5e;
                     border-radius: 5em;
                     color: #fff;
@@ -466,11 +484,12 @@ a{
                 }
             }
 
-            .overview{
+            .overview {
                 margin-right: .5em;
                 margin-bottom: .5em;
             }
         }
+
         img {
             border-radius: .5em;
             object-fit: cover;
@@ -479,23 +498,25 @@ a{
         }
     }
 
-    .status-buttons{
+    .status-buttons {
         background: #e0e0e0;
         width: 100%;
 
-        &::before{
+        &::before {
             display: inline-block;
             content: "My Watchlist:";
             color: #282828;
             font-weight: bold;
             margin-right: .5em;
         }
-        button{
+
+        button {
             background: #fff;
             border: none;
             padding: .5em 1em;
         }
-        button:disabled, button[disabled]{
+
+        button:disabled, button[disabled] {
             cursor: default;
             text-decoration: underline;
             background: cadetblue;
@@ -514,64 +535,70 @@ a{
                 color: #fff;
                 background: #c4ae24;
             }
+
             &.rewatching {
                 color: #fff;
                 background: #2149c2;
             }
+
             &.dropped {
                 color: #fff;
                 background: #9f0303;
             }
         }
 
-        button.delete{
+        button.delete {
             background: #ff0f0f;
             color: white;
 
-            &:hover{
+            &:hover {
                 background: #ed5e68;
             }
         }
     }
 }
 
-.watchlist-film{
+.watchlist-film {
     display: flex;
     flex-flow: row wrap;
     gap: 1em;
     background: #EEEEEE;
     min-width: 15em;
-    img{
+
+    img {
         width: 5em;
         height: auto;
         max-height: 10em;
         object-fit: cover;
     }
-    .details{
+
+    .details {
         display: flex;
         flex-flow: column nowrap;
         justify-content: space-between;
-        padding:.5em .5em .5em 0 ;
-        .text-details{
-            .name{
+        padding: .5em .5em .5em 0;
+
+        .text-details {
+            .name {
                 font-weight: bold;
             }
         }
 
-        .status-buttons{
-            button{
+        .status-buttons {
+            button {
                 background: #EEEEEE;
                 padding: .5em 1em;
                 border: 1px solid #5a5c5e;
                 border-radius: .5em;
                 margin: .1em;
 
-                &:hover{
+                &:hover {
                     color: #fff;
                     background: #545454;
                 }
             }
-            button:disabled, button[disabled]{
+
+            button:disabled, button[disabled] {
                 color: #fff;
                 background: #545454;
                 text-decoration: underline;
@@ -580,13 +607,13 @@ a{
     }
 }
 
-.home{
-    h1{
+.home {
+    h1 {
         text-align: center;
     }
 }
 
-.trending-films{
+.trending-films {
     width: 100%;
     padding-bottom: 5em;
     display: flex;
@@ -597,37 +624,40 @@ a{
     margin: auto;
     gap: .5em;
 
-    .trending-film-container{
+    .trending-film-container {
         width: 15em;
         border-radius: .5em;
 
-        .trending-film{
-            .name{
+        .trending-film {
+            .name {
                 font-weight: bold;
             }
-            a{
+
+            a {
                 width: inherit;
             }
-            img{
+
+            img {
                 width: 100%;
                 object-fit: cover;
                 border-radius: .5em;
             }
         }
-        &:hover{
-            img{
+
+        &:hover {
+            img {
                 box-shadow: rgba(0, 0, 0, 0.25) 0 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
             }
         }
     }
 }
 
-.full-show-details{
+.full-show-details {
     max-width: 100em;
     padding: 0 1em 5em;
     margin: 1em auto 0;
 
-    .show-details{
+    .show-details {
         display: flex;
         flex-flow: row wrap;
         align-items: center;
@@ -636,12 +666,14 @@ a{
         -moz-background-size: cover;
         -o-background-size: cover;
         background-size: cover;
-        img{
+
+        img {
             background: #e9e9ed;
             display: inline-block;
             max-height: 30em;
         }
-        .text-details{
+
+        .text-details {
             height: inherit;
             align-self: stretch;
             color: white;
@@ -652,51 +684,52 @@ a{
             flex-flow: column nowrap;
             justify-content: center;
 
-            .overview{
+            .overview {
                 max-width: 50em;
             }
         }
     }
 
-    button.toggle-full-cast{
+    button.toggle-full-cast {
         text-decoration: underline;
-        border:none;
+        border: none;
         padding: .5em 1em;
         border-radius: .5em;
         margin: 0 1em;
     }
 
-    .credits{
+    .credits {
         display: flex;
         flex-flow: row wrap;
 
-        .cast-member{
+        .cast-member {
             flex: 1 2 10em;
             max-width: 11em;
             display: flex;
             flex-flow: column nowrap;
 
-            img{
+            img {
                 display: inline-block;
                 height: auto;
                 background: #e9e9ed;
                 width: 100%;
             }
-            .name{
+
+            .name {
                 padding: 0 .5em;
             }
         }
     }
 
-    .seasons{
+    .seasons {
         display: flex;
         flex-flow: row wrap;
 
-        .season{
+        .season {
             flex: 1 2 10em;
             max-width: 11em;
 
-            img{
+            img {
                 height: auto;
                 width: 100%;
             }
@@ -704,70 +737,75 @@ a{
     }
 }
 
-.account-page{
-    h1{
-      text-align: center;
+.account-page {
+    h1 {
+        text-align: center;
     }
-    .account-details-section{
-        margin:auto;
+
+    .account-details-section {
+        margin: auto;
         max-width: 60em;
-        .current-avatar{
-            img{
+
+        .current-avatar {
+            img {
                 display: inline-block;
             }
         }
-        img{
+
+        img {
             width: 10em;
         }
     }
 }
 
-.user-page{
+.user-page {
     max-width: 45em;
     margin: 2em auto auto;
 
-    .banner{
+    .banner {
         display: flex;
         flex-flow: row wrap;
         align-items: center;
         background: #625fd2;
         background-size: cover;
 
-        h1{
+        h1 {
             color: #fff;
             margin: auto;
             display: inline-block;
             text-align: center;
         }
 
-        img{
+        img {
             height: 10em;
         }
     }
+
     .filter-select {
         width: 100%;
         max-width: 45em;
         margin-bottom: 1em;
     }
+
     .films {
         display: flex;
-        flex-flow: column  nowrap;
+        flex-flow: column nowrap;
         row-gap: .5em;
         max-width: 45em;
     }
 
-    .films-compact{
+    .films-compact {
         display: flex;
-        flex-flow: row  wrap;
+        flex-flow: row wrap;
         justify-content: center;
         gap: 1em;
 
-        .film{
+        .film {
             border-radius: .5em;
             flex: 1 2 15em;
             max-width: 17em;
 
-            .status-buttons{
+            .status-buttons {
                 display: flex;
                 flex-flow: column wrap;
             }
@@ -775,53 +813,54 @@ a{
     }
 }
 
-.actor-page{
+.actor-page {
     margin: auto;
     max-width: 100em;
-    padding: 2em 1em 5em ;
+    padding: 2em 1em 5em;
 
-    .details{
+    .details {
         display: flex;
         flex-flow: row wrap;
         align-items: center;
         background: #f6f6f6;
 
 
-        .text-details{
+        .text-details {
             padding: 2em;
             max-width: 65em;
 
-            h2{
+            h2 {
                 display: inline-block;
             }
         }
-        .headshot{
+
+        .headshot {
             text-align: center;
             height: 30em;
         }
     }
 
-    .credits{
+    .credits {
         display: flex;
         flex-flow: row wrap;
         gap: .5em;
 
 
-        h2{
+        h2 {
             width: 100%;
         }
 
-        .credit{
+        .credit {
             border-radius: .5em;
             overflow: hidden;
             flex: 1 2 10em;
             width: 11em;
 
-            .poster{
+            .poster {
                 width: 100%;
             }
 
-            .title{
+            .title {
                 font-weight: bold;
             }
         }

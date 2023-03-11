@@ -5,11 +5,11 @@ import {useSelector} from "react-redux";
 import {UserState} from "../../Store/userSlice";
 
 export function Root() {
-    const user = useSelector((state: {user:UserState }) => state.user).user;
+    const user = useSelector((state: { user: UserState }) => state.user).user;
     return (
-        <div className={user.darkMode ? "dark":""}>
+        <div className={user.darkMode ? "dark" : ""}>
             <HeaderBar/>
-            <Outlet />
+            <Outlet/>
         </div>
     )
 }

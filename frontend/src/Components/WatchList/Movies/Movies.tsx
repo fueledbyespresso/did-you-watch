@@ -37,7 +37,7 @@ export function Movies() {
                     defaultValue={{value: 'all', label: 'All Movies'}}
                     onChange={(values) => setFilter(values?.value)}
                     className="filter-select"/>
-            <button onClick={()=>setToggleCompact(!toggleCompact)}>
+            <button onClick={() => setToggleCompact(!toggleCompact)}>
                 Compact Mode
             </button>
             <div className={!toggleCompact ? "films" : "films-compact"}>

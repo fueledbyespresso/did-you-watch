@@ -30,7 +30,7 @@ import {ActorPage} from "./Pages/ActorPage";
 
 // Configure Firebase.
 // noinspection SpellCheckingInspection
-const config = JSON.parse(process.env.REACT_APP_FIREBASE_CONFIG||"")
+const config = JSON.parse(process.env.REACT_APP_FIREBASE_CONFIG || "")
 
 function App() {
     firebase.initializeApp(config)
@@ -46,7 +46,7 @@ function App() {
                     .then((idToken) => {
                         getAccount(idToken)
                     }).catch((error) => {
-                        console.log(error)
+                    console.log(error)
                 });
             }
         })

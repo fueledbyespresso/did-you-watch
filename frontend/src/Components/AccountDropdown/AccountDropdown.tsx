@@ -5,12 +5,13 @@ import {AuthGoogle} from "../../AuthGoogle";
 
 export function AccountDropdown() {
     const store = useSelector((state: any) => state.user);
+
     function signOut() {
         console.log("signing out")
         firebase.auth().signOut().then(r => console.log("signed out"))
     }
 
-    if(!store.userExists){
+    if (!store.userExists) {
         return (
             <div className={"account-dropdown"} tabIndex={4}>
                 Login/Signup

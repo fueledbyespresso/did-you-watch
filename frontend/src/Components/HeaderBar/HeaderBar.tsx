@@ -15,9 +15,12 @@ export function HeaderBar() {
                 <Link className={"logo"} to={"/"}>Did you watch?</Link>
                 {store.userExists &&
                     <>
-                        <NavLink className={({ isActive }) => (isActive ? 'active' : 'inactive')} to={"/my-movies"}>My Movies</NavLink>
-                        <NavLink className={({ isActive }) => (isActive ? 'active' : 'inactive')} to={"/my-shows"}>My Shows</NavLink>
-                        <NavLink className={({ isActive }) => (isActive ? 'active' : 'inactive')} to={"/account"}>Account</NavLink>
+                        <NavLink className={({isActive}) => (isActive ? 'active' : 'inactive')} to={"/my-movies"}>My
+                            Movies</NavLink>
+                        <NavLink className={({isActive}) => (isActive ? 'active' : 'inactive')} to={"/my-shows"}>My
+                            Shows</NavLink>
+                        <NavLink className={({isActive}) => (isActive ? 'active' : 'inactive')}
+                                 to={"/account"}>Account</NavLink>
                     </>
                 }
             </div>

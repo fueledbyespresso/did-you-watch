@@ -21,20 +21,21 @@ const status_types = [
     {value: 'dropped', label: 'Dropped'},
 ]
 
-export function Movie(props: { movie: Movie}) {
-    const user = useSelector((state: {user:UserState }) => state.user).user;
+export function Movie(props: { movie: Movie }) {
+    const user = useSelector((state: { user: UserState }) => state.user).user;
     const dispatch = useDispatch()
     const [loading, setLoading] = useState<boolean>(false)
-    const [curMovieStatus, setCurMovieStatus] = useState<string|null>(null)
+    const [curMovieStatus, setCurMovieStatus] = useState<string | null>(null)
 
     useEffect(() => {
         let matchingShow = user.movieList.filter(obj => {
             return obj.id === props.movie.id
         })
-        if(matchingShow.length > 0){
+        if (matchingShow.length > 0) {
             setCurMovieStatus(matchingShow[0].status)
         }
     }, [user]);
+
     function addMovieToWatchlist(id: number, status: string) {
         setLoading(true)
         fetch(process.env.REACT_APP_HOST + "/api/v1/movie/" + id + "/" + status, {
@@ -71,6 +72,7 @@ export function Movie(props: { movie: Movie}) {
                 }
             )
     }
+
     function deleteFromWatchlist(id: number) {
         fetch(process.env.REACT_APP_HOST + "/api/v1/movie/" + id, {
             method: "DELETE",
@@ -100,12 +102,13 @@ export function Movie(props: { movie: Movie}) {
                 }
             )
     }
+
     return (
         <div className="film">
             <div className={"film-details"}>
                 <div className={"text-details"}>
                     <div className={"name"}>
-                        <Link to={"/movie/"+props.movie.id}>
+                        <Link to={"/movie/" + props.movie.id}>
                             {props.movie.original_title}
                             <div className={"status"}>{props.movie.status}</div>
                         </Link>
@@ -134,21 +137,22 @@ export function Movie(props: { movie: Movie}) {
                     </button>
                 ))}
                 <button onClick={() => deleteFromWatchlist(props.movie.id)}
-                        className={"delete"}>Remove</button>
+                        className={"delete"}>Remove
+                </button>
                 {loading && <button>Loading...</button>}
             </div>
         </div>
     )
 }
 
-export function TrendingMovie(props: { movie: Movie }){
+export function TrendingMovie(props: { movie: Movie }) {
     return (
         <div className={"trending-film"}>
-            <Link to={"/movie/"+props.movie.id}>
+            <Link to={"/movie/" + props.movie.id}>
                 <img src={"https://image.tmdb.org/t/p/w500/" + props.movie.poster_path} className={"poster"}
-                                      alt={"movie-poster"}/>
+                     alt={"movie-poster"}/>
             </Link>
-            <div className={"name"}><Link to={"/movie/"+props.movie.id}>{props.movie.original_title}</Link></div>
+            <div className={"name"}><Link to={"/movie/" + props.movie.id}>{props.movie.original_title}</Link></div>
             <div className={"air-date"}>{props.movie.release_date}</div>
         </div>
     )

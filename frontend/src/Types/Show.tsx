@@ -24,16 +24,16 @@ const status_types = [
 ]
 
 export function Show(props: { show: Show, searchResult: boolean }) {
-    const user = useSelector((state: {user:UserState }) => state.user).user;
+    const user = useSelector((state: { user: UserState }) => state.user).user;
     const dispatch = useDispatch()
     const [loading, setLoading] = useState<boolean>(false)
-    const [curShowStatus, setCurShowStatus] = useState<string|null>(null)
+    const [curShowStatus, setCurShowStatus] = useState<string | null>(null)
 
     useEffect(() => {
         let matchingShow = user.tvList.filter(obj => {
             return obj.id === props.show.id
         })
-        if(matchingShow.length > 0){
+        if (matchingShow.length > 0) {
             setCurShowStatus(matchingShow[0].status)
         }
     }, [user]);
@@ -109,13 +109,13 @@ export function Show(props: { show: Show, searchResult: boolean }) {
             )
     }
 
-    if(props.searchResult){
+    if (props.searchResult) {
         return (
             <div className="film">
                 <div className={"film-details"}>
                     <div className={"text-details"}>
                         <div className={"name"}>
-                            <Link to={"/show/"+props.show.id}>
+                            <Link to={"/show/" + props.show.id}>
                                 {props.show.original_name}
                             </Link>
                             <div className={"status"}>{props.show.status}</div>
@@ -127,7 +127,7 @@ export function Show(props: { show: Show, searchResult: boolean }) {
                         <div className={"overview"}>{props.show.overview}</div>
                     </div>
                     <img src={(props.show.poster_path === "" || props.show.poster_path === null) ?
-                        "https://did-you-watch-avatars.s3.us-west-2.amazonaws.com/placeholder.jpg":
+                        "https://did-you-watch-avatars.s3.us-west-2.amazonaws.com/placeholder.jpg" :
                         "https://image.tmdb.org/t/p/w500/" + props.show.poster_path}
                          className={"poster"}
                          alt={"show-poster"}/>
@@ -144,7 +144,8 @@ export function Show(props: { show: Show, searchResult: boolean }) {
                         </button>
                     ))}
                     <button onClick={() => deleteFromWatchlist(props.show.id)}
-                            className={"delete"}>Remove</button>
+                            className={"delete"}>Remove
+                    </button>
                     {loading && <button>Loading...</button>}
                 </div>
             </div>
@@ -156,9 +157,11 @@ export function Show(props: { show: Show, searchResult: boolean }) {
             <img src={"https://image.tmdb.org/t/p/w500/" + props.show.poster_path} alt={""}/>
             <div className={"details"}>
                 <div className={"text-details"}>
-                    <div className={"name"}><Link to={"/show/"+props.show.id}>{props.show.original_name}</Link></div>
+                    <div className={"name"}><Link to={"/show/" + props.show.id}>{props.show.original_name}</Link></div>
                     <div className={"status"}>{props.show.status}</div>
-                    <div className={"watch-count"}>{props.show.episodes_watched}/{props.show.total_episodes} <button>Edit</button></div>
+                    <div className={"watch-count"}>{props.show.episodes_watched}/{props.show.total_episodes}
+                        <button>Edit</button>
+                    </div>
                     {loading && <div>Loading...</div>}
                 </div>
                 <div className={"status-buttons"}>
@@ -172,17 +175,18 @@ export function Show(props: { show: Show, searchResult: boolean }) {
                         </button>
                     ))}
                     <button onClick={() => deleteFromWatchlist(props.show.id)}
-                            className={"delete"}>Remove</button>
+                            className={"delete"}>Remove
+                    </button>
                 </div>
             </div>
         </div>
     )
 }
 
-export function TrendingShow(props: {show: Show}) {
+export function TrendingShow(props: { show: Show }) {
     return (
         <div className={"trending-film"}>
-            <Link to={"/show/"+props.show.id}>
+            <Link to={"/show/" + props.show.id}>
                 <img src={"https://image.tmdb.org/t/p/w500/" + props.show.poster_path} className={"poster"}
                      alt={"show-poster"}/>
             </Link>

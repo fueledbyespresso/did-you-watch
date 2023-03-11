@@ -43,7 +43,7 @@ export function Shows() {
                     defaultValue={{value: 'all', label: 'All Shows'}}
                     onChange={(values) => setFilter(values?.value)}
                     className="filter-select"/>
-            <button onClick={()=>setToggleCompact(!toggleCompact)}>
+            <button onClick={() => setToggleCompact(!toggleCompact)}>
                 Compact Mode
             </button>
             <div className={(!toggleCompact ? "films" : "films-compact")}>
@@ -51,9 +51,9 @@ export function Shows() {
                     user.tvList.map((show: Show) => {
                         return (
                             (filter === show.status || filter === "all") &&
-                                <Show key={show.id}
-                                      searchResult={false}
-                                      show={show}/>
+                            <Show key={show.id}
+                                  searchResult={false}
+                                  show={show}/>
                         )
                     }) : (
                         <div>No shows in this category :(</div>

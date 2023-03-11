@@ -1,14 +1,14 @@
 import {Link, useParams} from "react-router-dom";
 import React, {useEffect, useState} from "react";
 
-export function MoviePage(){
+export function MoviePage() {
     const {id} = useParams();
     const [show, setShow] = useState<any>(null)
     const [displayAllCast, setDisplayAllCast] = useState<boolean>(false)
 
     function getShowByID() {
         setDisplayAllCast(false)
-        fetch(process.env.REACT_APP_HOST + "/api/v1/movie/"+id, {
+        fetch(process.env.REACT_APP_HOST + "/api/v1/movie/" + id, {
             method: "GET",
         })
             .then((res) => {
@@ -24,26 +24,27 @@ export function MoviePage(){
                 }
             )
     }
+
     useEffect(() => {
         getShowByID()
     }, [id])
 
-    if (show === null){
+    if (show === null) {
         return <div>Loading...</div>
     }
 
-    return(
+    return (
         <div>
             <div className={"full-show-details"}>
                 <div className={"show-details"}
                      style={{
-                         background: `linear-gradient( rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.65) ),url("https://image.tmdb.org/t/p/original/`+ show.backdrop_path+ `") no-repeat center bottom fixed`,
+                         background: `linear-gradient( rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.65) ),url("https://image.tmdb.org/t/p/original/` + show.backdrop_path + `") no-repeat center bottom fixed`,
                          backgroundSize: "cover"
                      }}>
 
                     <img src={show.poster_path !== null ?
-                         "https://image.tmdb.org/t/p/w500/" +show.poster_path :
-                         "https://did-you-watch-avatars.s3.us-west-2.amazonaws.com/placeholder.jpg"}
+                        "https://image.tmdb.org/t/p/w500/" + show.poster_path :
+                        "https://did-you-watch-avatars.s3.us-west-2.amazonaws.com/placeholder.jpg"}
                          className={"poster"}
                          alt={"show-poster"}/>
                     <div className={"text-details"}>
@@ -52,10 +53,10 @@ export function MoviePage(){
                         <div className={"overview"}>{show.overview}</div>
                     </div>
                 </div>
-                
+
                 <h2>Cast
                     <button className={"toggle-full-cast"}
-                            onClick={()=>setDisplayAllCast(!displayAllCast)}>
+                            onClick={() => setDisplayAllCast(!displayAllCast)}>
                         Toggle Full Cast
                     </button>
                 </h2>
@@ -67,9 +68,9 @@ export function MoviePage(){
                         }
                         return (
                             <div className={"cast-member"} key={cast.id}>
-                                <Link to={"/actor/"+cast.id}>
-                                    <img src={ cast.profile_path !== null ?
-                                        "https://image.tmdb.org/t/p/w500/" +cast.profile_path :
+                                <Link to={"/actor/" + cast.id}>
+                                    <img src={cast.profile_path !== null ?
+                                        "https://image.tmdb.org/t/p/w500/" + cast.profile_path :
                                         "https://did-you-watch-avatars.s3.us-west-2.amazonaws.com/placeholder.jpg"}
                                          className={"poster"}
                                          alt={"show-poster"}/>
