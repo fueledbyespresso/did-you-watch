@@ -102,11 +102,12 @@ func addToWatchlist(db *database.DB) gin.HandlerFunc {
 		var returnedName string
 		var returnedPosterPath string
 		var returnedOverview string
+		var backdropPath string
 		err = db.Db.QueryRow(`INSERT INTO movie (id, name, poster_path, overview) VALUES ($1, $2, $3, $4) 
-										ON CONFLICT (id) DO UPDATE SET name=$2, poster_path=$3, overview=$4 
-										RETURNING id, name, COALESCE(poster_path, ''), COALESCE(overview, '')`,
-			movieID, dataJSON["original_title"], dataJSON["poster_path"], dataJSON["overview"]).Scan(
-			&returnedID, &returnedName, &returnedPosterPath, &returnedOverview)
+										ON CONFLICT (id) DO UPDATE SET name=$2, poster_path=$3, overview=$4, backdrop_path=$5
+										RETURNING id, name, COALESCE(poster_path, ''), COALESCE(overview, ''), COALESCE(backdrop_path, '')`,
+			movieID, dataJSON["original_title"], dataJSON["poster_path"], dataJSON["overview"], dataJSON["backdrop_path"]).Scan(
+			&returnedID, &returnedName, &returnedPosterPath, &returnedOverview, &backdropPath)
 		if err != nil {
 			fmt.Println(err)
 			return
@@ -125,11 +126,12 @@ func addToWatchlist(db *database.DB) gin.HandlerFunc {
 		}
 
 		c.JSON(http.StatusOK, account.Movie{
-			ID:         returnedID,
-			Name:       returnedName,
-			PosterPath: returnedPosterPath,
-			Status:     status,
-			Overview:   returnedOverview,
+			ID:           returnedID,
+			Name:         returnedName,
+			PosterPath:   returnedPosterPath,
+			Status:       status,
+			Overview:     returnedOverview,
+			BackdropPath: backdropPath,
 		})
 	}
 }

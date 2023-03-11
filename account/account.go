@@ -27,19 +27,23 @@ type User struct {
 }
 
 type Movie struct {
-	ID         int    `json:"id"`
-	Name       string `json:"original_title"`
-	PosterPath string `json:"poster_path"`
-	Status     string `json:"status"`
-	Overview   string `json:"overview"`
+	ID           int    `json:"id"`
+	Name         string `json:"original_title"`
+	PosterPath   string `json:"poster_path"`
+	Status       string `json:"status"`
+	Overview     string `json:"overview"`
+	BackdropPath string `json:"backdrop_path"`
 }
 
 type TV struct {
-	ID         int    `json:"id"`
-	Name       string `json:"original_name"`
-	PosterPath string `json:"poster_path"`
-	Status     string `json:"status"`
-	Overview   string `json:"overview"`
+	ID              int    `json:"id"`
+	Name            string `json:"original_name"`
+	PosterPath      string `json:"poster_path"`
+	Status          string `json:"status"`
+	Overview        string `json:"overview"`
+	EpisodesWatched int    `json:"episodes_watched"`
+	TotalEpisodes   int    `json:"total_episodes"`
+	BackdropPath    string `json:"backdrop_path"`
 }
 
 // Routes All the routes created by the package nested in
@@ -170,7 +174,7 @@ func GetUser(uid string, db *database.DB) (string, string, string, []Movie, []TV
        WHERE uid = $1`, uid).Scan(&username, &displayName, &profilePicURL, &darkMode)
 	PanicOnErr(err)
 
-	query, err := db.Db.Query(`SELECT movie.id, movie.name, COALESCE(poster_path, ''), COALESCE(movie.overview, ''), status
+	query, err := db.Db.Query(`SELECT movie.id, movie.name, COALESCE(poster_path, ''), COALESCE(movie.overview, ''), status, COALESCE(backdrop_path, '')
 										FROM movie JOIN movie_user_bridge mub on movie.id = mub.movie_id
 										JOIN account a on a.uid = mub.user_id
 											WHERE uid=$1 ORDER BY name`, uid)
@@ -179,7 +183,7 @@ func GetUser(uid string, db *database.DB) (string, string, string, []Movie, []TV
 	}
 	for query.Next() {
 		var movie Movie
-		err = query.Scan(&movie.ID, &movie.Name, &movie.PosterPath, &movie.Overview, &movie.Status)
+		err = query.Scan(&movie.ID, &movie.Name, &movie.PosterPath, &movie.Overview, &movie.Status, &movie.BackdropPath)
 		if err != nil {
 			return "", "", "", []Movie{}, []TV{}, false
 		}
@@ -187,14 +191,14 @@ func GetUser(uid string, db *database.DB) (string, string, string, []Movie, []TV
 		movieList = append(movieList, movie)
 	}
 
-	query, err = db.Db.Query(`SELECT tv.id, tv.name, COALESCE(poster_path, ''), COALESCE(tv.overview, '') , status
+	query, err = db.Db.Query(`SELECT tv.id, tv.name, COALESCE(poster_path, ''), COALESCE(tv.overview, '') , status, episodes_watched, total_episodes, COALESCE(backdrop_path, '')
 										FROM tv JOIN tv_user_bridge mub on tv.id = mub.tv_id
 										JOIN account a on a.uid = mub.user_id
 											WHERE uid=$1 ORDER BY tv.name`, uid)
 	PanicOnErr(err)
 	for query.Next() {
 		var show TV
-		err = query.Scan(&show.ID, &show.Name, &show.PosterPath, &show.Overview, &show.Status)
+		err = query.Scan(&show.ID, &show.Name, &show.PosterPath, &show.Overview, &show.Status, &show.EpisodesWatched, &show.TotalEpisodes, &show.BackdropPath)
 		if err != nil {
 			return "", "", "", []Movie{}, []TV{}, false
 		}

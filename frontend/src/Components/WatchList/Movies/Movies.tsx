@@ -46,7 +46,6 @@ export function Movies() {
                         return (
                             (filter === movie.status || filter === "all") &&
                             <Movie key={movie.id}
-                                   compact={toggleCompact}
                                    movie={movie}/>
                         )
                     }) : (

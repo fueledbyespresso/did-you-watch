@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import Select from "react-select";
-import {useDispatch, useSelector} from "react-redux";
+import {useSelector} from "react-redux";
 import {User} from "../../../Types/User";
 import {Show} from "../../../Types/Show";
 
@@ -18,7 +18,6 @@ export function Shows() {
 
     const userState = useSelector((state: any) => state.user);
     const [user, setUser] = useState<User>(userState.user)
-    const dispatch = useDispatch()
     const [toggleCompact, setToggleCompact] = useState(false)
 
     useEffect(() => {
@@ -26,11 +25,11 @@ export function Shows() {
     }, [userState]);
 
     function filterReturnsEmpty(filter: string | undefined) {
-        if (filter == "all") {
-            return user.tvList.length == 0
+        if (filter === "all") {
+            return user.tvList.length === 0
         }
         for (let i = 0; i < user.tvList.length; i++) {
-            if (user.tvList[i].status == filter) {
+            if (user.tvList[i].status === filter) {
                 return false
             }
         }
@@ -47,14 +46,14 @@ export function Shows() {
             <button onClick={()=>setToggleCompact(!toggleCompact)}>
                 Compact Mode
             </button>
-            <div className={!toggleCompact ? "films" : "films-compact"}>
+            <div className={(!toggleCompact ? "films" : "films-compact")}>
                 {user.tvList != null && !filterReturnsEmpty(filter) ?
                     user.tvList.map((show: Show) => {
                         return (
                             (filter === show.status || filter === "all") &&
-                            <Show key={show.id}
-                                  compact={toggleCompact}
-                                  show={show}/>
+                                <Show key={show.id}
+                                      searchResult={false}
+                                      show={show}/>
                         )
                     }) : (
                         <div>No shows in this category :(</div>

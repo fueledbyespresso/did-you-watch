@@ -55,10 +55,10 @@ export function UserPage(){
 
             <div className={"films"}>
                 {tab ==="shows" && user.tvList.map(show => (
-                    <Show show={show} compact={false} key={show.id}/>
+                    <Show show={show} key={show.id} searchResult={false}/>
                 ))}
                 {tab ==="movies" && user.movieList.map(movie => (
-                    <Movie movie={movie} compact={false} key={movie.id}/>
+                    <Movie movie={movie} key={movie.id}/>
                 ))}
             </div>
         </div>

@@ -70,7 +70,6 @@ export function Search() {
                         movieResults.results.map((movie: Movie) => {
                             return (
                                 <Movie key={movie.id}
-                                       compact={false}
                                        movie={movie}/>
                             )
                 }) : (
@@ -83,7 +82,7 @@ export function Search() {
                         TVResults.results.map((show: Show) => {
                             return (
                                 <Show key={Number(show.id)}
-                                      compact={false}
+                                      searchResult={true}
                                       show={show}/>
                         )
                 }) : (

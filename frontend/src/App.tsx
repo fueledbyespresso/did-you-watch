@@ -25,6 +25,8 @@ import {ActorPage} from "./Pages/ActorPage";
 // TODO Add compact mode to other user page
 // TODO Redirect user to their own watchlist when they navigate to their own profile
 // TODO Make overview expandable when too long
+// TODO Add episode progress for shows
+// TODO Add status buttons to show/movie full details page
 
 // Configure Firebase.
 // noinspection SpellCheckingInspection

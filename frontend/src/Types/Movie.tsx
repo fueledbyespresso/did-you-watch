@@ -7,6 +7,7 @@ export type Movie = {
     id: number,
     original_title: string,
     poster_path: string,
+    backdrop_path: string,
     status: string,
     overview: string,
     release_date: string
@@ -20,7 +21,7 @@ const status_types = [
     {value: 'dropped', label: 'Dropped'},
 ]
 
-export function Movie(props: { movie: Movie, compact: boolean }) {
+export function Movie(props: { movie: Movie}) {
     const user = useSelector((state: {user:UserState }) => state.user).user;
     const dispatch = useDispatch()
     const [loading, setLoading] = useState<boolean>(false)
@@ -113,7 +114,7 @@ export function Movie(props: { movie: Movie, compact: boolean }) {
                         {user.movieList.some(e => e.id === props.movie.id) && "In watchlist"}
                     </div>
                     <div className={"release-date"}>{props.movie.release_date}</div>
-                    <div className={"overview"}>{!props.compact && props.movie.overview}</div>
+                    <div className={"overview"}>{props.movie.overview}</div>
                 </div>
                 <img src={(props.movie.poster_path === "" || props.movie.poster_path === null) ?
                     "https://did-you-watch-avatars.s3.us-west-2.amazonaws.com/placeholder.jpg" :

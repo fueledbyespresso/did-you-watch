@@ -6,10 +6,13 @@ import {Link} from "react-router-dom";
 export type Show = {
     id: number,
     poster_path: string,
+    backdrop_path: string,
     status: string,
     overview: string,
     original_name: string,
-    first_air_date: string
+    first_air_date: string,
+    total_episodes: number,
+    episodes_watched: number
 }
 
 const status_types = [
@@ -20,7 +23,7 @@ const status_types = [
     {value: 'dropped', label: 'Dropped'},
 ]
 
-export function Show(props: { show: Show, compact: boolean }) {
+export function Show(props: { show: Show, searchResult: boolean }) {
     const user = useSelector((state: {user:UserState }) => state.user).user;
     const dispatch = useDispatch()
     const [loading, setLoading] = useState<boolean>(false)
@@ -62,6 +65,7 @@ export function Show(props: { show: Show, compact: boolean }) {
                     if (index > -1) {
                         tempUser.tvList[index] = result
                     } else {
+                        console.log(result)
                         tempUser.tvList.unshift(result)
                     }
                     setLoading(false)
@@ -105,42 +109,71 @@ export function Show(props: { show: Show, compact: boolean }) {
             )
     }
 
-    return (
-        <div className="film">
-            <div className={"film-details"}>
-                <div className={"text-details"}>
-                    <div className={"name"}>
-                        <Link to={"/show/"+props.show.id}>
-                            {props.show.original_name}
-                        </Link>
-                        <div className={"status"}>{props.show.status}</div>
+    if(props.searchResult){
+        return (
+            <div className="film">
+                <div className={"film-details"}>
+                    <div className={"text-details"}>
+                        <div className={"name"}>
+                            <Link to={"/show/"+props.show.id}>
+                                {props.show.original_name}
+                            </Link>
+                            <div className={"status"}>{props.show.status}</div>
+                        </div>
+                        <div>
+                            {user.tvList.some(e => e.id === props.show.id) && "In watchlist"}
+                        </div>
+                        <div className={"release-date"}>{props.show.first_air_date}</div>
+                        <div className={"overview"}>{props.show.overview}</div>
                     </div>
-                    <div>
-                        {user.tvList.some(e => e.id === props.show.id) && "In watchlist"}
-                    </div>
-                    <div className={"release-date"}>{props.show.first_air_date}</div>
-                    <div className={"overview"}>{!props.compact && props.show.overview}</div>
+                    <img src={(props.show.poster_path === "" || props.show.poster_path === null) ?
+                        "https://did-you-watch-avatars.s3.us-west-2.amazonaws.com/placeholder.jpg":
+                        "https://image.tmdb.org/t/p/w500/" + props.show.poster_path}
+                         className={"poster"}
+                         alt={"show-poster"}/>
                 </div>
-                <img src={(props.show.poster_path === "" || props.show.poster_path === null) ?
-                    "https://did-you-watch-avatars.s3.us-west-2.amazonaws.com/placeholder.jpg":
-                    "https://image.tmdb.org/t/p/w500/" + props.show.poster_path}
-                     className={"poster"}
-                     alt={"show-poster"}/>
-            </div>
 
-            <div className={"status-buttons"}>
-                {status_types.map((status) => (
-                    <button className={status.value}
-                            key={status.value}
-                            tabIndex={3}
-                            disabled={curShowStatus === status.value}
-                            onClick={() => addShowToWatchlist(props.show.id, status.value)}>
-                        {status.label}
-                    </button>
-                ))}
-                <button onClick={() => deleteFromWatchlist(props.show.id)}
-                        className={"delete"}>Remove</button>
-                {loading && <button>Loading...</button>}
+                <div className={"status-buttons"}>
+                    {status_types.map((status) => (
+                        <button className={status.value}
+                                key={status.value}
+                                tabIndex={3}
+                                disabled={curShowStatus === status.value}
+                                onClick={() => addShowToWatchlist(props.show.id, status.value)}>
+                            {status.label}
+                        </button>
+                    ))}
+                    <button onClick={() => deleteFromWatchlist(props.show.id)}
+                            className={"delete"}>Remove</button>
+                    {loading && <button>Loading...</button>}
+                </div>
+            </div>
+        )
+    }
+
+    return (
+        <div className={"watchlist-film"}>
+            <img src={"https://image.tmdb.org/t/p/w500/" + props.show.poster_path} alt={""}/>
+            <div className={"details"}>
+                <div className={"text-details"}>
+                    <div className={"name"}><Link to={"/show/"+props.show.id}>{props.show.original_name}</Link></div>
+                    <div className={"status"}>{props.show.status}</div>
+                    <div className={"watch-count"}>{props.show.episodes_watched}/{props.show.total_episodes} <button>Edit</button></div>
+                    {loading && <div>Loading...</div>}
+                </div>
+                <div className={"status-buttons"}>
+                    {status_types.map((status) => (
+                        <button className={status.value}
+                                key={status.value}
+                                tabIndex={3}
+                                disabled={curShowStatus === status.value}
+                                onClick={() => addShowToWatchlist(props.show.id, status.value)}>
+                            {status.label}
+                        </button>
+                    ))}
+                    <button onClick={() => deleteFromWatchlist(props.show.id)}
+                            className={"delete"}>Remove</button>
+                </div>
             </div>
         </div>
     )

@@ -52,7 +52,7 @@ export function ActorPage(){
                      className={"headshot"}
                      alt={"actor-headshot"}/>
                 <div className={"text-details"}>
-                    <h1 className={"name"}>{actor?.name} ({new Date().getFullYear() - actor.birthday.substring(0,4)-1})</h1>
+                    <h1 className={"name"}>{actor?.name} ({new Date().getFullYear() - actor.birthday?.substring(0,4)-1})</h1>
                     <div className={"biography"}>
                         <h2>Biography</h2>
                         <div>{actor?.biography}</div>
@@ -67,7 +67,7 @@ export function ActorPage(){
                         return null
                     }
                     return(
-                        <div className={"credit"} key={film.id}>
+                        <div className={"credit"} key={film.credit_id}>
                             <Link to={film.media_type === "movie" ? "/movie/"+film.id : "/show/"+film.id}>
                                 <img src={film.poster_path !== null ?
                                     "https://image.tmdb.org/t/p/w300/" +film.poster_path :

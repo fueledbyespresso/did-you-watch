@@ -48,10 +48,12 @@ func getTVShow(db *database.DB) gin.HandlerFunc {
 		id := c.Param("id")
 		resp, err := http.Get("https://api.themoviedb.org/3/tv/" + url.QueryEscape(id) + "?api_key=" + os.Getenv("TMDB_API_KEY") + "&append_to_response=aggregate_credits")
 		if err != nil {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, "Could not retrieve show.")
 			return
 		}
 		contents, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, "Could not retrieve show.")
 			return
 		}
 		var dataJSON map[string]any
@@ -59,7 +61,9 @@ func getTVShow(db *database.DB) gin.HandlerFunc {
 		if err != nil {
 			log.Println(err)
 		}
-
+		if resp.StatusCode == 200 {
+			db.Db.QueryRow(`UPDATE tv SET total_episodes=$1 WHERE id=$2`, dataJSON["number_of_episodes"], id)
+		}
 		c.JSON(http.StatusOK, dataJSON)
 	}
 }
@@ -102,11 +106,13 @@ func addToWatchlist(db *database.DB) gin.HandlerFunc {
 		var returnedName string
 		var returnedPosterPath string
 		var returnedOverview string
-		err = db.Db.QueryRow(`INSERT INTO tv (id, name, poster_path, overview) VALUES ($1, $2, $3, $4) 
-										ON CONFLICT (id) DO UPDATE SET name=$2, poster_path=$3, overview=$4 
-										returning id, name, COALESCE(poster_path, ''), COALESCE(overview, '')`,
-			tvID, dataJSON["original_name"], dataJSON["poster_path"], dataJSON["overview"]).Scan(
-			&returnedID, &returnedName, &returnedPosterPath, &returnedOverview)
+		var backdropPath string
+		var totalEpisodes int
+		err = db.Db.QueryRow(`INSERT INTO tv (id, name, poster_path, overview, backdrop_path, total_episodes) VALUES ($1, $2, $3, $4, $5, $6) 
+										ON CONFLICT (id) DO UPDATE SET name=$2, poster_path=$3, overview=$4, backdrop_path=$5, total_episodes=$6
+										returning id, name, COALESCE(poster_path, ''), COALESCE(overview, ''), COALESCE(backdrop_path, ''), total_episodes`,
+			tvID, dataJSON["original_name"], dataJSON["poster_path"], dataJSON["overview"], dataJSON["backdrop_path"], dataJSON["number_of_episodes"]).Scan(
+			&returnedID, &returnedName, &returnedPosterPath, &returnedOverview, &backdropPath, &totalEpisodes)
 		if err != nil {
 			fmt.Println(err)
 			return
@@ -116,20 +122,24 @@ func addToWatchlist(db *database.DB) gin.HandlerFunc {
 			return
 		}
 
-		err = db.Db.QueryRow(`INSERT INTO tv_user_bridge (tv_id, user_id, status) VALUES ($1, $2, $3) 
-										ON CONFLICT (tv_id, user_id) DO UPDATE SET status=$3
-										returning status`, tvID, user.UID, status).Scan(&status)
+		var episodesWatched int
+		err = db.Db.QueryRow(`INSERT INTO tv_user_bridge (tv_id, user_id, status, episodes_watched) VALUES ($1, $2, $3, $4) 
+										ON CONFLICT (tv_id, user_id) DO UPDATE SET status=$3, episodes_watched=$4
+										returning status, episodes_watched`, tvID, user.UID, status, 0).Scan(&status, &episodesWatched)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, "Unable to add to watchlist")
 			return
 		}
 
 		c.JSON(http.StatusOK, account.TV{
-			ID:         returnedID,
-			Name:       returnedName,
-			PosterPath: returnedPosterPath,
-			Status:     status,
-			Overview:   returnedOverview,
+			ID:              returnedID,
+			Name:            returnedName,
+			PosterPath:      returnedPosterPath,
+			Status:          status,
+			Overview:        returnedOverview,
+			BackdropPath:    backdropPath,
+			TotalEpisodes:   totalEpisodes,
+			EpisodesWatched: episodesWatched,
 		})
 	}
 }
