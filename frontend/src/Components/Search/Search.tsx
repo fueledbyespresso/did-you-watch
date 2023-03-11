@@ -70,6 +70,7 @@ export function Search() {
                         movieResults.results.map((movie: Movie) => {
                             return (
                                 <Movie key={movie.id}
+                                       searchResult={true}
                                        movie={movie}/>
                             )
                         }) : (

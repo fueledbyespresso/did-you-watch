@@ -58,7 +58,7 @@ export function UserPage() {
                     <Show show={show} key={show.id} searchResult={false}/>
                 ))}
                 {tab === "movies" && user.movieList.map(movie => (
-                    <Movie movie={movie} key={movie.id}/>
+                    <Movie movie={movie} key={movie.id} searchResult={false}/>
                 ))}
             </div>
         </div>

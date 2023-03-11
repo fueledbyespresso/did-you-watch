@@ -46,6 +46,7 @@ export function Movies() {
                         return (
                             (filter === movie.status || filter === "all") &&
                             <Movie key={movie.id}
+                                   searchResult={false}
                                    movie={movie}/>
                         )
                     }) : (
