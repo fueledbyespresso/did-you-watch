@@ -118,3 +118,14 @@ create table if not exists movie_user_bridge
         primary key (user_id, movie_id)
 );
 
+INSERT INTO avatar (id, image_url) VALUES (4, 'https://did-you-watch-avatars.s3.us-west-2.amazonaws.com/green_tv_panda_compressed.jpg');
+INSERT INTO avatar (id, image_url) VALUES (3, 'https://did-you-watch-avatars.s3.us-west-2.amazonaws.com/blue_tv_astronaut.jpg');
+INSERT INTO avatar (id, image_url) VALUES (5, 'https://did-you-watch-avatars.s3.us-west-2.amazonaws.com/orange_sentient_tv.jpg');
+INSERT INTO avatar (id, image_url) VALUES (2, 'https://did-you-watch-avatars.s3.us-west-2.amazonaws.com/blue_astronaut_popcorn.jpg');
+INSERT INTO avatar (id, image_url) VALUES (1, 'https://did-you-watch-avatars.s3.us-west-2.amazonaws.com/blue_astronaut_on_moon.jpg');
+INSERT INTO avatar (id, image_url) VALUES (6, 'https://did-you-watch-avatars.s3.us-west-2.amazonaws.com/purple_astronaut_juggling_planets.jpg');
+INSERT INTO avatar (id, image_url) VALUES (7, 'https://did-you-watch-avatars.s3.us-west-2.amazonaws.com/purple_astronaut_on_moon.jpg');
+INSERT INTO avatar (id, image_url) VALUES (8, 'https://did-you-watch-avatars.s3.us-west-2.amazonaws.com/red_movie_items.jpg');
+INSERT INTO avatar (id, image_url) VALUES (9, 'https://did-you-watch-avatars.s3.us-west-2.amazonaws.com/red_unicorn_popcorn.jpg');
+INSERT INTO avatar (id, image_url) VALUES (10, 'https://did-you-watch-avatars.s3.us-west-2.amazonaws.com/yellow_tv.jpg');
+
