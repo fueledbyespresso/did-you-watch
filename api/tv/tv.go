@@ -1,6 +1,7 @@
 package tv
 
 import (
+	"database/sql"
 	"did-you-watch/account"
 	"did-you-watch/database"
 	"encoding/json"
@@ -62,7 +63,11 @@ func getTVShow(db *database.DB) gin.HandlerFunc {
 			log.Println(err)
 		}
 		if resp.StatusCode == 200 {
-			db.Db.QueryRow(`UPDATE tv SET total_episodes=$1 WHERE id=$2`, dataJSON["number_of_episodes"], id)
+			err = db.Db.QueryRow(`UPDATE tv SET total_episodes=$1 WHERE id=$2`, dataJSON["number_of_episodes"], id).Scan()
+			if err != nil && err != sql.ErrNoRows {
+				fmt.Println("EPISODE UPDATE ERROR", err)
+				return
+			}
 		}
 		c.JSON(http.StatusOK, dataJSON)
 	}
