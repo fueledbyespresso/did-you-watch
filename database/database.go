@@ -29,7 +29,7 @@ func InitDBConnection() *sql.DB {
 		fmt.Println("Cannot establish SQL connection")
 		panic(err.Error())
 	}
-
+	db.SetMaxOpenConns(15)
 	return db
 }
 
