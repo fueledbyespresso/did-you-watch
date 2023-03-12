@@ -101,6 +101,7 @@ export function Show(props: { show: Show, searchResult: boolean }) {
                             break;
                         }
                     }
+                    setCurShowStatus(null)
                     setLoading(false)
                     dispatch(set(tempUser))
                 }, (error) => {

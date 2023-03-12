@@ -94,7 +94,7 @@ export function Movie(props: { movie: Movie, searchResult: boolean  }) {
                             break;
                         }
                     }
-
+                    setCurMovieStatus(null)
                     dispatch(set(tempUser))
                     console.log(result)
                 }, (error) => {
