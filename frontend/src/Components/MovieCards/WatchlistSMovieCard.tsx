@@ -11,7 +11,8 @@ export function WatchlistSMovieCard(props: {
             <img src={"https://image.tmdb.org/t/p/w500/" + props.movie.poster_path} alt={""}/>
             <div className={"details"}>
                 <div className={"text-details"}>
-                    <div className={"name"}><Link to={"/movie/" + props.movie.id}>{props.movie.original_title}</Link>
+                    <div className={"name"}>
+                        <Link to={"/movie/" + props.movie.id}>{props.movie.original_title}</Link>
                     </div>
                     <div className={"status"}>{props.movie.status}</div>
                 </div>

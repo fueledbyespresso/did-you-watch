@@ -17,7 +17,7 @@ export function MovieStatusCard(props: { movieID: number }) {
     const [curMovieStatus, setCurMovieStatus] = useState<string | null>(null)
 
     useEffect(() => {
-        let matchingShow = user.tvList.filter(obj => {
+        let matchingShow = user.movieList.filter(obj => {
             return obj.id === props.movieID
         })
         if (matchingShow.length > 0) {
