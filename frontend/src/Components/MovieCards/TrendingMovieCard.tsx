@@ -6,7 +6,7 @@ import {Movie} from "../../Types/Movie";
 export function TrendingMovieCard(props: { movie: Movie }) {
     return (
         <div className={"trending-film"}>
-            <Link to={"/show/" + props.movie.id}>
+            <Link to={"/movie/" + props.movie.id}>
                 <img src={"https://image.tmdb.org/t/p/w500/" + props.movie.poster_path} className={"poster"}
                      alt={"show-poster"}/>
             </Link>
