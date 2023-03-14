@@ -1,8 +1,9 @@
 import React, {useEffect, useState} from "react";
 import {useParams} from "react-router-dom";
 import {User} from "../Types/User";
-import {Show} from "../Types/Show";
 import {Movie} from "../Types/Movie";
+import {ProfileShowCard} from "../Components/ShowCards/PorfileShowCard";
+import {ProfileMovieCard} from "../Components/MovieCards/PorfileMovieCard";
 
 export function UserPage() {
     const [user, setUser] = useState<User | null>(null)
@@ -55,10 +56,10 @@ export function UserPage() {
 
             <div className={"films"}>
                 {tab === "shows" && user.tvList.map(show => (
-                    <Show show={show} key={show.id} searchResult={false}/>
+                    <ProfileShowCard show={show} key={show.id}/>
                 ))}
                 {tab === "movies" && user.movieList.map(movie => (
-                    <Movie movie={movie} key={movie.id} searchResult={false}/>
+                    <ProfileMovieCard movie={movie} key={movie.id}/>
                 ))}
             </div>
         </div>

@@ -1,21 +1,24 @@
-import {useState} from "react";
+import React, {useState} from "react";
 import Select from "react-select";
 import {User} from "../../Types/User";
-import {Show} from "../../Types/Show";
 import {Movie} from "../../Types/Movie";
+import {Show} from "../../Types/Show";
+import {SearchResultShowCard} from "../ShowCards/SearchResultShowCard";
+import {WatchlistShowCard} from "../ShowCards/WatchlistShowCard";
+import {WatchlistSMovieCard} from "../MovieCards/WatchlistSMovieCard";
+import {SearchResultMovieCard} from "../MovieCards/SearchResultMovieCard";
 
 const options = [
+    {value: 'multi', label: 'Multi'},
     {value: 'tv', label: 'TV'},
     {value: 'movie', label: 'Movie'},
     {value: 'users', label: 'Users'},
 ]
 
 export function Search() {
-    const [curCategory, setCurCategory] = useState<string | undefined>("tv")
+    const [curCategory, setCurCategory] = useState<string | undefined>("multi")
     const [searchQuery, setSearchQuery] = useState<String>("")
-    const [movieResults, setMovieResults] = useState<any>(null)
-    const [TVResults, setTVResults] = useState<any>(null)
-    const [userResults, setUserResults] = useState<any>(null)
+    const [searchResults, setSearchResults] = useState<any>(null)
 
     function submitSearch(searchCategory: string | null | undefined) {
         fetch(process.env.REACT_APP_HOST + "/api/v1/search/" + searchCategory + "/" + searchQuery, {
@@ -28,13 +31,7 @@ export function Search() {
             })
             .then(
                 (result) => {
-                    if (searchCategory == "movie") {
-                        setMovieResults(result)
-                    } else if (searchCategory == "tv") {
-                        setTVResults(result)
-                    } else if (searchCategory == "users") {
-                        setUserResults(result)
-                    }
+                    setSearchResults(result.results)
                 }, (error) => {
 
                 }
@@ -46,7 +43,7 @@ export function Search() {
             <div className={"search-bar"}>
                 <Select options={options}
                         tabIndex={1}
-                        defaultValue={{value: 'tv', label: 'TV'}}
+                        defaultValue={{value: 'multi', label: 'Multi'}}
                         onChange={(values) => setCurCategory(values?.value)}
                         className="category-select"/>
 
@@ -65,44 +62,17 @@ export function Search() {
             </div>
 
             <div className="results">
-                {curCategory === "movie" && (
-                    movieResults !== null && movieResults.results.length !== 0 ?
-                        movieResults.results.map((movie: Movie) => {
-                            return (
-                                <Movie key={movie.id}
-                                       searchResult={true}
-                                       movie={movie}/>
-                            )
-                        }) : (
-                            movieResults !== null && movieResults.results.length === 0 && (
-                                <div>No results</div>
-                            )
-                        ))}
-                {curCategory === "tv" && (
-                    TVResults !== null && TVResults.results.length !== 0 ?
-                        TVResults.results.map((show: Show) => {
-                            return (
-                                <Show key={Number(show.id)}
-                                      searchResult={true}
-                                      show={show}/>
-                            )
-                        }) : (
-                            TVResults !== null && TVResults.results.length === 0 && (
-                                <div>No results</div>
-                            )
-                        ))}
-                {curCategory === "users" && (
-                    userResults !== null && userResults.length !== 0 ?
-                        userResults.map((user: User) => {
-                            return (
-                                <User key={user.uid}
-                                      user={user}/>
-                            )
-                        }) : (
-                            userResults !== null && userResults.length === 0 && (
-                                <div>No results</div>
-                            )
-                        ))}
+                {searchResults !== null && searchResults.map((media: any) => {
+                    switch (media.media_type) {
+                        case "tv":
+                            return <SearchResultShowCard show={media} key={media.id}/>
+                        case "movie":
+                            return <SearchResultMovieCard movie={media} key={media.id}/>
+                        case "user":
+                            return <User user={media}/>
+                        default: return <div></div>
+                    }
+                })}
             </div>
         </div>
     )

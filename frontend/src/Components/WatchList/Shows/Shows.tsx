@@ -3,6 +3,7 @@ import Select from "react-select";
 import {useSelector} from "react-redux";
 import {User} from "../../../Types/User";
 import {Show} from "../../../Types/Show";
+import {WatchlistShowCard} from "../../ShowCards/WatchlistShowCard";
 
 const options = [
     {value: 'all', label: 'All Shows'},
@@ -15,10 +16,8 @@ const options = [
 
 export function Shows() {
     const [filter, setFilter] = useState<string | undefined>("all")
-
     const userState = useSelector((state: any) => state.user);
     const [user, setUser] = useState<User>(userState.user)
-    const [toggleCompact, setToggleCompact] = useState(false)
 
     useEffect(() => {
         setUser(userState.user)
@@ -43,17 +42,13 @@ export function Shows() {
                     defaultValue={{value: 'all', label: 'All Shows'}}
                     onChange={(values) => setFilter(values?.value)}
                     className="filter-select"/>
-            <button onClick={() => setToggleCompact(!toggleCompact)}>
-                Compact Mode
-            </button>
-            <div className={(!toggleCompact ? "films" : "films-compact")}>
+
+            <div className={"films"}>
                 {user.tvList != null && !filterReturnsEmpty(filter) ?
                     user.tvList.map((show: Show) => {
                         return (
                             (filter === show.status || filter === "all") &&
-                            <Show key={show.id}
-                                  searchResult={false}
-                                  show={show}/>
+                                <WatchlistShowCard show={show}/>
                         )
                     }) : (
                         <div>No shows in this category :(</div>

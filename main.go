@@ -4,11 +4,11 @@ import (
 	"did-you-watch/account"
 	"did-you-watch/api/actors"
 	"did-you-watch/api/movies"
+	"did-you-watch/api/search"
 	"did-you-watch/api/trending"
 	"did-you-watch/api/tv"
 	"did-you-watch/api/users"
 	"did-you-watch/database"
-	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
 	"time"
 )
@@ -42,8 +42,7 @@ func createServer(dbConnection *database.DB) *gin.Engine {
 	users.Routes(v1, dbConnection)
 	trending.Routes(v1)
 	actors.Routes(v1)
-
-	r.Use(static.Serve("/", static.LocalFile("./frontend/build", true)))
+	search.Routes(v1, dbConnection)
 
 	return r
 }

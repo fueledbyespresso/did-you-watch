@@ -1,7 +1,7 @@
 import React from "react";
 import {Search} from "../Search/Search";
 import {AccountDropdown} from "../AccountDropdown/AccountDropdown";
-import {Link, NavLink} from "react-router-dom";
+import {NavLink} from "react-router-dom";
 import {useSelector} from "react-redux";
 
 export function HeaderBar() {
@@ -12,7 +12,7 @@ export function HeaderBar() {
             <AccountDropdown/>
             <Search/>
             <div className={"links"}>
-                <Link className={"logo"} to={"/"}>Did you watch?</Link>
+                <NavLink className={({isActive}) => (isActive ? 'active' : 'inactive')} to={"/"}>Did you watch?</NavLink>
                 {store.userExists &&
                     <>
                         <NavLink className={({isActive}) => (isActive ? 'active' : 'inactive')} to={"/my-movies"}>My

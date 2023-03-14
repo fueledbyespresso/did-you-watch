@@ -1,5 +1,6 @@
 import {Link, useParams} from "react-router-dom";
 import React, {useEffect, useState} from "react";
+import {ShowStatusButtons} from "../Components/ShowCards/ShowStatusButtons";
 
 export function TVShowPage() {
     const {id} = useParams()
@@ -51,6 +52,7 @@ export function TVShowPage() {
                         <h2>{show.original_name}</h2>
                         <div>{show.first_air_date}</div>
                         <div className={"overview"}>{show.overview}</div>
+                        <ShowStatusButtons showID={show.id}/>
                     </div>
                 </div>
                 <h2>Cast

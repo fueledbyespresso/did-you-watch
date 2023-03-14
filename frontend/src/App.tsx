@@ -16,7 +16,6 @@ import {MoviePage} from "./Pages/MoviePage";
 import {Root} from "./Components/Root/Root";
 import {UserPage} from "./Pages/UserPage";
 import {ActorPage} from "./Pages/ActorPage";
-// TODO Add a calendar page.
 // TODO Add more sorting features
 // TODO Style buttons better
 // TODO Add follow other people
@@ -51,7 +50,17 @@ function App() {
             }
         })
         setInterval(() => {
-            firebase.auth().currentUser?.getIdToken(true)
+            if (firebase.auth().currentUser === null) {
+                console.log("no user logged in")
+                dispatch(remove())
+            } else {
+                firebase.auth().currentUser?.getIdToken(true)
+                    .then((idToken) => {
+                        getAccount(idToken)
+                    }).catch((error) => {
+                    console.log(error)
+                });
+            }
         }, 300000);
     }, [])
 
