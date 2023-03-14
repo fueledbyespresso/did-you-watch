@@ -11,7 +11,11 @@ export function SearchResultMovieCard(props: {
             <div className={"film-details"}>
                 <div className={"text-details"}>
                     <div className={"name"}>
-                        <Link to={"/show/" + props.movie.id}>
+                        <Link to={"/movie/" + props.movie.id} onClick={()=>{
+                            if (document.activeElement instanceof HTMLElement) {
+                                document.activeElement.blur();
+                            }}
+                        }>
                             {props.movie.original_title}
                         </Link>
                         <div className={"status"}>{props.movie.status}</div>
