@@ -15,9 +15,6 @@ export function WatchlistShowCard(props: {
                         <Link to={"/show/" + props.show.id}>{props.show.original_name}</Link>
                     </div>
                     <div className={"status"}>{props.show.status}</div>
-                    <div className={"watch-count"}>{props.show.episodes_watched}/{props.show.total_episodes}
-                        <button>Edit</button>
-                    </div>
                 </div>
                 <ShowStatusButtons showID={props.show.id}/>
             </div>

@@ -14,21 +14,29 @@ export function ShowStatusButtons(props: { showID: number }) {
     const user = useSelector((state: { user: UserState }) => state.user).user;
     const dispatch = useDispatch()
     const [loading, setLoading] = useState<boolean>(false)
-    const [curShowStatus, setCurShowStatus] = useState<string | null>(null)
+    const [editMode, setEditMode] = useState<boolean>(false)
+    const [newEpisodesWatched, setNewEpisodesWatched] = useState<number>(0)
+
+    const [showStatus, setShowStatus] = useState<string | null>(null)
+    const [episodesWatched, setEpisodesWatched] = useState<number>(0)
+    const [totalEpisodes, setTotalEpisodes] = useState<number | null>(null)
 
     useEffect(() => {
         let matchingShow = user.tvList.filter(obj => {
             return obj.id === props.showID
         })
         if (matchingShow.length > 0) {
-            setCurShowStatus(matchingShow[0].status)
+            setShowStatus(matchingShow[0].status)
+            setEpisodesWatched(matchingShow[0].episodes_watched)
+            setNewEpisodesWatched(matchingShow[0].episodes_watched)
+            setTotalEpisodes(matchingShow[0].total_episodes)
         }
     }, [user]);
 
 
-    function addShowToWatchlist(id: number, status: string) {
+    function addShowToWatchlist(id: number, status: string, episodesWatched: number) {
         setLoading(true)
-        fetch(process.env.REACT_APP_HOST + "/api/v1/tv/" + id + "/" + status, {
+        fetch(process.env.REACT_APP_HOST + "/api/v1/tv/" + id + "/" + status+"/"+episodesWatched, {
             method: "PUT",
             headers: {
                 'AuthToken': user.idToken
@@ -88,7 +96,7 @@ export function ShowStatusButtons(props: { showID: number }) {
                             break;
                         }
                     }
-                    setCurShowStatus(null)
+                    setShowStatus(null)
                     setLoading(false)
                     dispatch(set(tempUser))
                 }, (error) => {
@@ -99,13 +107,37 @@ export function ShowStatusButtons(props: { showID: number }) {
 
     return (
         <div className={"status-buttons"}>
+            <div className={"watch-count"}>
+                {editMode ? (
+                    <>
+                        Episodes watched: <input value={newEpisodesWatched} onChange={(e) => {
+                            if(!isNaN(+e.target.value) && Number(e.target.value) <= (totalEpisodes || 0)){
+                                setNewEpisodesWatched(Number(e.target.value))
+                            }
+                        }
+                    }/>/{totalEpisodes}
+                        <button onClick={()=>{
+                            addShowToWatchlist(props.showID, showStatus || "plan-to-watch", newEpisodesWatched)
+                            setEditMode(false)
+                        }
+                        }>Submit</button>
+                        <button onClick={()=>setEditMode(false)}>Cancel Edit</button>
+                    </>
+                ) : (
+                    <>
+                        Episodes watched: {episodesWatched}/{totalEpisodes}
+                        <button onClick={()=>setEditMode(true)}>Edit</button>
+                    </>
+                )}
+
+            </div>
             {loading && <div>"Loading..."</div>}
             {status_types.map((status) => (
                 <button className={status.value}
                         key={status.value}
                         tabIndex={3}
-                        disabled={curShowStatus === status.value}
-                        onClick={() => addShowToWatchlist(props.showID, status.value)}>
+                        disabled={showStatus === status.value}
+                        onClick={() => addShowToWatchlist(props.showID, status.value, episodesWatched)}>
                     {status.label}
                 </button>
             ))}

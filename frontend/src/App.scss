@@ -549,8 +549,9 @@ a {
     display: flex;
     flex-flow: row nowrap;
     gap: 1em;
-    background: #EEEEEE;
+    background: #f6f6f6;
     min-width: 15em;
+    box-shadow: rgba(0, 0, 0, 0.1) 0 5px 15px -6px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px;
 
     img {
         width: 5em;

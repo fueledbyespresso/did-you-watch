@@ -48,7 +48,7 @@ export function Shows() {
                     user.tvList.map((show: Show) => {
                         return (
                             (filter === show.status || filter === "all") &&
-                                <WatchlistShowCard show={show}/>
+                                <WatchlistShowCard show={show} key={show.id}/>
                         )
                     }) : (
                         <div>No shows in this category :(</div>
