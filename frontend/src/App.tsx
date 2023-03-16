@@ -16,6 +16,7 @@ import {MoviePage} from "./Pages/MoviePage";
 import {Root} from "./Components/Root/Root";
 import {UserPage} from "./Pages/UserPage";
 import {ActorPage} from "./Pages/ActorPage";
+import {LoginSignUpPage} from "./Pages/LoginSignUpPage";
 // TODO Add more sorting features
 // TODO Style buttons better
 // TODO Add follow other people
@@ -24,7 +25,6 @@ import {ActorPage} from "./Pages/ActorPage";
 // TODO Add compact mode to other user page
 // TODO Redirect user to their own watchlist when they navigate to their own profile
 // TODO Make overview expandable when too long
-// TODO Add episode progress for shows
 // TODO Add status buttons to show/movie full details page
 
 // Configure Firebase.
@@ -102,11 +102,14 @@ function App() {
             path: "",
             element: <Home/>,
         }, {
+            path: "login-signup",
+            element: <LoginSignUpPage/>
+        },{
             path: "my-movies",
-            element: <Watchlist category={"movies"}/>,
+            element: <ProtectedRoute children={<Watchlist category={"movies"}/>}/>,
         }, {
             path: "my-shows",
-            element: <Watchlist category={"shows"}/>,
+            element: <ProtectedRoute children={<Watchlist category={"shows"}/>}/>,
         }, {
             path: "account",
             element: <ProtectedRoute children={<Account/>}/>,

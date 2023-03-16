@@ -16,11 +16,11 @@ export function HeaderBar() {
                 {store.userExists &&
                     <>
                         <NavLink className={({isActive}) => (isActive ? 'active' : 'inactive')} to={"/my-movies"}>My
-                            Movies</NavLink>
+                            Movies
+                        </NavLink>
                         <NavLink className={({isActive}) => (isActive ? 'active' : 'inactive')} to={"/my-shows"}>My
-                            Shows</NavLink>
-                        <NavLink className={({isActive}) => (isActive ? 'active' : 'inactive')}
-                                 to={"/account"}>Account</NavLink>
+                            Shows
+                        </NavLink>
                     </>
                 }
             </div>

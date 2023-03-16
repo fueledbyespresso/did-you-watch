@@ -3,7 +3,7 @@ import * as firebaseui from "firebaseui";
 import firebase from "firebase/compat/app";
 import 'firebaseui/dist/firebaseui.css'
 
-export function AuthGoogle() {
+export function AuthLogin() {
     useEffect(() => {
         let ui = firebaseui.auth.AuthUI.getInstance() || new firebaseui.auth.AuthUI(firebase.auth())
 

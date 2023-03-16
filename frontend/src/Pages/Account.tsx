@@ -1,6 +1,7 @@
 import {useDispatch, useSelector} from "react-redux";
 import {set, UserState} from "../Store/userSlice";
 import {useEffect, useState} from "react";
+import firebase from "firebase/compat/app";
 
 export function Account() {
     const user = useSelector((state: { user: UserState }) => state.user).user;
@@ -159,6 +160,12 @@ export function Account() {
             )
     }
 
+
+    function signOut() {
+        console.log("signing out")
+        firebase.auth().signOut().then(r => console.log("signed out"))
+    }
+
     return (
         <div className={"account-page"}>
             <h1>Account</h1>
@@ -235,6 +242,8 @@ export function Account() {
                 <div>
                     {error}
                 </div>
+
+                <button onClick={()=>signOut()}>Logout</button>
             </div>
         </div>
     )

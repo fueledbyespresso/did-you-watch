@@ -13,6 +13,7 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     background: #ffffff;
+    //border-top: 2px solid #ff6200;
 }
 
 
@@ -93,14 +94,16 @@ a {
     align-items: center;
     width: 100%;
     background: #EEEEEE;
+    padding: .5em;
+    box-shadow: rgba(100, 100, 111, 0.3) 0 1px 8px 0;
 
     .links {
-        padding: .5em 1em;
         white-space: nowrap;
         overflow: scroll;
-
+        padding: .5em 0;
         a {
-            padding: .5em 1em;
+            border-radius: .25em;
+            padding: .5em;
             transition: border, border-radius, background .25s ease;
 
             &:link {
@@ -130,8 +133,15 @@ a {
         }
     }
 
+    a.login-signup-button{
+        padding: .5em 1em;
+        color: #fff;
+        background: #0a95ff;
+        border-radius: .25em;
+        border: 1px solid #0778ce;
+    }
+
     .account-dropdown {
-        margin: .5em;
         background: white;
         padding: .5em 1em;
         display: flex;
@@ -153,78 +163,6 @@ a {
         img {
             width: 2.5em;
             border-radius: 100%;
-        }
-
-        &:focus-within .login {
-            display: block;
-        }
-
-        &:hover .login {
-            display: block;
-        }
-
-        .login {
-            background: #EEEEEE;
-            width: 100%;
-            max-width: inherit;
-            margin-top: 10.5em;
-            margin-left: -1em;
-            display: none;
-            position: absolute;
-            box-sizing: border-box;
-            z-index: 3;
-        }
-
-        .sign-up {
-            margin-top: 0;
-            top: 0;
-
-            label[for="ui-sign-in-name-input"]::before {
-                content: "Displayname or ";
-            }
-        }
-
-        &:focus-within .account-options {
-            display: block;
-        }
-
-        &:hover .account-options {
-            display: block;
-        }
-
-        .account-options {
-            width: 100%;
-            max-width: inherit;
-            margin-top: 6em;
-            margin-left: -1em;
-            display: none;
-            position: absolute;
-            box-sizing: border-box;
-            z-index: 3;
-
-            button {
-                cursor: pointer;
-                box-sizing: border-box;
-                height: 3em;
-                border: none;
-                width: 100%;
-                margin: 0;
-                padding: 0;
-            }
-
-            a {
-                box-sizing: border-box;
-                text-align: center;
-                display: block;
-                background: #e9e9ed;
-                margin: 0;
-                line-height: 3em;
-                height: 3em;
-                border: none;
-                width: 100%;
-                font-size: .9em;
-                color: inherit;
-            }
         }
     }
 
@@ -851,5 +789,18 @@ a {
                 font-weight: bold;
             }
         }
+    }
+}
+
+.login-signup{
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: center;
+    height: 40vh;
+
+    & > * {
+        box-shadow: rgba(0, 0, 0, 0.05) 0 10px 24px 0, rgba(0, 0, 0, 0.05) 0 20px 48px 0, rgba(0, 0, 0, 0.1) 0 1px 4px 0;
+
     }
 }
