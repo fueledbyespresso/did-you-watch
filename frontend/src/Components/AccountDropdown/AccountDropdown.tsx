@@ -7,9 +7,14 @@ export function AccountDropdown() {
 
     if (!store.userExists) {
         return (
-            <Link to={"/login-signup"} className={"login-signup-button"} tabIndex={4}>
-                Login/Signup
-            </Link>
+            <>
+                <Link to={"/login-signup"} className={"signup-button"} tabIndex={4}>
+                    Sign up
+                </Link>
+                <Link to={"/login-signup"} className={"login-button"} tabIndex={4}>
+                    Login
+                </Link>
+            </>
         )
     }
     return (

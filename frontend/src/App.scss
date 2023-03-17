@@ -133,12 +133,33 @@ a {
         }
     }
 
-    a.login-signup-button{
-        padding: .5em 1em;
-        color: #fff;
-        background: #0a95ff;
-        border-radius: .25em;
-        border: 1px solid #0778ce;
+    a{
+        margin: 0 .05em;
+        &.login-button {
+            padding: .5em;
+            color: inherit;
+            background: #fff;
+            border-radius: .25em;
+            border: 1px solid #0778ce;
+            font-size: .9em;
+
+            &:hover{
+                background: #dde8f1;
+            }
+        }
+
+        &.signup-button {
+            padding: .5em;
+            color: #fff;
+            background: #0a95ff;
+            border-radius: .25em;
+            border: 1px solid #0778ce;
+            font-size: .9em;
+
+            &:hover{
+                background: #0778ce;
+            }
+        }
     }
 
     .account-dropdown {
@@ -171,6 +192,7 @@ a {
         max-width: 45em;
         margin: auto;
         z-index: 2;
+        font-size: .9em;
 
         &:focus-within .results {
             display: flex;

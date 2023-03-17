@@ -54,11 +54,6 @@ export function Search() {
                        onKeyDown={(e) => (e.key === 'Enter' ? submitSearch(curCategory) : null)}
                        placeholder={"The Last of Us..."}
                        autoFocus={true}/>
-
-                <button tabIndex={3}
-                        onClick={() => submitSearch(curCategory)}>
-                    Search
-                </button>
             </div>
 
             <div className="results">
