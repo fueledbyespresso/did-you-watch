@@ -7,7 +7,7 @@ export function LoginSignUpPage() {
     const user = useSelector((state: any) => state.user)
     let location = useLocation()
 
-    if (!user.userExists) {
+    if (user.userExists) {
         return <Navigate to="/account" state={{from: location}} replace/>
     }
 
