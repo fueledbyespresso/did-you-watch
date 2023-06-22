@@ -11,7 +11,7 @@ const status_types = [
 ]
 
 export function ShowStatusButtons(props: { showID: number }) {
-    const user = useSelector((state: { user: UserState }) => state.user).user;
+    const user = useSelector((state: { user: UserState }) => state.user);
     const dispatch = useDispatch()
     const [loading, setLoading] = useState<boolean>(false)
     const [editMode, setEditMode] = useState<boolean>(false)
@@ -22,7 +22,7 @@ export function ShowStatusButtons(props: { showID: number }) {
     const [totalEpisodes, setTotalEpisodes] = useState<number | null>(null)
 
     useEffect(() => {
-        let matchingShow = user.tvList.filter(obj => {
+        let matchingShow = user.user.tvList.filter(obj => {
             return obj.id === props.showID
         })
         if (matchingShow.length > 0) {
@@ -39,7 +39,7 @@ export function ShowStatusButtons(props: { showID: number }) {
         fetch(process.env.REACT_APP_HOST + "/api/v1/tv/" + id + "/" + status+"/"+episodesWatched, {
             method: "PUT",
             headers: {
-                'AuthToken': user.idToken
+                'AuthToken': user.user.idToken
             }
         })
             .then((res) => {
@@ -78,7 +78,7 @@ export function ShowStatusButtons(props: { showID: number }) {
         fetch(process.env.REACT_APP_HOST + "/api/v1/tv/" + id, {
             method: "DELETE",
             headers: {
-                'AuthToken': user.idToken
+                'AuthToken': user.user.idToken
             }
         })
             .then((res) => {
@@ -105,6 +105,9 @@ export function ShowStatusButtons(props: { showID: number }) {
             )
     }
 
+    if (!user.userExists) {
+        return <></>
+    }
     return (
         <div className={"status-buttons"}>
             <div className={"watch-count"}>

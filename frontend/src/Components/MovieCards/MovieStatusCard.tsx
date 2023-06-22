@@ -9,15 +9,15 @@ const status_types = [
     {value: 'rewatching', label: 'Rewatching'},
     {value: 'dropped', label: 'Dropped'},
 ]
-
+// TODO Change user variable name to be pragmatic
 export function MovieStatusCard(props: { movieID: number }) {
-    const user = useSelector((state: { user: UserState }) => state.user).user;
+    const user = useSelector((state: { user: UserState }) => state.user);
     const dispatch = useDispatch()
     const [loading, setLoading] = useState<boolean>(false)
     const [curMovieStatus, setCurMovieStatus] = useState<string | null>(null)
 
     useEffect(() => {
-        let matchingShow = user.movieList.filter(obj => {
+        let matchingShow = user.user.movieList.filter(obj => {
             return obj.id === props.movieID
         })
         if (matchingShow.length > 0) {
@@ -31,7 +31,7 @@ export function MovieStatusCard(props: { movieID: number }) {
         fetch(process.env.REACT_APP_HOST + "/api/v1/movie/" + id + "/" + status, {
             method: "PUT",
             headers: {
-                'AuthToken': user.idToken
+                'AuthToken': user.user.idToken
             }
         })
             .then((res) => {
@@ -67,7 +67,7 @@ export function MovieStatusCard(props: { movieID: number }) {
         fetch(process.env.REACT_APP_HOST + "/api/v1/movie/" + id, {
             method: "DELETE",
             headers: {
-                'AuthToken': user.idToken
+                'AuthToken': user.user.idToken
             }
         })
             .then((res) => {
@@ -93,6 +93,9 @@ export function MovieStatusCard(props: { movieID: number }) {
             )
     }
 
+    if (!user.userExists) {
+        return <></>
+    }
     return (
         <div className={"status-buttons"}>
             {loading && <div>"Loading..."</div>}

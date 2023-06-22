@@ -51,7 +51,7 @@ export function Search() {
                        tabIndex={2}
                        value={searchQuery as any}
                        onChange={event => setSearchQuery(event.target.value)}
-                       onKeyDown={(e) => (e.key === 'Enter' ? submitSearch(curCategory) : null)}
+                       onKeyDown={(e) => (submitSearch(curCategory))}
                        placeholder={"The Last of Us..."}
                        autoFocus={true}/>
             </div>
