@@ -31,6 +31,7 @@ func getActor() gin.HandlerFunc {
 		if err != nil {
 			fmt.Println(err)
 		}
+		fmt.Println(resp.Request.URL)
 		fmt.Println(extraLenient)
 
 		var dataJSON map[string]any
