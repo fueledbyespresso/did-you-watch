@@ -31,6 +31,7 @@ func getActor() gin.HandlerFunc {
 		if err != nil {
 			log.Println(err)
 		}
+		print(contents)
 
 		c.JSON(http.StatusOK, dataJSON)
 	}
