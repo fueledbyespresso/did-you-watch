@@ -25,6 +25,14 @@ func getActor() gin.HandlerFunc {
 		if err != nil {
 			return
 		}
+		var extraLenient interface{}
+		err = json.Unmarshal(contents, &extraLenient)
+
+		if err != nil {
+			fmt.Println(err)
+		}
+		fmt.Println(extraLenient)
+
 		var dataJSON map[string]any
 		err = json.Unmarshal(contents, &dataJSON)
 		if err != nil {
