@@ -16,7 +16,7 @@ func Routes(r *gin.RouterGroup) {
 func getActor() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id := c.Param("id")
-		resp, err := http.Get("https://api.themoviedb.org/3/person/" + url.QueryEscape(id) + "?api_key=" + os.Getenv("TMDB_API_KEY"))
+		resp, err := http.Get("https://api.themoviedb.org/3/person/" + url.QueryEscape(id) + "?api_key=" + os.Getenv("TMDB_API_KEY") + "&append_to_response=combined_credits")
 		if err != nil {
 			return
 		}
