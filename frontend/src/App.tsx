@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 import firebase from "firebase/compat/app";
-import {onAuthStateChanged} from "firebase/auth"
+import {onAuthStateChanged,getAuth, connectAuthEmulator} from "firebase/auth"
 import "./App.scss"
 
 import {useDispatch} from "react-redux";
@@ -34,6 +34,10 @@ const config = JSON.parse(process.env.REACT_APP_FIREBASE_CONFIG || "")
 function App() {
     firebase.initializeApp(config)
     const dispatch = useDispatch()
+    if(process.env.NODE_ENV == "development"){
+        const auth = getAuth();
+        connectAuthEmulator(auth, "http://127.0.0.1:9099");
+    }
 
     useEffect(() => {
         onAuthStateChanged(firebase.auth() as any, (firebaseUser) => {

@@ -101,13 +101,14 @@ func handleLogin(db *database.DB) gin.HandlerFunc {
 		}
 		username, displayName, profilePicURL, movieList, tvList, darkMode := GetUser(user.UID, db)
 		if username == "" {
-			err := createUser(user.UID, user.Email, user.DisplayName, db)
+			var err error
+			err, username, displayName = createUser(user.UID, user.Email, user.DisplayName, db)
 			if err != nil {
 				c.AbortWithStatusJSON(500, "Unable to create new user :(")
 				return
 			}
 		}
-
+		//todo return displayname and username on new user created
 		c.JSON(200, User{
 			UID:           user.UID,
 			Username:      username,
@@ -120,7 +121,7 @@ func handleLogin(db *database.DB) gin.HandlerFunc {
 	}
 }
 
-func createUser(uid string, email string, displayName string, db *database.DB) error {
+func createUser(uid string, email string, displayName string, db *database.DB) (error, string, string) {
 	username := getRandomName()
 
 	var count int
@@ -129,7 +130,7 @@ func createUser(uid string, email string, displayName string, db *database.DB) e
 		fmt.Println(username)
 		err := db.Db.QueryRow(`SELECT count(*) FROM account WHERE upper(username) = upper($1)`, username).Scan(&count)
 		if err != nil {
-			return err
+			return err, "", ""
 		}
 		if count == 0 {
 			nameIsUnique = true
@@ -141,13 +142,16 @@ func createUser(uid string, email string, displayName string, db *database.DB) e
 	if len(displayName) > 20 {
 		displayName = displayName[:20]
 	}
+	if displayName == "" {
+		displayName = "Default name"
+	}
 	if len(username) > 20 {
 		username = username[:20]
 	}
 	insert, err := db.Db.Prepare(`INSERT INTO account (uid, email, profile_picture_url, username, display_name) 
 											VALUES ($1, $2, default, $3, $4)`)
 	if err != nil {
-		return err
+		return err, "", ""
 	}
 
 	//Execute the previous sql query using data from the
@@ -155,9 +159,9 @@ func createUser(uid string, email string, displayName string, db *database.DB) e
 	_, err = insert.Exec(uid, email, username, displayName)
 
 	if err != nil {
-		return err
+		return err, "", ""
 	}
-	return nil
+	return nil, username, displayName
 }
 
 func GetUser(uid string, db *database.DB) (string, string, string, []Movie, []TV, bool) {

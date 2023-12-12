@@ -51,21 +51,21 @@ export function ShowStatusButtons(props: { showID: number }) {
                 (result) => {
                     let tempUser = JSON.parse(JSON.stringify(user));
                     let index = -1;
-                    for (let i = 0; i < tempUser.tvList.length; i++) {
-                        if (tempUser.tvList[i].id === result.id) {
+                    for (let i = 0; i < tempUser.user.tvList.length; i++) {
+                        if (tempUser.user.tvList[i].id === result.id) {
                             index = i;
                             break;
                         }
                     }
                     if (index > -1) {
-                        tempUser.tvList[index] = result
+                        tempUser.user.tvList[index] = result
                     } else {
                         console.log(result)
-                        tempUser.tvList.unshift(result)
+                        tempUser.user.tvList.unshift(result)
                     }
                     setLoading(false)
 
-                    dispatch(set(tempUser))
+                    dispatch(set(tempUser.user))
                 }, (error) => {
                     setLoading(false)
                 }
@@ -89,16 +89,16 @@ export function ShowStatusButtons(props: { showID: number }) {
             .then(
                 (result) => {
                     let tempUser = JSON.parse(JSON.stringify(user));
-                    for (let i = 0; i < tempUser.tvList.length; i++) {
-                        if (tempUser.tvList[i].id === id) {
-                            tempUser.tvList.splice(i, 1)
+                    for (let i = 0; i < tempUser.user.tvList.length; i++) {
+                        if (tempUser.user.tvList[i].id === id) {
+                            tempUser.user.tvList.splice(i, 1)
 
                             break;
                         }
                     }
                     setShowStatus(null)
                     setLoading(false)
-                    dispatch(set(tempUser))
+                    dispatch(set(tempUser.user))
                 }, (error) => {
 
                 }
