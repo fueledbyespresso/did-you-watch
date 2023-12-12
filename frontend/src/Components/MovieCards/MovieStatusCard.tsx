@@ -43,19 +43,19 @@ export function MovieStatusCard(props: { movieID: number }) {
                 (result) => {
                     let tempUser = JSON.parse(JSON.stringify(user));
                     let index = -1;
-                    for (let i = 0; i < tempUser.movieList.length; i++) {
-                        if (tempUser.movieList[i].id === result.id) {
+                    for (let i = 0; i < tempUser.user.movieList.length; i++) {
+                        if (tempUser.user.movieList[i].id === result.id) {
                             index = i;
                             break;
                         }
                     }
                     if (index > -1) {
-                        tempUser.movieList[index] = result
+                        tempUser.user.movieList[index] = result
                     } else {
-                        tempUser.movieList.unshift(result)
+                        tempUser.user.movieList.unshift(result)
                     }
 
-                    dispatch(set(tempUser))
+                    dispatch(set(tempUser.user))
                     setLoading(false)
                 }, (error) => {
                     setLoading(false)
@@ -78,14 +78,14 @@ export function MovieStatusCard(props: { movieID: number }) {
             .then(
                 (result) => {
                     let tempUser = JSON.parse(JSON.stringify(user));
-                    for (let i = 0; i < tempUser.movieList.length; i++) {
-                        if (tempUser.movieList[i].id === id) {
-                            tempUser.movieList.splice(i, 1)
+                    for (let i = 0; i < tempUser.user.movieList.length; i++) {
+                        if (tempUser.user.movieList[i].id === id) {
+                            tempUser.user.movieList.splice(i, 1)
                             break;
                         }
                     }
                     setCurMovieStatus(null)
-                    dispatch(set(tempUser))
+                    dispatch(set(tempUser.user))
                     console.log(result)
                 }, (error) => {
 
