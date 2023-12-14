@@ -1,5 +1,5 @@
 import {useDispatch, useSelector} from "react-redux";
-import {set, UserState} from "../../Store/userSlice";
+import {RootState, set, UserState} from "../../Store/userSlice";
 import React, {useEffect, useState} from "react";
 
 const status_types = [
@@ -11,7 +11,7 @@ const status_types = [
 ]
 
 export function ShowStatusButtons(props: { showID: number }) {
-    const user = useSelector((state: { user: UserState }) => state.user);
+    const user = useSelector<RootState, UserState>((state) => state.user);
     const dispatch = useDispatch()
     const [loading, setLoading] = useState<boolean>(false)
     const [editMode, setEditMode] = useState<boolean>(false)
@@ -22,7 +22,10 @@ export function ShowStatusButtons(props: { showID: number }) {
     const [totalEpisodes, setTotalEpisodes] = useState<number | null>(null)
 
     useEffect(() => {
-        let matchingShow = user.user.tvList.filter(obj => {
+        if (user.profile == null){
+            return
+        }
+        let matchingShow = user.profile.tvList.filter(obj => {
             return obj.id === props.showID
         })
         if (matchingShow.length > 0) {
@@ -35,11 +38,14 @@ export function ShowStatusButtons(props: { showID: number }) {
 
 
     function addShowToWatchlist(id: number, status: string, episodesWatched: number) {
+        if (user.profile == null){
+            return
+        }
         setLoading(true)
         fetch(process.env.REACT_APP_HOST + "/api/v1/tv/" + id + "/" + status+"/"+episodesWatched, {
             method: "PUT",
             headers: {
-                'AuthToken': user.user.idToken
+                'AuthToken': user.profile.idToken
             }
         })
             .then((res) => {
@@ -49,23 +55,23 @@ export function ShowStatusButtons(props: { showID: number }) {
             })
             .then(
                 (result) => {
-                    let tempUser = JSON.parse(JSON.stringify(user));
+                    let tempUserProfile = JSON.parse(JSON.stringify(user.profile));
                     let index = -1;
-                    for (let i = 0; i < tempUser.user.tvList.length; i++) {
-                        if (tempUser.user.tvList[i].id === result.id) {
+                    for (let i = 0; i < tempUserProfile.tvList.length; i++) {
+                        if (tempUserProfile.tvList[i].id === result.id) {
                             index = i;
                             break;
                         }
                     }
                     if (index > -1) {
-                        tempUser.user.tvList[index] = result
+                        tempUserProfile.tvList[index] = result
                     } else {
                         console.log(result)
-                        tempUser.user.tvList.unshift(result)
+                        tempUserProfile.tvList.unshift(result)
                     }
                     setLoading(false)
 
-                    dispatch(set(tempUser.user))
+                    dispatch(set(tempUserProfile))
                 }, (error) => {
                     setLoading(false)
                 }
@@ -74,11 +80,13 @@ export function ShowStatusButtons(props: { showID: number }) {
 
     function deleteFromWatchlist(id: number) {
         setLoading(true)
-
+        if (user.profile == null){
+            return
+        }
         fetch(process.env.REACT_APP_HOST + "/api/v1/tv/" + id, {
             method: "DELETE",
             headers: {
-                'AuthToken': user.user.idToken
+                'AuthToken': user.profile.idToken
             }
         })
             .then((res) => {
@@ -105,7 +113,7 @@ export function ShowStatusButtons(props: { showID: number }) {
             )
     }
 
-    if (!user.userExists) {
+    if (user === null) {
         return <></>
     }
     return (

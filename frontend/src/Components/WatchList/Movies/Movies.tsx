@@ -3,6 +3,7 @@ import Select from "react-select";
 import {useSelector} from "react-redux";
 import {Movie} from "../../../Types/Movie";
 import {WatchlistSMovieCard} from "../../MovieCards/WatchlistSMovieCard";
+import {RootState, UserState} from "../../../Store/userSlice";
 
 const options = [
     {value: 'all', label: 'All Movies'},
@@ -15,18 +16,25 @@ const options = [
 
 export function Movies() {
     const [filter, setFilter] = useState<string | undefined>("all")
-    const user = useSelector((state: any) => state.user).user;
+    const user = useSelector<RootState, UserState>((state) => state.user);
 
     function filterReturnsEmpty(filter: string | undefined) {
-        if (filter == "all") {
-            return user.movieList.length == 0
+        if (user.profile === null){
+            return true
         }
-        for (let i = 0; i < user.movieList.length; i++) {
-            if (user.movieList[i].status == filter) {
+        if (filter == "all") {
+            return user.profile.movieList.length == 0
+        }
+        for (let i = 0; i < user.profile.movieList.length; i++) {
+            if (user.profile.movieList[i].status == filter) {
                 return false
             }
         }
         return true
+    }
+
+    if (user.profile === null){
+        return <></>
     }
 
     return (
@@ -38,8 +46,8 @@ export function Movies() {
                     className="filter-select"/>
 
             <div className={"films"}>
-                {user.movieList != null && !filterReturnsEmpty(filter) ?
-                    user.movieList.map((movie: Movie) => {
+                {user.profile.movieList != null && !filterReturnsEmpty(filter) ?
+                    user.profile.movieList.map((movie: Movie) => {
                         return (
                             (filter === movie.status || filter === "all") &&
                                 <WatchlistSMovieCard movie={movie} key={movie.id}/>

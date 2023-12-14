@@ -1,23 +1,23 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit'
 import {User} from "../Types/User";
+import {store} from "./store";
 
 export type UserState = {
-    user: User,
-    userExists: boolean
+    profile: User | null,
 }
 
 const initialState: UserState = {
-    user: {
-        idToken: "",
-        uid: "",
-        displayName: "",
-        profilePicURL: "",
-        username: "",
-        darkMode: localStorage.getItem('darkTheme') === "true",
-        movieList: [],
-        tvList: [],
-    },
-    userExists: false
+    /*    profile: {
+            idToken: "",
+            uid: "",
+            displayName: "",
+            profilePicURL: "",
+            username: "",
+            darkMode: localStorage.getItem('darkTheme') === "true",
+            movieList: [],
+            tvList: [],
+        }*/
+    profile: null
 }
 
 
@@ -26,26 +26,17 @@ export const userSlice = createSlice({
     // `createSlice` will infer the state type from the `initialState` argument
     initialState,
     reducers: {
-        set: (state, action: PayloadAction<User>) => {
-            state.user = action.payload
-            state.userExists = true
-            localStorage.setItem('darkTheme', state.user.darkMode.toString())
+        set: (state: UserState, action: PayloadAction<User>) => {
+            state.profile = action.payload
+            localStorage.setItem('darkTheme', state.profile.darkMode.toString())
         },
-        remove: state => {
-            state.user = {
-                idToken: "",
-                uid: "",
-                displayName: "",
-                profilePicURL: "",
-                username: "",
-                darkMode: false,
-                movieList: [],
-                tvList: [],
-            }
-            state.userExists = false
+        remove: (state: UserState) => {
+            state.profile = null
         },
     }
 })
+
+export type RootState = ReturnType<typeof store.getState>
 
 export const {set, remove} = userSlice.actions
 

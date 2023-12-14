@@ -2,9 +2,10 @@ import {useDispatch, useSelector} from "react-redux";
 import {set, UserState} from "../Store/userSlice";
 import {useEffect, useState} from "react";
 import firebase from "firebase/compat/app";
+import {RootState} from "../Store/userSlice";
 
 export function Account() {
-    const user = useSelector((state: { user: UserState }) => state.user).user;
+    const user = useSelector<RootState, UserState>((state) => state.user);
     const [editUsernameMode, setEditUsernameMode] = useState<boolean>(false)
     const [editDisplayNameMode, setEditDisplayNameMode] = useState<boolean>(false)
     const [changeAvatarMode, setChangeAvatarMode] = useState<boolean>(false)
@@ -46,10 +47,13 @@ export function Account() {
     }
 
     function updateUsername() {
+        if (user.profile == null){
+            return
+        }
         fetch(process.env.REACT_APP_HOST + "/account/v1/username/" + newUsername, {
             method: "PUT",
             headers: {
-                'AuthToken': user.idToken
+                'AuthToken': user.profile.idToken
             }
         })
             .then(async (res) => {
@@ -75,10 +79,13 @@ export function Account() {
     }
 
     function updateDisplayName() {
+        if (user.profile == null){
+            return
+        }
         fetch(process.env.REACT_APP_HOST + "/account/v1/displayName/" + newDisplayName, {
             method: "PUT",
             headers: {
-                'AuthToken': user.idToken
+                'AuthToken': user.profile.idToken
             }
         })
             .then(async (res) => {
@@ -104,10 +111,13 @@ export function Account() {
     }
 
     function updateAvatar() {
+        if (user.profile == null){
+            return
+        }
         fetch(process.env.REACT_APP_HOST + "/account/v1/avatar/" + newAvatar, {
             method: "PUT",
             headers: {
-                'AuthToken': user.idToken
+                'AuthToken': user.profile.idToken
             }
         })
             .then(async (res) => {
@@ -133,10 +143,13 @@ export function Account() {
     }
 
     function toggleDarkMode() {
+        if (user.profile == null){
+            return
+        }
         fetch(process.env.REACT_APP_HOST + "/account/v1/toggleDarkMode", {
             method: "PUT",
             headers: {
-                'AuthToken': user.idToken
+                'AuthToken': user.profile.idToken
             }
         })
             .then(async (res) => {
@@ -165,14 +178,16 @@ export function Account() {
         console.log("signing out")
         firebase.auth().signOut().then(r => console.log("signed out"))
     }
-
+    if (user.profile === null){
+        return <></>
+    }
     return (
         <div className={"account-page"}>
             <h1>Account</h1>
             <div className={"account-details-section"}>
                 {!changeAvatarMode ?
                     <div>
-                        <img src={user.profilePicURL} alt={"profile"}/>
+                        <img src={user.profile.profilePicURL} alt={"profile"}/>
                         <button onClick={() => {
                             setChangeAvatarMode(true)
                             setNewAvatar(null)
@@ -183,7 +198,7 @@ export function Account() {
                     <div>
                         <div className={"current-avatar"}>
                             <h2>Current Avatar</h2>
-                            <img src={newAvatar === null ? user.profilePicURL : availableAvatars[newAvatar]}
+                            <img src={newAvatar === null ? user.profile.profilePicURL : availableAvatars[newAvatar]}
                                  alt={""}/>
                         </div>
                         {availableAvatars !== null &&
@@ -205,40 +220,40 @@ export function Account() {
 
                 {!editDisplayNameMode ?
                     <div>
-                        Display name: {user.displayName}
+                        Display name: {user.profile.displayName}
                         <button onClick={() => {
                             setEditDisplayNameMode(true)
-                            setNewDisplayName(user.displayName)
+                            //setNewDisplayName(user.profile.displayName)
                         }}>Edit
                         </button>
                     </div>
                     :
                     <div>
                         <input onChange={(e) => setNewDisplayName(e.target.value)} value={newDisplayName}
-                               placeholder={user.displayName}/>
+                               placeholder={user.profile.displayName}/>
                         <button onClick={() => updateDisplayName()}>Change name</button>
                         <button onClick={() => setEditDisplayNameMode(false)}>Cancel Edit</button>
                     </div>
                 }
                 {!editUsernameMode ?
                     <div>
-                        Username: {user.username}
+                        Username: {user.profile.username}
                         <button onClick={() => {
                             setEditUsernameMode(true)
-                            setNewUsername(user.username)
+                            //setNewUsername(user.profile.username)
                         }}>Edit
                         </button>
                     </div>
                     :
                     <div>
                         <input onChange={(e) => setNewUsername(e.target.value)} value={newUsername}
-                               placeholder={user.username}/>
+                               placeholder={user.profile.username}/>
                         <button onClick={() => updateUsername()}>Change name</button>
                         <button onClick={() => setEditUsernameMode(false)}>Cancel Edit</button>
                     </div>
                 }
                 <button
-                    onClick={() => toggleDarkMode()}>{user.darkMode ? "Enable Light Mode" : "Enable Dark Mode"}</button>
+                    onClick={() => toggleDarkMode()}>{user.profile.darkMode ? "Enable Light Mode" : "Enable Dark Mode"}</button>
                 <div>
                     {error}
                 </div>

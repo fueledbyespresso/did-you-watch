@@ -3,9 +3,10 @@ import {Search} from "../Search/Search";
 import {AccountDropdown} from "../AccountDropdown/AccountDropdown";
 import {NavLink} from "react-router-dom";
 import {useSelector} from "react-redux";
+import {RootState, UserState} from "../../Store/userSlice";
 
 export function HeaderBar() {
-    const store = useSelector((state: any) => state.user);
+    const user = useSelector<RootState, UserState>((state) => state.user);
 
     return (
         <div className={"header-bar"}>
@@ -13,7 +14,7 @@ export function HeaderBar() {
             <Search/>
             <div className={"links"}>
                 <NavLink className={({isActive}) => (isActive ? 'active' : 'inactive')} to={"/"}>Did you watch?</NavLink>
-                {store.userExists &&
+                {user !== null &&
                     <>
                         <NavLink className={({isActive}) => (isActive ? 'active' : 'inactive')} to={"/my-movies"}>My
                             Movies

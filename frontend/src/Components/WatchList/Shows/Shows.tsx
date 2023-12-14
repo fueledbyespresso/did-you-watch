@@ -4,6 +4,7 @@ import {useSelector} from "react-redux";
 import {User} from "../../../Types/User";
 import {Show} from "../../../Types/Show";
 import {WatchlistShowCard} from "../../ShowCards/WatchlistShowCard";
+import {RootState, UserState} from "../../../Store/userSlice";
 
 const options = [
     {value: 'all', label: 'All Shows'},
@@ -16,23 +17,25 @@ const options = [
 
 export function Shows() {
     const [filter, setFilter] = useState<string | undefined>("all")
-    const userState = useSelector((state: any) => state.user);
-    const [user, setUser] = useState<User>(userState.user)
-
-    useEffect(() => {
-        setUser(userState.user)
-    }, [userState]);
+    const user = useSelector<RootState, UserState>((state) => state.user);
 
     function filterReturnsEmpty(filter: string | undefined) {
-        if (filter === "all") {
-            return user.tvList.length === 0
+        if (user.profile === null){
+            return false
         }
-        for (let i = 0; i < user.tvList.length; i++) {
-            if (user.tvList[i].status === filter) {
+        if (filter === "all") {
+            return user.profile.tvList.length === 0
+        }
+        for (let i = 0; i < user.profile.tvList.length; i++) {
+            if (user.profile.tvList[i].status === filter) {
                 return false
             }
         }
         return true
+    }
+
+    if(user.profile === null){
+        return <></>
     }
 
     return (
@@ -44,8 +47,8 @@ export function Shows() {
                     className="filter-select"/>
 
             <div className={"films"}>
-                {user.tvList != null && !filterReturnsEmpty(filter) ?
-                    user.tvList.map((show: Show) => {
+                {user.profile.tvList != null && !filterReturnsEmpty(filter) ?
+                    user.profile.tvList.map((show: Show) => {
                         return (
                             (filter === show.status || filter === "all") &&
                                 <WatchlistShowCard show={show} key={show.id}/>
