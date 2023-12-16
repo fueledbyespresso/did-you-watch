@@ -110,7 +110,7 @@ export function Account() {
     }
 
     function updateAvatar() {
-        if (user.profile == null){
+        if (user.profile === null){
             return
         }
         fetch(process.env.REACT_APP_HOST + "/account/v1/avatar/" + newAvatar, {
@@ -128,9 +128,9 @@ export function Account() {
             })
             .then(
                 (result) => {
-                    let tempUser = JSON.parse(JSON.stringify(user));
-                    tempUser.profilePicURL = result.profilePicURL
-                    dispatch(set(tempUser))
+                    let tempUserProfile = JSON.parse(JSON.stringify(user.profile));
+                    tempUserProfile.profilePicURL = result.profilePicURL
+                    dispatch(set(tempUserProfile))
                     console.log("Successful avatar change!")
                     setError(null)
                     setChangeAvatarMode(false)
@@ -160,9 +160,9 @@ export function Account() {
             })
             .then(
                 (result) => {
-                    let tempUser = JSON.parse(JSON.stringify(user));
-                    tempUser.darkMode = result
-                    dispatch(set(tempUser))
+                    let tempUserProfile = JSON.parse(JSON.stringify(user.profile));
+                    tempUserProfile.darkMode = result
+                    dispatch(set(tempUserProfile))
                     console.log("Dark mode toggled. Dark mode on:" + result)
                     setError(null)
                 }, (error: Error) => {
