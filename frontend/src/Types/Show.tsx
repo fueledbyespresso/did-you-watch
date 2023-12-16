@@ -1,5 +1,3 @@
-import React from "react";
-
 export type Show = {
     id: number,
     poster_path: string,

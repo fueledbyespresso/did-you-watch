@@ -1,8 +1,7 @@
 import {useDispatch, useSelector} from "react-redux";
-import {set, UserState} from "../Store/userSlice";
+import {RootState, set, UserState} from "../Store/userSlice";
 import {useEffect, useState} from "react";
 import firebase from "firebase/compat/app";
-import {RootState} from "../Store/userSlice";
 
 export function Account() {
     const user = useSelector<RootState, UserState>((state) => state.user);

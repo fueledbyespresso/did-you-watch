@@ -1,7 +1,6 @@
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import Select from "react-select";
 import {useSelector} from "react-redux";
-import {User} from "../../../Types/User";
 import {Show} from "../../../Types/Show";
 import {WatchlistShowCard} from "../../ShowCards/WatchlistShowCard";
 import {RootState, UserState} from "../../../Store/userSlice";

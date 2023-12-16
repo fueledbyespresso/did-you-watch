@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {useParams} from "react-router-dom";
 import {User} from "../Types/User";
-import {Movie} from "../Types/Movie";
 import {ProfileShowCard} from "../Components/ShowCards/PorfileShowCard";
 import {ProfileMovieCard} from "../Components/MovieCards/PorfileMovieCard";
 

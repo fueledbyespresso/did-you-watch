@@ -1,5 +1,3 @@
-import React from "react";
-
 export type Movie = {
     id: number,
     original_title: string,

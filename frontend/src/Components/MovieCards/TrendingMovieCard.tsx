@@ -1,4 +1,3 @@
-import {Show} from "../../Types/Show";
 import {Link} from "react-router-dom";
 import React from "react";
 import {Movie} from "../../Types/Movie";

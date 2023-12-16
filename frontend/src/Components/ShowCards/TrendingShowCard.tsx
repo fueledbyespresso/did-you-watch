@@ -1,7 +1,6 @@
 import {Show} from "../../Types/Show";
 import {Link} from "react-router-dom";
 import React from "react";
-import {shallowEqual} from "react-redux";
 
 export function TrendingShow(props: { show: Show }) {
     let date = new Date(props.show.first_air_date)

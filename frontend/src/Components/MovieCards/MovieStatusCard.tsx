@@ -9,7 +9,6 @@ const status_types = [
     {value: 'rewatching', label: 'Rewatching'},
     {value: 'dropped', label: 'Dropped'},
 ]
-// TODO Change user variable name to be pragmatic
 export function MovieStatusCard(props: { movieID: number }) {
     const user = useSelector<RootState, UserState>((state) => state.user);
     const dispatch = useDispatch()

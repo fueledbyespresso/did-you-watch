@@ -1,11 +1,7 @@
 import React, {useState} from "react";
 import Select from "react-select";
 import {User} from "../../Types/User";
-import {Movie} from "../../Types/Movie";
-import {Show} from "../../Types/Show";
 import {SearchResultShowCard} from "../ShowCards/SearchResultShowCard";
-import {WatchlistShowCard} from "../ShowCards/WatchlistShowCard";
-import {WatchlistSMovieCard} from "../MovieCards/WatchlistSMovieCard";
 import {SearchResultMovieCard} from "../MovieCards/SearchResultMovieCard";
 import {ActorResultCard} from "./ActorResultCard";
 
@@ -38,7 +34,7 @@ export function Search() {
                 (result) => {
                     setSearchResults(result.results)
                 }, (error) => {
-
+                    console.log(error)
                 }
             )
     }
@@ -56,7 +52,7 @@ export function Search() {
                        tabIndex={2}
                        value={searchQuery as any}
                        onChange={event => setSearchQuery(event.target.value)}
-                       onKeyUp={(e) => (submitSearch(curCategory))}
+                       onKeyUp={() => (submitSearch(curCategory))}
                        placeholder={"The Last of Us..."}
                        autoFocus={true}/>
             </div>
