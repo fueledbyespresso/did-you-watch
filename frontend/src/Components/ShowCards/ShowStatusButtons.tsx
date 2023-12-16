@@ -1,6 +1,7 @@
 import {useDispatch, useSelector} from "react-redux";
 import {RootState, set, UserState} from "../../Store/userSlice";
 import React, {useEffect, useState} from "react";
+import {Show} from "../../Types/Show";
 
 const status_types = [
     {value: 'plan-to-watch', label: 'Plan to Watch'},
@@ -25,15 +26,16 @@ export function ShowStatusButtons(props: { showID: number }) {
         if (user.profile == null){
             return
         }
-        let matchingShow = user.profile.tvList.filter(obj => {
-            return obj.id === props.showID
+        let matchingShow = user.profile.tvList.find(curShow => {
+            return curShow.id === props.showID
         })
-        if (matchingShow.length > 0) {
-            setShowStatus(matchingShow[0].status)
-            setEpisodesWatched(matchingShow[0].episodes_watched)
-            setNewEpisodesWatched(matchingShow[0].episodes_watched)
-            setTotalEpisodes(matchingShow[0].total_episodes)
+        if (matchingShow === undefined){
+            return
         }
+        setShowStatus(matchingShow.status)
+        setEpisodesWatched(matchingShow.episodes_watched)
+        setNewEpisodesWatched(matchingShow.episodes_watched)
+        setTotalEpisodes(matchingShow.total_episodes)
     }, [user]);
 
 
@@ -54,20 +56,15 @@ export function ShowStatusButtons(props: { showID: number }) {
                 }
             })
             .then(
-                (result) => {
+                (newlyAddedShow: Show) => {
                     let tempUserProfile = JSON.parse(JSON.stringify(user.profile));
-                    let index = -1;
-                    for (let i = 0; i < tempUserProfile.tvList.length; i++) {
-                        if (tempUserProfile.tvList[i].id === result.id) {
-                            index = i;
-                            break;
-                        }
-                    }
+                    let index = tempUserProfile.tvList.findIndex((show: Show) => show.id === newlyAddedShow.id)
                     if (index > -1) {
-                        tempUserProfile.tvList[index] = result
+                        //Update users tvList with the new show status
+                        tempUserProfile.tvList[index] = newlyAddedShow
                     } else {
-                        console.log(result)
-                        tempUserProfile.tvList.unshift(result)
+                        //Add show to the top of the tvList
+                        tempUserProfile.tvList.unshift(newlyAddedShow)
                     }
                     setLoading(false)
 
@@ -96,17 +93,17 @@ export function ShowStatusButtons(props: { showID: number }) {
             })
             .then(
                 (result) => {
-                    let tempUser = JSON.parse(JSON.stringify(user));
-                    for (let i = 0; i < tempUser.user.tvList.length; i++) {
-                        if (tempUser.user.tvList[i].id === id) {
-                            tempUser.user.tvList.splice(i, 1)
+                    let tempUserProfile = JSON.parse(JSON.stringify(user.profile));
+                    for (let i = 0; i < tempUserProfile.tvList.length; i++) {
+                        if (tempUserProfile.tvList[i].id === id) {
+                            tempUserProfile.tvList.splice(i, 1)
 
                             break;
                         }
                     }
                     setShowStatus(null)
                     setLoading(false)
-                    dispatch(set(tempUser.user))
+                    dispatch(set(tempUserProfile))
                 }, (error) => {
 
                 }
