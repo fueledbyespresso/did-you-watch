@@ -86,15 +86,15 @@ export function MovieStatusCard(props: { movieID: number }) {
             })
             .then(
                 (result) => {
-                    let tempUser = JSON.parse(JSON.stringify(user));
-                    for (let i = 0; i < tempUser.user.movieList.length; i++) {
-                        if (tempUser.user.movieList[i].id === id) {
-                            tempUser.user.movieList.splice(i, 1)
+                    let tempUser = JSON.parse(JSON.stringify(user.profile));
+                    for (let i = 0; i < tempUser.movieList.length; i++) {
+                        if (tempUser.movieList[i].id === id) {
+                            tempUser.movieList.splice(i, 1)
                             break;
                         }
                     }
                     setCurMovieStatus(null)
-                    dispatch(set(tempUser.user))
+                    dispatch(set(tempUser))
                     console.log(result)
                 }, (error) => {
 

@@ -204,7 +204,8 @@ a {
             display: none;
             overflow: scroll;
             background: #fff;
-            box-shadow: rgba(0, 0, 0, 0.55) 0px -20px 26px -18px inset;
+            border: solid 1px #ccc;
+            border-radius: 4px;
 
             .film {
                 width: 100%;
@@ -214,6 +215,27 @@ a {
 
                 .film-details .text-details .name .status {
                     display: none;
+                }
+            }
+
+            .actor{
+                width: 100%;
+                background: none;
+                box-shadow: none;
+                border-radius: 0;
+                display: flex;
+                justify-content: space-between;
+                padding: 0.5em 1em;
+                a{
+                    font-weight: bold;
+                }
+                img {
+
+                    border-radius: .5em;
+                    object-fit: cover;
+                    width: 6em;
+                    height: 6em;
+                    background: #61dafb;
                 }
             }
         }

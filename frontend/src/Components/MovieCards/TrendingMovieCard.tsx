@@ -4,6 +4,8 @@ import React from "react";
 import {Movie} from "../../Types/Movie";
 
 export function TrendingMovieCard(props: { movie: Movie }) {
+    let date = new Date(props.movie.release_date)
+
     return (
         <div className={"trending-film"}>
             <Link to={"/movie/" + props.movie.id}>
@@ -11,7 +13,7 @@ export function TrendingMovieCard(props: { movie: Movie }) {
                      alt={"show-poster"}/>
             </Link>
             <div className={"name"}>{props.movie.original_title}</div>
-            <div className={"air-date"}>{props.movie.release_date}</div>
+            <div className={"air-date"}>{date.toDateString()}</div>
         </div>
     )
 }

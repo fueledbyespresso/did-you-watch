@@ -7,6 +7,7 @@ import {SearchResultShowCard} from "../ShowCards/SearchResultShowCard";
 import {WatchlistShowCard} from "../ShowCards/WatchlistShowCard";
 import {WatchlistSMovieCard} from "../MovieCards/WatchlistSMovieCard";
 import {SearchResultMovieCard} from "../MovieCards/SearchResultMovieCard";
+import {ActorResultCard} from "./ActorResultCard";
 
 const options = [
     {value: 'multi', label: 'Multi'},
@@ -21,6 +22,10 @@ export function Search() {
     const [searchResults, setSearchResults] = useState<any>(null)
 
     function submitSearch(searchCategory: string | null | undefined) {
+        if (searchQuery === ""){
+            setSearchResults(null)
+            return
+        }
         fetch(process.env.REACT_APP_HOST + "/api/v1/search/" + searchCategory + "/" + searchQuery, {
             method: "GET",
         })
@@ -57,14 +62,16 @@ export function Search() {
             </div>
 
             <div className="results">
-                {searchResults !== null && searchResults.map((media: any) => {
-                    switch (media.media_type) {
+                {searchResults !== null && searchResults.map((searchResult: any) => {
+                    switch (searchResult.media_type) {
                         case "tv":
-                            return <SearchResultShowCard show={media} key={media.id}/>
+                            return <SearchResultShowCard show={searchResult} key={searchResult.id}/>
                         case "movie":
-                            return <SearchResultMovieCard movie={media} key={media.id}/>
+                            return <SearchResultMovieCard movie={searchResult} key={searchResult.id}/>
                         case "user":
-                            return <User user={media}/>
+                            return <User user={searchResult}/>
+                        case "person":
+                            return <ActorResultCard actor={searchResult} actorID={searchResult.id}/>
                         default: return <div></div>
                     }
                 })}
