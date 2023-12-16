@@ -8,7 +8,7 @@ export function LoginSignUpPage() {
     const user = useSelector<RootState, UserState>((state) => state.user);
     let location = useLocation()
 
-    if (user === null) {
+    if (user !== null) {
         return (
             <div className={"login-signup"}>
                 <AuthLogin/>

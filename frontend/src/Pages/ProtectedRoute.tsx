@@ -8,7 +8,7 @@ const ProtectedRoute = ({children}: any) => {
     let location = useLocation();
 
     if (user.profile === null) {
-        return <Navigate to="/" state={{from: location}} replace/>
+        return <Navigate to="/login-signup" state={{from: location}} replace/>
     }
     return children
 
