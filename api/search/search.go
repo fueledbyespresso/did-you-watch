@@ -3,6 +3,7 @@ package search
 import (
 	"did-you-watch/database"
 	"encoding/json"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"io/ioutil"
 	"log"
@@ -21,6 +22,8 @@ type UserResult struct {
 
 func Routes(r *gin.RouterGroup, db *database.DB) {
 	r.GET("/search/multi/:query", multiSearch(db))
+	r.GET("/search/users/:username", userSearch(db))
+
 }
 
 func multiSearch(db *database.DB) gin.HandlerFunc {
@@ -41,6 +44,35 @@ func multiSearch(db *database.DB) gin.HandlerFunc {
 		}
 		results := dataJSON["results"].([]any)
 
+		rows, err := db.Db.Query(`Select username, uid, a.image_url, display_name FROM account 
+												JOIN avatar a on a.id = account.profile_picture_url
+												WHERE LOWER(username) LIKE LOWER('%' || $1 || '%') LIMIT 10`, query)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusBadRequest, "User does not exist")
+			return
+		}
+		for rows.Next() {
+			var user UserResult
+			err = rows.Scan(&user.Username, &user.UID, &user.ProfilePicURL, &user.DisplayName)
+			if err != nil {
+				c.AbortWithStatusJSON(http.StatusBadRequest, "User does not exist")
+				return
+			}
+			user.MediaType = "user"
+			results = append(results, user)
+		}
+
+		dataJSON["results"] = results
+		c.JSON(http.StatusOK, dataJSON)
+	}
+}
+
+func userSearch(db *database.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		query := c.Param("username")
+		fmt.Println(query)
+		dataJSON := make(map[string]any)
+		var results []any
 		rows, err := db.Db.Query(`Select username, uid, a.image_url, display_name FROM account 
 												JOIN avatar a on a.id = account.profile_picture_url
 												WHERE LOWER(username) LIKE LOWER('%' || $1 || '%') LIMIT 10`, query)
