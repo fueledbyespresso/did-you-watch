@@ -1,5 +1,7 @@
 import {Link, useParams} from "react-router-dom";
 import React, {useEffect, useState} from "react";
+import {ShowStatusButtons} from "../Components/ShowCards/ShowStatusButtons";
+import {MovieStatusCard} from "../Components/MovieCards/MovieStatusCard";
 
 export function MoviePage() {
     const {id} = useParams();
@@ -51,6 +53,8 @@ export function MoviePage() {
                         <h2>{show.original_title}</h2>
                         <div>{show.release_date}</div>
                         <div className={"overview"}>{show.overview}</div>
+                        <MovieStatusCard movieID={show.id}/>
+
                     </div>
                 </div>
 
