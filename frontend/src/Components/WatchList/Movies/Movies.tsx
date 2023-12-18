@@ -22,11 +22,11 @@ export function Movies() {
         if (user.profile === null){
             return true
         }
-        if (filter == "all") {
-            return user.profile.movieList.length == 0
+        if (filter === "all") {
+            return user.profile.movieList.length === 0
         }
         for (let i = 0; i < user.profile.movieList.length; i++) {
-            if (user.profile.movieList[i].status == filter) {
+            if (user.profile.movieList[i].status === filter) {
                 return false
             }
         }

@@ -18,16 +18,15 @@ import {UserPage} from "./Pages/UserPage";
 import {ActorPage} from "./Pages/ActorPage";
 import {LoginSignUpPage} from "./Pages/LoginSignUpPage";
 // TODO Add more sorting features
-// TODO Style buttons better
 // TODO Add follow other people
 // TODO Add rankings
 // TODO Add profile background
-// TODO Add compact mode to other user page
 // TODO Redirect user to their own watchlist when they navigate to their own profile
 // TODO Make overview expandable when too long
 // TODO Add status buttons to movie full details page
 // TODO Style account page
 // TODO Add Season view
+// TODO Feature: Mark episode as viewed
 
 // Configure Firebase.
 // noinspection SpellCheckingInspection
@@ -36,7 +35,7 @@ const config = JSON.parse(process.env.REACT_APP_FIREBASE_CONFIG || "")
 function App() {
     firebase.initializeApp(config)
     const dispatch = useDispatch()
-    if(process.env.NODE_ENV == "development"){
+    if(process.env.NODE_ENV === "development"){
         const auth = getAuth();
         connectAuthEmulator(auth, "http://127.0.0.1:9099");
     }

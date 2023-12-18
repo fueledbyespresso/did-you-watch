@@ -548,30 +548,32 @@ a {
                 font-weight: bold;
             }
         }
-
-        .status-buttons {
-            button {
-                background: #EEEEEE;
-                padding: .5em;
-                border: 1px solid #ccc;
-                border-radius: .25em;
-                margin: .1em;
-
-                &:hover {
-                    color: #fff;
-                    background: #007a35;
-                }
-            }
-
-            button:disabled, button[disabled] {
-                color: #fff;
-                background: #007a35;
-                text-decoration: underline;
-            }
-        }
     }
 }
+.status-buttons {
+    button {
+        background: #EEEEEE;
+        padding: .5em;
+        border: none;
+        border-radius: .25em;
+        margin: .1em;
 
+        &:hover {
+            color: #fff;
+            background: #007a35;
+        }
+        &.delete:hover{
+            color: #fff;
+            background: #ff0f0f;
+        }
+    }
+
+    button:disabled, button[disabled] {
+        color: #fff;
+        background: #007a35;
+        text-decoration: underline;
+    }
+}
 .home {
     h1 {
         text-align: center;
