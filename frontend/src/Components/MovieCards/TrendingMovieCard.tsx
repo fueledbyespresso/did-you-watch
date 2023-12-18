@@ -4,6 +4,12 @@ import {Movie} from "../../Types/Movie";
 
 export function TrendingMovieCard(props: { movie: Movie }) {
     let date = new Date(props.movie.release_date)
+    let dateStr = date.toDateString()
+    if(dateStr === "Invalid Date"){
+        dateStr = "Unannounced release date"
+    }else{
+        dateStr = date.toDateString()
+    }
 
     return (
         <div className={"trending-film"}>
@@ -12,7 +18,7 @@ export function TrendingMovieCard(props: { movie: Movie }) {
                      alt={"show-poster"}/>
             </Link>
             <div className={"name"}>{props.movie.original_title}</div>
-            <div className={"air-date"}>{date.toDateString()}</div>
+            <div className={"air-date"}>{dateStr}</div>
         </div>
     )
 }

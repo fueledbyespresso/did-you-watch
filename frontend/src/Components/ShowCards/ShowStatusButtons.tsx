@@ -115,30 +115,34 @@ export function ShowStatusButtons(props: { showID: number }) {
     }
     return (
         <div className={"status-buttons"}>
+            {showStatus !== null &&
             <div className={"watch-count"}>
                 {editMode ? (
                     <>
                         Episodes watched: <input value={newEpisodesWatched} onChange={(e) => {
-                            if(!isNaN(+e.target.value) && Number(e.target.value) <= (totalEpisodes || 0)){
-                                setNewEpisodesWatched(Number(e.target.value))
-                            }
+                        if (!isNaN(+e.target.value) && Number(e.target.value) <= (totalEpisodes || 0)) {
+                            setNewEpisodesWatched(Number(e.target.value))
                         }
+                    }
                     }/>/{totalEpisodes}
-                        <button onClick={()=>{
+                        <button onClick={() => {
                             addShowToWatchlist(props.showID, showStatus || "plan-to-watch", newEpisodesWatched)
                             setEditMode(false)
                         }
-                        }>Submit</button>
-                        <button onClick={()=>setEditMode(false)}>Cancel Edit</button>
+                        }>Submit
+                        </button>
+                        <button onClick={() => setEditMode(false)}>Cancel Edit</button>
                     </>
                 ) : (
                     <>
                         Episodes watched: {episodesWatched}/{totalEpisodes}
-                        <button onClick={()=>setEditMode(true)}>Edit</button>
+                        <button onClick={() => setEditMode(true)}>Edit</button>
                     </>
                 )}
 
             </div>
+            }
+
             {loading && <div>"Loading..."</div>}
             {status_types.map((status) => (
                 <button className={status.value}
