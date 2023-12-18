@@ -25,7 +25,9 @@ import {LoginSignUpPage} from "./Pages/LoginSignUpPage";
 // TODO Add compact mode to other user page
 // TODO Redirect user to their own watchlist when they navigate to their own profile
 // TODO Make overview expandable when too long
-// TODO Add status buttons to show/movie full details page
+// TODO Add status buttons to movie full details page
+// TODO Style account page
+// TODO Add Season view
 
 // Configure Firebase.
 // noinspection SpellCheckingInspection

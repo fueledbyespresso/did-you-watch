@@ -13,7 +13,7 @@ export function HeaderBar() {
             <AccountDropdown/>
             <Search/>
             <div className={"links"}>
-                <NavLink className={({isActive}) => (isActive ? 'active' : 'inactive')} to={"/"}>Did you watch?</NavLink>
+                <NavLink className={({isActive}) => (isActive ? 'active' : 'inactive')} to={"/"}>Trending</NavLink>
                 {user !== null &&
                     <>
                         <NavLink className={({isActive}) => (isActive ? 'active' : 'inactive')} to={"/my-movies"}>My

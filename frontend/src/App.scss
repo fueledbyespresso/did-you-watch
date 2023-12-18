@@ -117,12 +117,12 @@ a {
 
             &:hover {
                 text-decoration: none;
-                background: #ff6200;
+                background: #BD0000FF;
                 color: white;
             }
 
             &.active {
-                background: #ff6200;
+                background: #BD0000FF;
                 color: white;
                 text-decoration: underline;
             }
@@ -360,13 +360,13 @@ a {
 
     .filter-select {
         width: 100%;
-        max-width: 45em;
+        max-width: 35em;
         margin-bottom: 1em;
     }
 
     .films {
         display: flex;
-        flex-flow: row wrap;
+        flex-flow: column wrap;
         gap: .5em;
         margin: auto;
         justify-content: center;
@@ -488,7 +488,7 @@ a {
 
             &.plan-to-watch {
                 color: #fff;
-                background: #ff6200;
+                background: #BD0000FF;
             }
 
             &.completed {
@@ -553,19 +553,19 @@ a {
             button {
                 background: #EEEEEE;
                 padding: .5em;
-                border: 1px solid #5a5c5e;
-                border-radius: .5em;
+                border: 1px solid #ccc;
+                border-radius: .25em;
                 margin: .1em;
 
                 &:hover {
                     color: #fff;
-                    background: #545454;
+                    background: #007a35;
                 }
             }
 
             button:disabled, button[disabled] {
                 color: #fff;
-                background: #545454;
+                background: #007a35;
                 text-decoration: underline;
             }
         }
