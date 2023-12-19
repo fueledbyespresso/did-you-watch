@@ -1,10 +1,19 @@
 import {Link, useParams} from "react-router-dom";
 import React, {useEffect, useState} from "react";
 import {ShowStatusButtons} from "../Components/ShowCards/ShowStatusButtons";
+import {types} from "sass";
 
 export function TVShowPage() {
+    type season = {
+        loading: boolean;
+        name: string;
+        episodes: any;
+    }
     const {id} = useParams()
     const [show, setShow] = useState<any>(null)
+    const [selectedSeason, setSelectedSeason] = useState<any>(null)
+    const [seasons, setSelectedSeasons] = useState<Map<number, season>>(new Map<number, season>())
+
     const [displayAllCast, setDisplayAllCast] = useState<boolean>(false)
 
     function getShowByID() {
@@ -19,11 +28,58 @@ export function TVShowPage() {
             })
             .then(
                 (result) => {
+                    let mapOfSeasons = new Map<number, season>();
+                    result.seasons.forEach((curSeason:any) => {
+                        let tempSeason: season = {
+                            loading: true,
+                            name: curSeason.name,
+                            episodes: null
+                        }
+                        mapOfSeasons.set(curSeason.season_number, tempSeason)
+                    })
+
+                    console.log(mapOfSeasons)
+                    setSelectedSeasons(mapOfSeasons)
                     setShow(result)
                 }, (error) => {
 
                 }
             )
+    }
+
+    function getSeasonByID(seasonID: any) {
+        fetch(process.env.REACT_APP_HOST + "/api/v1/tv/" + id +"/season/" + seasonID, {
+            method: "GET",
+        })
+            .then((res) => {
+                if (res.ok) {
+                    return res.json()
+                }
+            })
+            .then(
+                (result) => {
+                    let mapOfSeasons = seasons
+                    mapOfSeasons.set(seasonID, {
+                        loading: false,
+                        name:result.name,
+                        episodes: result.episodes
+                    })
+                    console.log(mapOfSeasons)
+                    setSelectedSeasons(mapOfSeasons)
+                    setSelectedSeason(seasonID)
+                }, (error) => {
+
+                }
+            )
+    }
+
+    function selectSeason(seasonID: any){
+        console.log(seasonID)
+        if(seasons.get(seasonID)?.loading ){
+            getSeasonByID(seasonID)
+        }else{
+            setSelectedSeason(seasonID)
+        }
     }
 
     useEffect(() => {
@@ -86,13 +142,41 @@ export function TVShowPage() {
                 <div className={"seasons"}>
                     {show.seasons.map((season: any) => {
                         return (
-                            <div className={"season"} key={season.name}>
+                            <div className={"season"}
+                                 key={season.name}
+                                 onClick={()=>selectSeason(season.season_number)}>
                                 <img src={"https://image.tmdb.org/t/p/w500/" + season.poster_path} className={"poster"}
                                      alt={"show-poster"}/>
                                 <div>{season.name}</div>
                             </div>
                         )
                     })}
+                </div>
+                <div className={"season-selector"}>
+                    {[...seasons.keys()].map((seasonNumber: any) =>
+                        <button onClick={()=>selectSeason(seasonNumber)}>
+                            {seasons?.get(seasonNumber)?.name}
+                        </button>
+                    )}
+                </div>
+                <div className={"selected-season"}>
+                    {seasons?.get(selectedSeason)?.loading ? "loading":
+                        <div>
+                            {seasons?.get(selectedSeason)?.episodes.map((episode:any) => {
+                                return (
+                                    <div className={"season"}>
+                                        <img src={episode.still_path !== null ?
+                                            "https://image.tmdb.org/t/p/w300/" + episode.still_path :
+                                            "https://did-you-watch-avatars.s3.us-west-2.amazonaws.com/placeholder.jpg"}/>
+                                        <div className={"info"}>
+                                            <b>{episode.name}</b>
+                                            <div>{episode.overview}</div>
+                                        </div>
+                                    </div>
+                                )
+                            })}
+                        </div>
+                    }
                 </div>
             </div>
         </div>

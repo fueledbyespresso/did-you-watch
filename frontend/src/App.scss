@@ -701,6 +701,47 @@ a {
             }
         }
     }
+
+    .selected-season{
+        .season{
+            min-height: 10em;
+            height: 10em;
+            width: 100%;
+            display: flex;
+            flex-flow: row nowrap;
+
+            img{
+                display: inline-block;
+            }
+            .info{
+                max-width:70em;
+                padding: 1em 2em;
+                overflow: clip;
+            }
+        }
+    }
+}
+
+@media screen and (max-width: 700px) {
+    .full-show-details {
+        .selected-season {
+            .season {
+                height: auto;
+                display: block;
+
+                img {
+                    width: 100%;
+                    max-height: 25em;
+                    display: block;
+                    object-fit: cover;
+                }
+
+                .info {
+                    padding: 1em;
+                }
+            }
+        }
+    }
 }
 
 .account-page {

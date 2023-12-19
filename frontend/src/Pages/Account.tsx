@@ -64,9 +64,9 @@ export function Account() {
             })
             .then(
                 (result) => {
-                    let tempUser = JSON.parse(JSON.stringify(user));
-                    tempUser.username = result.username
-                    dispatch(set(tempUser))
+                    let tempUserProfile = JSON.parse(JSON.stringify(user.profile));
+                    tempUserProfile.username = result.username
+                    dispatch(set(tempUserProfile))
                     console.log("Successful username change!")
                     setError(null)
                     setEditUsernameMode(false)
@@ -96,9 +96,9 @@ export function Account() {
             })
             .then(
                 (result) => {
-                    let tempUser = JSON.parse(JSON.stringify(user));
-                    tempUser.displayName = result.displayName
-                    dispatch(set(tempUser))
+                    let tempUserProfile = JSON.parse(JSON.stringify(user.profile));
+                    tempUserProfile.displayName = result.displayName
+                    dispatch(set(tempUserProfile))
                     console.log("Successful display name change!")
                     setError(null)
                     setEditDisplayNameMode(false)

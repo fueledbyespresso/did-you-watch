@@ -20,6 +20,7 @@ import (
 func Routes(r *gin.RouterGroup, db *database.DB) {
 	r.GET("/search/tv/:query", searchForTV(db))
 	r.GET("/tv/:id", getTVShow(db))
+	r.GET("/tv/:id/season/:season", getSeason(db))
 	r.PUT("/tv/:id/:status/:count", addToWatchlist(db))
 	r.DELETE("/tv/:id", removeFromWatchlist(db))
 }
@@ -70,6 +71,31 @@ func getTVShow(db *database.DB) gin.HandlerFunc {
 				return
 			}
 		}
+		c.JSON(http.StatusOK, dataJSON)
+	}
+}
+
+func getSeason(db *database.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		id := c.Param("id")
+		season := c.Param("season")
+
+		resp, err := http.Get("https://api.themoviedb.org/3/tv/" + url.QueryEscape(id) + "/season/" + url.QueryEscape(season) + "?api_key=" + os.Getenv("TMDB_API_KEY"))
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, "Could not retrieve show.")
+			return
+		}
+		contents, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, "Could not retrieve show.")
+			return
+		}
+		var dataJSON map[string]any
+		err = json.Unmarshal(contents, &dataJSON)
+		if err != nil {
+			log.Println(err)
+		}
+		/* TODO: Update cached season data*/
 		c.JSON(http.StatusOK, dataJSON)
 	}
 }
