@@ -18,10 +18,9 @@ export function ActorPage() {
             .then(
                 (result) => {
                     result.combined_credits.cast.sort(compare);
-
                     setActor(result)
                 }, (error) => {
-
+                    console.log(error)
                 }
             )
     }
@@ -46,6 +45,20 @@ export function ActorPage() {
         return 0;
     }
 
+    function birthday(): string{
+        if(actor.birthday === null){
+            return "No birthday given"
+        }
+        let bDay
+
+        if(actor.deathday !== null){
+            bDay = actor.deathday.substring(0, 4) - actor.birthday.substring(0, 4)
+        }else {
+            bDay = new Date().getFullYear() - actor.birthday?.substring(0, 4) - 1
+        }
+        return bDay.toString()
+    }
+
     return (
         <div className={"actor-page"}>
             <div className={"details"}>
@@ -55,7 +68,7 @@ export function ActorPage() {
                      className={"headshot"}
                      alt={"actor-headshot"}/>
                 <div className={"text-details"}>
-                    <h1 className={"name"}>{actor?.name} ({new Date().getFullYear() - actor.birthday?.substring(0, 4) - 1})</h1>
+                    <h1 className={"name"}>{actor?.name} ({birthday()})</h1>
                     <div className={"biography"}>
                         <h2>Biography</h2>
                         <div>{actor?.biography}</div>

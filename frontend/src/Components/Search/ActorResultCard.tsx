@@ -1,12 +1,6 @@
-import React, {useEffect} from "react";
 import {Link} from "react-router-dom";
 
 export function ActorResultCard(props: {actor: any, actorID: number }) {
-    useEffect(() => {
-        console.log(props.actor.name)
-    }, [props.actor]);
-
-
     return (
         <div className={"actor"}>
             <div>
