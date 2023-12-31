@@ -4,6 +4,7 @@ import {store} from "./store";
 
 export type UserState = {
     profile: User | null,
+    loading: boolean
 }
 
 const initialState: UserState = {
@@ -17,7 +18,8 @@ const initialState: UserState = {
             movieList: [],
             tvList: [],
         }*/
-    profile: null
+    profile: null,
+    loading: true
 }
 
 
@@ -28,10 +30,12 @@ export const userSlice = createSlice({
     reducers: {
         set: (state: UserState, action: PayloadAction<User>) => {
             state.profile = action.payload
+            state.loading = false
             localStorage.setItem('darkTheme', state.profile.darkMode.toString())
         },
         remove: (state: UserState) => {
             state.profile = null
+            state.loading = false
         },
     }
 })

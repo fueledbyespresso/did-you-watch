@@ -7,7 +7,9 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"google.golang.org/api/option"
+	"log"
 	"os"
+	"regexp"
 	"strconv"
 )
 
@@ -50,6 +52,7 @@ type TV struct {
 // oauth/v1/*
 func Routes(r *gin.RouterGroup, db *database.DB) {
 	r.GET("/login", handleLogin(db))
+	r.POST("/signup", handleSignUp(db))
 	r.PUT("/toggleDarkMode", toggleDarkMode(db))
 	r.PUT("/username/:newUsername", handleChangeUsername(db))
 	r.PUT("/displayName/:newDisplayName", handleChangeDisplayName(db))
@@ -92,6 +95,15 @@ func GetUserRecord(c *gin.Context) *auth.UserRecord {
 	return user
 }
 
+func userExists(uid string, db *database.DB) bool {
+	count := 0
+	err := db.Db.QueryRow(`SELECT count(*) FROM account WHERE uid = $1`, uid).Scan(&count)
+	if err != nil {
+		return false
+	}
+	return count != 0
+}
+
 func handleLogin(db *database.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		user := GetUserRecord(c)
@@ -99,16 +111,39 @@ func handleLogin(db *database.DB) gin.HandlerFunc {
 			c.AbortWithStatusJSON(500, "Unable to verify token")
 			return
 		}
-		username, displayName, profilePicURL, movieList, tvList, darkMode := GetUser(user.UID, db)
-		if username == "" {
-			var err error
-			err, username, displayName = createUser(user.UID, user.Email, user.DisplayName, db)
-			if err != nil {
-				c.AbortWithStatusJSON(500, "Unable to create new user :(")
-				return
+		if _, ok := user.CustomClaims["synced"]; !ok {
+			opt := option.WithCredentialsJSON([]byte(os.Getenv("FIREBASE_CREDS")))
+			app, err := firebase.NewApp(c, nil, opt)
+			client, err := app.Auth(c)
+			if userExists(user.UID, db) {
+				_ = client.SetCustomUserClaims(c, user.UID, map[string]interface{}{"synced": true})
+			} else {
+				newUsername := getRandomName()
+				formattedDisplayName := user.DisplayName
+				if len(formattedDisplayName) > 20 {
+					formattedDisplayName = formattedDisplayName[:20]
+				}
+				err = createUser(user.UID, user.Email, formattedDisplayName, newUsername, db)
+				if err != nil {
+					c.AbortWithStatusJSON(500, "Idk what happened")
+					fmt.Println(err)
+					return
+				}
+
+				if err != nil {
+					c.AbortWithStatusJSON(500, "Error getting Auth Client")
+					return
+				}
+				_ = client.SetCustomUserClaims(c, user.UID, map[string]interface{}{"synced": true})
 			}
 		}
-		//todo return displayname and username on new user created
+
+		username, displayName, profilePicURL, movieList, tvList, darkMode := GetUser(user.UID, db)
+		if username == "" {
+			c.AbortWithStatusJSON(500, "Unable to get user")
+			return
+		}
+
 		c.JSON(200, User{
 			UID:           user.UID,
 			Username:      username,
@@ -121,37 +156,83 @@ func handleLogin(db *database.DB) gin.HandlerFunc {
 	}
 }
 
-func createUser(uid string, email string, displayName string, db *database.DB) (error, string, string) {
-	username := getRandomName()
+type NewUser struct {
+	Email       string `json:"email"`
+	Password    string `json:"password"`
+	Username    string `json:"username"`
+	DisplayName string `json:"displayname"`
+}
 
-	var count int
-	nameIsUnique := false
-	for !nameIsUnique {
-		fmt.Println(username)
-		err := db.Db.QueryRow(`SELECT count(*) FROM account WHERE upper(username) = upper($1)`, username).Scan(&count)
+func handleSignUp(db *database.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var requestBody NewUser
+		if err := c.BindJSON(&requestBody); err != nil {
+			c.AbortWithStatusJSON(400, "Unable to create user. New user data is in an invalid format.")
+			return
+		}
+		dnIsAlphanumeric := regexp.MustCompile(`^[a-zA-Z0-9]*$`).MatchString(requestBody.DisplayName)
+		unIsAlphanumeric := regexp.MustCompile(`^[a-zA-Z0-9]*$`).MatchString(requestBody.Username)
+
+		if !dnIsAlphanumeric || !unIsAlphanumeric {
+			c.AbortWithStatusJSON(400, "Username or displayname does not meet requirements. Must be 2-20 characters long. Must be alphanumeric.")
+			return
+		}
+
+		if !usernameIsUnique(requestBody.Username, db) {
+			c.AbortWithStatusJSON(409, "Username already in use.")
+			return
+		}
+
+		opt := option.WithCredentialsJSON([]byte(os.Getenv("FIREBASE_CREDS")))
+		app, err := firebase.NewApp(c, nil, opt)
+		client, err := app.Auth(c)
+
+		params := (&auth.UserToCreate{}).
+			Email(requestBody.Email).
+			EmailVerified(false).
+			Password(requestBody.Password).
+			Disabled(false)
+		user, err := client.CreateUser(c, params)
 		if err != nil {
-			return err, "", ""
+			c.AbortWithStatusJSON(400, err)
 		}
-		if count == 0 {
-			nameIsUnique = true
-		} else {
-			username = getRandomName()
-		}
-	}
+		err = createUser(user.UID, user.Email, requestBody.DisplayName, requestBody.Username, db)
+		if err != nil {
+			c.AbortWithStatusJSON(500, "User could not be saved to database after creation. Deleting user.")
 
-	if len(displayName) > 20 {
-		displayName = displayName[:20]
+			err = client.DeleteUser(c, user.UID)
+			if err != nil {
+				log.Fatalf("User was created in Firebase. User was not able to be saved in database. "+
+					"User was not able to be removed from database. "+
+					"Failure unrecoverable. Server and Firebase out of sync. Error from firebase: %v", err)
+			}
+			return
+		}
+		_ = client.SetCustomUserClaims(c, user.UID, map[string]interface{}{"synced": true})
+		token, err := client.CustomToken(c, user.UID)
+		if err != nil {
+			c.AbortWithStatusJSON(400, "User created but custom token could not be minted")
+			return
+		}
+		c.JSON(200, token)
 	}
-	if displayName == "" {
-		displayName = "Default name"
+}
+
+func usernameIsUnique(username string, db *database.DB) bool {
+	var count int
+	err := db.Db.QueryRow(`SELECT count(*) FROM account WHERE upper(username) = upper($1)`, username).Scan(&count)
+	if err != nil {
+		return false
 	}
-	if len(username) > 20 {
-		username = username[:20]
-	}
+	return count == 0
+}
+
+func createUser(uid string, email string, displayName string, username string, db *database.DB) error {
+
 	insert, err := db.Db.Prepare(`INSERT INTO account (uid, email, profile_picture_url, username, display_name) 
 											VALUES ($1, $2, default, $3, $4)`)
 	if err != nil {
-		return err, "", ""
+		return err
 	}
 
 	//Execute the previous sql query using data from the
@@ -159,9 +240,9 @@ func createUser(uid string, email string, displayName string, db *database.DB) (
 	_, err = insert.Exec(uid, email, username, displayName)
 
 	if err != nil {
-		return err, "", ""
+		return err
 	}
-	return nil, username, displayName
+	return nil
 }
 
 func GetUser(uid string, db *database.DB) (string, string, string, []Movie, []TV, bool) {

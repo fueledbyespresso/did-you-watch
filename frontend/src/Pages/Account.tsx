@@ -1,7 +1,7 @@
 import {useDispatch, useSelector} from "react-redux";
 import {RootState, set, UserState} from "../Store/userSlice";
 import {useEffect, useState} from "react";
-import firebase from "firebase/compat/app";
+import {getAuth} from "firebase/auth";
 
 export function Account() {
     const user = useSelector<RootState, UserState>((state) => state.user);
@@ -175,7 +175,7 @@ export function Account() {
 
     function signOut() {
         console.log("signing out")
-        firebase.auth().signOut().then(r => console.log("signed out"))
+        getAuth().signOut().then(r => console.log("signed out"))
     }
     if (user.profile === null){
         return <></>

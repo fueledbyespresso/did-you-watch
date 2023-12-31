@@ -5,9 +5,8 @@ import {Show} from "../../Types/Show";
 
 const status_types = [
     {value: 'plan-to-watch', label: 'Plan to Watch'},
-    {value: 'completed', label: 'Completed'},
     {value: 'started', label: 'Started'},
-    {value: 'rewatching', label: 'Rewatching'},
+    {value: 'completed', label: 'Completed'},
     {value: 'dropped', label: 'Dropped'},
 ]
 

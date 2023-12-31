@@ -1,7 +1,6 @@
 import {Link, useParams} from "react-router-dom";
 import React, {useEffect, useState} from "react";
 import {ShowStatusButtons} from "../Components/ShowCards/ShowStatusButtons";
-import {types} from "sass";
 
 export function TVShowPage() {
     type season = {

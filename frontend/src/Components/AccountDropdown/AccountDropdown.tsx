@@ -8,10 +8,10 @@ export function AccountDropdown() {
     if (user.profile === null) {
         return (
             <>
-                <Link to={"/login-signup"} className={"signup-button"} tabIndex={4}>
+                <Link to={"/signup"} className={"signup-button"} tabIndex={4}>
                     Sign up
                 </Link>
-                <Link to={"/login-signup"} className={"login-button"} tabIndex={4}>
+                <Link to={"/login"} className={"login-button"} tabIndex={4}>
                     Login
                 </Link>
             </>

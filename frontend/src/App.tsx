@@ -16,7 +16,8 @@ import {MoviePage} from "./Pages/MoviePage";
 import {Root} from "./Components/Root/Root";
 import {UserPage} from "./Pages/UserPage";
 import {ActorPage} from "./Pages/ActorPage";
-import {LoginSignUpPage} from "./Pages/LoginSignUpPage";
+import SignUp from "./SignUp";
+import Login from "./Login";
 // TODO Add more sorting features
 // TODO Add follow other people
 // TODO Add rankings
@@ -30,22 +31,22 @@ import {LoginSignUpPage} from "./Pages/LoginSignUpPage";
 // Configure Firebase.
 // noinspection SpellCheckingInspection
 const config = JSON.parse(process.env.REACT_APP_FIREBASE_CONFIG || "")
+const firebaseApp = firebase.initializeApp(config);
+const auth = getAuth(firebaseApp);
 
 function App() {
-    firebase.initializeApp(config)
     const dispatch = useDispatch()
     if(process.env.NODE_ENV === "development"){
-        const auth = getAuth();
         connectAuthEmulator(auth, "http://127.0.0.1:9099");
     }
 
     useEffect(() => {
-        onAuthStateChanged(firebase.auth() as any, (firebaseUser) => {
+        onAuthStateChanged(auth as any, (firebaseUser) => {
             if (firebaseUser === null) {
                 console.log("no user logged in")
                 dispatch(remove())
             } else {
-                firebase.auth().currentUser?.getIdToken(true)
+                firebaseUser?.getIdToken(true)
                     .then((idToken) => {
                         getAccount(idToken)
                     }).catch((error) => {
@@ -106,8 +107,11 @@ function App() {
             path: "",
             element: <Home/>,
         }, {
-            path: "login-signup",
-            element: <LoginSignUpPage/>
+            path: "login",
+            element: <Login/>
+        },{
+            path:"signup",
+            element: <SignUp/>
         },{
             path: "my-movies",
             element: <ProtectedRoute children={<Watchlist category={"movies"}/>}/>,

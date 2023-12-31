@@ -6,9 +6,11 @@ import {RootState, UserState} from "../Store/userSlice";
 const ProtectedRoute = ({children}: any) => {
     const user = useSelector<RootState, UserState>((state) => state.user);
     let location = useLocation();
-
+    if(user.loading){
+        return <div>Loading...</div>
+    }
     if (user.profile === null) {
-        return <Navigate to="/login-signup" state={{from: location}} replace/>
+        return <Navigate to="/signup" state={{from: location}} replace/>
     }
     return children
 

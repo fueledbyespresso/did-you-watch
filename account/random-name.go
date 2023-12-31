@@ -41,5 +41,5 @@ func getRandomName() string {
 
 	randomName := fmt.Sprintf("%v-%v-%d", randomAdjective, randomNoun, randomNum)
 
-	return randomName
+	return randomName[:20]
 }

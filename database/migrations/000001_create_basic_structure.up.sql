@@ -93,8 +93,7 @@ create table if not exists tv_user_bridge
     status           varchar
         constraint check_name
             check (((status)::text = 'plan-to-watch'::text) OR ((status)::text = 'completed'::text) OR
-                   ((status)::text = 'started'::text) OR ((status)::text = 'dropped'::text) OR
-                   ((status)::text = 'rewatching'::text)),
+                   ((status)::text = 'started'::text) OR ((status)::text = 'dropped'::text)),
     episodes_watched integer default 0 not null,
     constraint tv_user_bridge_pk
         primary key (tv_id, user_id)
@@ -112,8 +111,7 @@ create table if not exists movie_user_bridge
     status   varchar default 'plan-to-watch'::character varying not null
         constraint check_name
             check (((status)::text = 'plan-to-watch'::text) OR ((status)::text = 'completed'::text) OR
-                   ((status)::text = 'started'::text) OR ((status)::text = 'dropped'::text) OR
-                   ((status)::text = 'rewatching'::text)),
+                   ((status)::text = 'started'::text) OR ((status)::text = 'dropped'::text)),
     constraint movie_user_bridge_pk
         primary key (user_id, movie_id)
 );

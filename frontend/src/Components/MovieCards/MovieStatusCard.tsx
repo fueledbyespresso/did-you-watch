@@ -4,9 +4,8 @@ import React, {useEffect, useState} from "react";
 
 const status_types = [
     {value: 'plan-to-watch', label: 'Plan to Watch'},
-    {value: 'completed', label: 'Completed'},
     {value: 'started', label: 'Started'},
-    {value: 'rewatching', label: 'Rewatching'},
+    {value: 'completed', label: 'Completed'},
     {value: 'dropped', label: 'Dropped'},
 ]
 export function MovieStatusCard(props: { movieID: number }) {
