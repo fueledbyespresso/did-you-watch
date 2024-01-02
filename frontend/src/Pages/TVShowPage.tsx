@@ -110,6 +110,18 @@ export function TVShowPage() {
                         <ShowStatusButtons showID={show.id}/>
                     </div>
                 </div>
+                <section className={"next-episode-to-air"}>
+                    {show.next_episode_to_air !== null &&
+                        <div>
+                            <h2>Next episode airs on {(new Date(show.next_episode_to_air.air_date)).toDateString()}</h2>
+                            <img src={show.next_episode_to_air.still_path !== null ?
+                                "https://image.tmdb.org/t/p/w500/" + show.next_episode_to_air.still_path :
+                                "https://did-you-watch-avatars.s3.us-west-2.amazonaws.com/placeholder.jpg"}/>
+                            <div>Episode {show.next_episode_to_air.episode_number}: {show.next_episode_to_air.name}</div>
+                            <div>{show.next_episode_to_air.overview}</div>
+                        </div>
+                    }
+                </section>
                 <h2>Cast
                     <button className={"toggle-full-cast"}
                             onClick={() => setDisplayAllCast(!displayAllCast)}>
@@ -153,7 +165,7 @@ export function TVShowPage() {
                 </div>
                 <div className={"season-selector"}>
                     {[...seasons.keys()].map((seasonNumber: any) =>
-                        <button onClick={()=>selectSeason(seasonNumber)}>
+                        <button onClick={()=>selectSeason(seasonNumber)} key={seasonNumber}>
                             {seasons?.get(seasonNumber)?.name}
                         </button>
                     )}
@@ -163,7 +175,7 @@ export function TVShowPage() {
                         <div>
                             {seasons?.get(selectedSeason)?.episodes.map((episode:any) => {
                                 return (
-                                    <div className={"season"}>
+                                    <div className={"season"} key={episode.id}>
                                         <img src={episode.still_path !== null ?
                                             "https://image.tmdb.org/t/p/w300/" + episode.still_path :
                                             "https://did-you-watch-avatars.s3.us-west-2.amazonaws.com/placeholder.jpg"}/>

@@ -55,11 +55,11 @@ function App() {
             }
         })
         setInterval(() => {
-            if (firebase.auth().currentUser === null) {
+            if (auth.currentUser === null) {
                 console.log("no user logged in")
                 dispatch(remove())
             } else {
-                firebase.auth().currentUser?.getIdToken(true)
+                auth.currentUser?.getIdToken(true)
                     .then((idToken) => {
                         getAccount(idToken)
                     }).catch((error) => {

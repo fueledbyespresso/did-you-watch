@@ -111,31 +111,10 @@ func handleLogin(db *database.DB) gin.HandlerFunc {
 			c.AbortWithStatusJSON(500, "Unable to verify token")
 			return
 		}
-		if _, ok := user.CustomClaims["synced"]; !ok {
-			opt := option.WithCredentialsJSON([]byte(os.Getenv("FIREBASE_CREDS")))
-			app, err := firebase.NewApp(c, nil, opt)
-			client, err := app.Auth(c)
-			if userExists(user.UID, db) {
-				_ = client.SetCustomUserClaims(c, user.UID, map[string]interface{}{"synced": true})
-			} else {
-				newUsername := getRandomName()
-				formattedDisplayName := user.DisplayName
-				if len(formattedDisplayName) > 20 {
-					formattedDisplayName = formattedDisplayName[:20]
-				}
-				err = createUser(user.UID, user.Email, formattedDisplayName, newUsername, db)
-				if err != nil {
-					c.AbortWithStatusJSON(500, "Idk what happened")
-					fmt.Println(err)
-					return
-				}
-
-				if err != nil {
-					c.AbortWithStatusJSON(500, "Error getting Auth Client")
-					return
-				}
-				_ = client.SetCustomUserClaims(c, user.UID, map[string]interface{}{"synced": true})
-			}
+		err := createUserIfNotExist(user, c, db)
+		if err != nil {
+			c.AbortWithStatusJSON(500, "Server was unable to create a user on first login")
+			return
 		}
 
 		username, displayName, profilePicURL, movieList, tvList, darkMode := GetUser(user.UID, db)
@@ -154,6 +133,37 @@ func handleLogin(db *database.DB) gin.HandlerFunc {
 			DarkMode:      darkMode,
 		})
 	}
+}
+
+func createUserIfNotExist(user *auth.UserRecord, c *gin.Context, db *database.DB) error {
+	if _, ok := user.CustomClaims["synced"]; !ok {
+		//todo generate new random username on conflict
+		opt := option.WithCredentialsJSON([]byte(os.Getenv("FIREBASE_CREDS")))
+		app, err := firebase.NewApp(c, nil, opt)
+		client, err := app.Auth(c)
+		if userExists(user.UID, db) {
+			// User is present in database but not marked in firebase. Weird.
+			err = client.SetCustomUserClaims(c, user.UID, map[string]interface{}{"synced": true})
+			return err
+		} else {
+			newUsername := getRandomName()
+			formattedDisplayName := user.DisplayName
+			if len(formattedDisplayName) > 20 {
+				formattedDisplayName = formattedDisplayName[:20]
+			}
+			err = createUser(user.UID, user.Email, formattedDisplayName, newUsername, db)
+			if err != nil {
+				return err
+			}
+
+			if err != nil {
+				return err
+			}
+			_ = client.SetCustomUserClaims(c, user.UID, map[string]interface{}{"synced": true})
+		}
+	}
+
+	return nil
 }
 
 type NewUser struct {
@@ -260,7 +270,7 @@ func GetUser(uid string, db *database.DB) (string, string, string, []Movie, []TV
 	PanicOnErr(err)
 
 	query, err := db.Db.Query(`SELECT movie.id, movie.name, COALESCE(poster_path, ''), COALESCE(movie.overview, ''), status, COALESCE(backdrop_path, '')
-										FROM movie JOIN movie_user_bridge mub on movie.id = mub.movie_id
+										FROM movie JOIN (SELECT * FROM movie_user_bridge WHERE user_id=$1 ORDER BY timestamp DESC LIMIT 1) mub on movie.id = mub.movie_id
 										JOIN account a on a.uid = mub.user_id
 											WHERE uid=$1 ORDER BY name`, uid)
 	if err != nil {
@@ -277,7 +287,7 @@ func GetUser(uid string, db *database.DB) (string, string, string, []Movie, []TV
 	}
 
 	query, err = db.Db.Query(`SELECT tv.id, tv.name, COALESCE(poster_path, ''), COALESCE(tv.overview, '') , status, episodes_watched, total_episodes, COALESCE(backdrop_path, '')
-										FROM tv JOIN tv_user_bridge mub on tv.id = mub.tv_id
+										FROM tv JOIN (SELECT * FROM tv_user_bridge WHERE user_id=$1 ORDER BY timestamp DESC LIMIT 1) mub on tv.id = mub.tv_id
 										JOIN account a on a.uid = mub.user_id
 											WHERE uid=$1 ORDER BY tv.name`, uid)
 	PanicOnErr(err)
