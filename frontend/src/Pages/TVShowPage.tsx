@@ -113,7 +113,7 @@ export function TVShowPage() {
                 <section className={"next-episode-to-air"}>
                     {show.next_episode_to_air !== null &&
                         <div>
-                            <h2>Next episode airs on {(new Date(show.next_episode_to_air.air_date)).toDateString()}</h2>
+                            <h2>Next episode airs on {(new Date(show.next_episode_to_air.air_date+"PST")).toDateString()}</h2>
                             <img src={show.next_episode_to_air.still_path !== null ?
                                 "https://image.tmdb.org/t/p/w500/" + show.next_episode_to_air.still_path :
                                 "https://did-you-watch-avatars.s3.us-west-2.amazonaws.com/placeholder.jpg"}/>
