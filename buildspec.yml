@@ -20,3 +20,4 @@ artifacts:
   files:
     - main
     - appspec.yml
+    - deployment/*.sh

@@ -5,8 +5,8 @@ files:
     destination: /opt
 hooks:
   ApplicationStop:
-    - location: codedeploy/ApplicationStop.sh
+    - location: deployment/ApplicationStop.sh
   ApplicationStart:
-    - location: codedeploy/ApplicationStart.sh
+    - location: deployment/ApplicationStart.sh
   ValidateService:
-    - location: codedeploy/ValidateService.sh
+    - location: deployment/ValidateService.sh
