@@ -7,9 +7,9 @@ import (
 	"github.com/antonlindstrom/pgstore"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/secretsmanager"
 	"github.com/aws/aws-sdk-go/service/ssm"
 	"github.com/aws/aws-sdk-go/service/ssm/ssmiface"
-	"github.com/aws/aws-secretsmanager-caching-go/secretcache"
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
@@ -72,10 +72,6 @@ func PerformMigrations(migrationsFolder string) {
 	fmt.Println("Database migrations completed. Database should be up to date.")
 }
 
-var (
-	secretCache, _ = secretcache.New()
-)
-
 func getDbURL() string {
 	if os.Getenv("ENV") == "DEV" {
 		return os.Getenv("DATABASE_URL")
@@ -90,12 +86,19 @@ func getDbURL() string {
 			panic(err)
 		}
 		var jsonMap map[string]interface{}
-		url, _ := secretCache.GetSecretString(RDSSecretName)
-		fmt.Println(url)
+		svc := secretsmanager.New(session.Must(session.NewSession(&aws.Config{
+			Region: aws.String("us-west-2")},
+		)))
+		input := &secretsmanager.GetSecretValueInput{
+			SecretId: aws.String(RDSSecretName),
+		}
+
+		RDSLoginStr, err := svc.GetSecretValue(input)
+		fmt.Println(RDSSecretName, RDSLoginStr)
 		if err != nil {
 			panic(err)
 		}
-		err = json.Unmarshal([]byte(url), &jsonMap)
+		err = json.Unmarshal([]byte(RDSLoginStr.String()), &jsonMap)
 		if err != nil {
 			panic(err)
 		}
