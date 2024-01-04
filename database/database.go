@@ -81,7 +81,7 @@ func getDbURL() string {
 		return os.Getenv("DATABASE_URL")
 	} else {
 		ssmsvc := NewSSMClient()
-		result, err := ssmsvc.Param("rds_secret_name", true).GetValue()
+		RDSSecretName, err := ssmsvc.Param("rds_secret_name", true).GetValue()
 		if err != nil {
 			panic(err)
 		}
@@ -90,7 +90,11 @@ func getDbURL() string {
 			panic(err)
 		}
 		var jsonMap map[string]interface{}
-		url, _ := secretCache.GetSecretString(result)
+		url, _ := secretCache.GetSecretString(RDSSecretName)
+		fmt.Println(url)
+		if err != nil {
+			panic(err)
+		}
 		err = json.Unmarshal([]byte(url), &jsonMap)
 		if err != nil {
 			panic(err)
