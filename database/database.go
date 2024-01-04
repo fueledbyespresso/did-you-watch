@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/antonlindstrom/pgstore"
+	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ssm"
 	"github.com/aws/aws-sdk-go/service/ssm/ssmiface"
@@ -103,7 +104,9 @@ type SSM struct {
 }
 
 func Sessions() (*session.Session, error) {
-	sess, err := session.NewSession()
+	sess, err := session.NewSession(&aws.Config{
+		Region: aws.String("us-west-2")},
+	)
 	svc := session.Must(sess, err)
 	return svc, err
 }
