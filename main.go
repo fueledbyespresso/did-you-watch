@@ -42,6 +42,9 @@ func createServer(dbConnection *database.DB) *gin.Engine {
 	trending.Routes(v1)
 	actors.Routes(v1)
 	search.Routes(v1, dbConnection)
+	r.GET("/health-check", func(c *gin.Context) {
+		c.JSON(200, "Healthy")
+	})
 
 	return r
 }
