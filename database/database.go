@@ -2,8 +2,13 @@ package database
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"github.com/antonlindstrom/pgstore"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/ssm"
+	"github.com/aws/aws-sdk-go/service/ssm/ssmiface"
+	"github.com/aws/aws-secretsmanager-caching-go/secretcache"
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
@@ -21,9 +26,7 @@ type DB struct {
 // InitDBConnection Initialize a database connection using the environment variable DATABASE_URL
 // Returns type *sql.DB
 func InitDBConnection() *sql.DB {
-	fmt.Println(os.Getenv("DATABASE_URL"))
-
-	db, err := sql.Open("postgres", os.Getenv("DATABASE_URL"))
+	db, err := sql.Open("postgres", getDbURL())
 	// if there is an error opening the connection, handle it
 	if err != nil {
 		fmt.Println("Cannot establish SQL connection")
@@ -58,7 +61,7 @@ func InitOauthStore() *pgstore.PGStore {
 func PerformMigrations(migrationsFolder string) {
 	m, err := migrate.New(
 		migrationsFolder,
-		os.Getenv("DATABASE_URL"))
+		getDbURL())
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -66,4 +69,81 @@ func PerformMigrations(migrationsFolder string) {
 		log.Fatal(err)
 	}
 	fmt.Println("Database migrations completed. Database should be up to date.")
+}
+
+var (
+	secretCache, _ = secretcache.New()
+)
+
+func getDbURL() string {
+	if os.Getenv("ENV") == "DEV" {
+		return os.Getenv("DATABASE_URL")
+	} else {
+		ssmsvc := NewSSMClient()
+		result, err := ssmsvc.Param("rds_secret_name", true).GetValue()
+		if err != nil {
+			panic(err)
+		}
+		endpoint, err := ssmsvc.Param("rds_endpoint", true).GetValue()
+		if err != nil {
+			panic(err)
+		}
+		var jsonMap map[string]interface{}
+		url, _ := secretCache.GetSecretString(result)
+		err = json.Unmarshal([]byte(url), &jsonMap)
+		if err != nil {
+			panic(err)
+		}
+		return "postgres://postgres:" + fmt.Sprintf("%v", jsonMap["password"]) + endpoint + ":5432/did_you_watch"
+	}
+}
+
+type SSM struct {
+	client ssmiface.SSMAPI
+}
+
+func Sessions() (*session.Session, error) {
+	sess, err := session.NewSession()
+	svc := session.Must(sess, err)
+	return svc, err
+}
+
+func NewSSMClient() *SSM {
+	// Create AWS Session
+	sess, err := Sessions()
+	if err != nil {
+		log.Println(err)
+		return nil
+	}
+	ssmsvc := &SSM{ssm.New(sess)}
+	// Return SSM client
+	return ssmsvc
+}
+
+type Param struct {
+	Name           string
+	WithDecryption bool
+	ssmsvc         *SSM
+}
+
+//Param creates the struct for querying the param store
+func (s *SSM) Param(name string, decryption bool) *Param {
+	return &Param{
+		Name:           name,
+		WithDecryption: decryption,
+		ssmsvc:         s,
+	}
+}
+
+func (p *Param) GetValue() (string, error) {
+	ssmsvc := p.ssmsvc.client
+	parameter, err := ssmsvc.GetParameter(&ssm.GetParameterInput{
+		Name:           &p.Name,
+		WithDecryption: &p.WithDecryption,
+	})
+	if err != nil {
+		return "", err
+	}
+	value := *parameter.Parameter.Value
+	return value, nil
 }
