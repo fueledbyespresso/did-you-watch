@@ -43,7 +43,7 @@ export function ShowStatusButtons(props: { showID: number }) {
             return
         }
         setLoading(true)
-        fetch(process.env.REACT_APP_HOST + "/api/v1/tv/" + id + "/" + status+"/"+episodesWatched, {
+        fetch(process.env.REACT_APP_HOST + "/api/v1/tv/" + id + "/" + status, {
             method: "PUT",
             headers: {
                 'AuthToken': user.profile.idToken
