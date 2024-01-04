@@ -9,5 +9,3 @@ hooks:
   ApplicationStart:
     - location: deployment/ApplicationStart.sh
       runas: root
-  ValidateService:
-    - location: deployment/ValidateService.sh
