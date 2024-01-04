@@ -1,3 +1,2 @@
 #!/bin/bash
-cd /opt
-./main
+/opt/main > /dev/null 2> /dev/null < /dev/null &

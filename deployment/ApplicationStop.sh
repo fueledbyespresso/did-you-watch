@@ -1,3 +1,3 @@
 #!/bin/bash
-killall main
+sudo killall main
 exit 0
