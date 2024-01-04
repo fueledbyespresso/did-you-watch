@@ -1,12 +1,12 @@
 package trending
 
 import (
+	"did-you-watch/database"
 	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
 )
 
 // Routes All the routes created by the package nested in
@@ -17,7 +17,7 @@ func Routes(r *gin.RouterGroup) {
 
 func getTrending() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		resp, err := http.Get("https://api.themoviedb.org/3/trending/all/week?api_key=" + os.Getenv("TMDB_API_KEY"))
+		resp, err := http.Get("https://api.themoviedb.org/3/trending/all/week?api_key=" + database.GetEnvOrParam("TMDB_API_KEY", "TMDB_API_KEY"))
 		if err != nil {
 			return
 		}

@@ -21,3 +21,4 @@ artifacts:
     - main
     - appspec.yml
     - deployment/*.sh
+    - database/migrations/*.sql

@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"github.com/antonlindstrom/pgstore"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/secretsmanager"
@@ -15,13 +14,11 @@ import (
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "github.com/lib/pq"
 	"log"
-	"net/http"
 	"os"
 )
 
 type DB struct {
-	Db           *sql.DB
-	SessionStore *pgstore.PGStore
+	Db *sql.DB
 }
 
 // InitDBConnection Initialize a database connection using the environment variable DATABASE_URL
@@ -35,26 +32,6 @@ func InitDBConnection() *sql.DB {
 	}
 	db.SetMaxOpenConns(15)
 	return db
-}
-
-func InitOauthStore() *pgstore.PGStore {
-	var err error
-
-	SessionStore, err := pgstore.NewPGStore(os.Getenv("DATABASE_URL"), []byte(os.Getenv("DATABASE_SECRET")))
-	if err != nil {
-		panic(err)
-	}
-
-	SessionStore.MaxAge(1800)
-	SessionStore.Options.SameSite = http.SameSiteLaxMode
-	SessionStore.Options.HttpOnly = true
-	if os.Getenv("ENV") == "DEV" {
-		SessionStore.Options.Secure = false
-	} else {
-		SessionStore.Options.Secure = true
-	}
-	fmt.Println("Successful connected to oauth session datastore")
-	return SessionStore
 }
 
 // PerformMigrations Check that database is up-to-date.
@@ -106,6 +83,19 @@ func getDbURL() string {
 			panic(err)
 		}
 		return "postgres://postgres:" + fmt.Sprintf("%v", jsonMap["password"]) + "@" + endpoint + ":5432/did_you_watch"
+	}
+}
+
+func GetEnvOrParam(envKey string, paramKey string) string {
+	if os.Getenv("ENV") == "DEV" {
+		return os.Getenv(envKey)
+	} else {
+		ssmsvc := NewSSMClient()
+		TMDBKey, err := ssmsvc.Param(paramKey, true).GetValue()
+		if err != nil {
+			panic(err)
+		}
+		return TMDBKey
 	}
 }
 

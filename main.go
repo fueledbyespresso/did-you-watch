@@ -10,7 +10,6 @@ import (
 	"did-you-watch/api/users"
 	"did-you-watch/database"
 	"github.com/gin-gonic/gin"
-	"time"
 )
 
 // CORSMiddleware Cannot use gin-gonic cors since pre-flight does not include
@@ -52,10 +51,8 @@ func main() {
 	db := database.InitDBConnection()
 	defer db.Close()
 
-	SStore := database.InitOauthStore()
 	// Run a background goroutine to clean up expired sessions from the database.
-	defer SStore.StopCleanup(SStore.Cleanup(time.Minute * 5))
-	dbConnection := &database.DB{Db: db, SessionStore: SStore}
+	dbConnection := &database.DB{Db: db}
 
 	r := createServer(dbConnection)
 

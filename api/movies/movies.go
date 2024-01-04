@@ -10,7 +10,6 @@ import (
 	"log"
 	"net/http"
 	"net/url"
-	"os"
 )
 
 // Routes All the routes created by the package nested in
@@ -26,7 +25,7 @@ func Routes(r *gin.RouterGroup, db *database.DB) {
 func searchForMovie() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		query := c.Param("query")
-		resp, err := http.Get("https://api.themoviedb.org/3/search/movie?api_key=" + os.Getenv("TMDB_API_KEY") + "&query=" + url.QueryEscape(query) + "&page=1")
+		resp, err := http.Get("https://api.themoviedb.org/3/search/movie?api_key=" + database.GetEnvOrParam("TMDB_API_KEY", "TMDB_API_KEY") + "&query=" + url.QueryEscape(query) + "&page=1")
 		if err != nil {
 			return
 		}
@@ -47,7 +46,7 @@ func searchForMovie() gin.HandlerFunc {
 func getMovie(db *database.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id := c.Param("id")
-		resp, err := http.Get("https://api.themoviedb.org/3/movie/" + url.QueryEscape(id) + "?api_key=" + os.Getenv("TMDB_API_KEY") + "&append_to_response=credits")
+		resp, err := http.Get("https://api.themoviedb.org/3/movie/" + url.QueryEscape(id) + "?api_key=" + database.GetEnvOrParam("TMDB_API_KEY", "TMDB_API_KEY") + "&append_to_response=credits")
 		if err != nil {
 			return
 		}
@@ -72,7 +71,7 @@ func addToWatchlist(db *database.DB) gin.HandlerFunc {
 			c.AbortWithStatusJSON(http.StatusBadRequest, "Invalid status")
 			return
 		}
-		resp, err := http.Get("https://api.themoviedb.org/3/movie/" + url.QueryEscape(movieID) + "?api_key=" + os.Getenv("TMDB_API_KEY") + "&language=en-US")
+		resp, err := http.Get("https://api.themoviedb.org/3/movie/" + url.QueryEscape(movieID) + "?api_key=" + database.GetEnvOrParam("TMDB_API_KEY", "TMDB_API_KEY") + "&language=en-US")
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, "Unable to communicate with TMDB Server")
 			return

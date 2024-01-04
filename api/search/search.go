@@ -9,7 +9,6 @@ import (
 	"log"
 	"net/http"
 	"net/url"
-	"os"
 )
 
 type UserResult struct {
@@ -29,7 +28,7 @@ func Routes(r *gin.RouterGroup, db *database.DB) {
 func multiSearch(db *database.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		query := c.Param("query")
-		resp, err := http.Get("https://api.themoviedb.org/3/search/multi?api_key=" + os.Getenv("TMDB_API_KEY") + "&query=" + url.QueryEscape(query) + "&page=1")
+		resp, err := http.Get("https://api.themoviedb.org/3/search/multi?api_key=" + database.GetEnvOrParam("TMDB_API_KEY", "TMDB_API_KEY") + "&query=" + url.QueryEscape(query) + "&page=1")
 		if err != nil {
 			return
 		}

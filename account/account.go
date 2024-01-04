@@ -8,7 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"google.golang.org/api/option"
 	"log"
-	"os"
 	"regexp"
 	"strconv"
 )
@@ -67,7 +66,7 @@ func GetUserRecord(c *gin.Context) *auth.UserRecord {
 
 		return nil
 	}
-	opt := option.WithCredentialsJSON([]byte(os.Getenv("FIREBASE_CREDS")))
+	opt := option.WithCredentialsJSON([]byte(database.GetEnvOrParam("FIREBASE_CREDS", "FIREBASE_CREDS")))
 
 	app, err := firebase.NewApp(c, nil, opt)
 
@@ -138,7 +137,7 @@ func handleLogin(db *database.DB) gin.HandlerFunc {
 func createUserIfNotExist(user *auth.UserRecord, c *gin.Context, db *database.DB) error {
 	if _, ok := user.CustomClaims["synced"]; !ok {
 		//todo generate new random username on conflict
-		opt := option.WithCredentialsJSON([]byte(os.Getenv("FIREBASE_CREDS")))
+		opt := option.WithCredentialsJSON([]byte(database.GetEnvOrParam("FIREBASE_CREDS", "FIREBASE_CREDS")))
 		app, err := firebase.NewApp(c, nil, opt)
 		client, err := app.Auth(c)
 		if userExists(user.UID, db) {
@@ -193,7 +192,7 @@ func handleSignUp(db *database.DB) gin.HandlerFunc {
 			return
 		}
 
-		opt := option.WithCredentialsJSON([]byte(os.Getenv("FIREBASE_CREDS")))
+		opt := option.WithCredentialsJSON([]byte(database.GetEnvOrParam("FIREBASE_CREDS", "FIREBASE_CREDS")))
 		app, err := firebase.NewApp(c, nil, opt)
 		client, err := app.Auth(c)
 

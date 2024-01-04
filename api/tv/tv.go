@@ -11,7 +11,6 @@ import (
 	"log"
 	"net/http"
 	"net/url"
-	"os"
 	"strconv"
 )
 
@@ -28,7 +27,7 @@ func Routes(r *gin.RouterGroup, db *database.DB) {
 func searchForTV(db *database.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		query := c.Param("query")
-		resp, err := http.Get("https://api.themoviedb.org/3/search/tv?api_key=" + os.Getenv("TMDB_API_KEY") + "&query=" + url.QueryEscape(query) + "&page=1")
+		resp, err := http.Get("https://api.themoviedb.org/3/search/tv?api_key=" + database.GetEnvOrParam("TMDB_API_KEY", "TMDB_API_KEY") + "&query=" + url.QueryEscape(query) + "&page=1")
 		if err != nil {
 			return
 		}
@@ -49,7 +48,7 @@ func searchForTV(db *database.DB) gin.HandlerFunc {
 func getTVShow(db *database.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id := c.Param("id")
-		resp, err := http.Get("https://api.themoviedb.org/3/tv/" + url.QueryEscape(id) + "?api_key=" + os.Getenv("TMDB_API_KEY") + "&append_to_response=aggregate_credits")
+		resp, err := http.Get("https://api.themoviedb.org/3/tv/" + url.QueryEscape(id) + "?api_key=" + database.GetEnvOrParam("TMDB_API_KEY", "TMDB_API_KEY") + "&append_to_response=aggregate_credits")
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, "Could not retrieve show.")
 			return
@@ -80,7 +79,7 @@ func getSeason(db *database.DB) gin.HandlerFunc {
 		id := c.Param("id")
 		season := c.Param("season")
 
-		resp, err := http.Get("https://api.themoviedb.org/3/tv/" + url.QueryEscape(id) + "/season/" + url.QueryEscape(season) + "?api_key=" + os.Getenv("TMDB_API_KEY"))
+		resp, err := http.Get("https://api.themoviedb.org/3/tv/" + url.QueryEscape(id) + "/season/" + url.QueryEscape(season) + "?api_key=" + database.GetEnvOrParam("TMDB_API_KEY", "TMDB_API_KEY"))
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, "Could not retrieve show.")
 			return
@@ -114,7 +113,7 @@ func addToWatchlist(db *database.DB) gin.HandlerFunc {
 			return
 		}
 
-		resp, err := http.Get("https://api.themoviedb.org/3/tv/" + url.QueryEscape(tvID) + "?api_key=" + os.Getenv("TMDB_API_KEY") + "&language=en-US")
+		resp, err := http.Get("https://api.themoviedb.org/3/tv/" + url.QueryEscape(tvID) + "?api_key=" + database.GetEnvOrParam("TMDB_API_KEY", "TMDB_API_KEY") + "&language=en-US")
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, "Unable to communicate with TMDB Server")
 			return
