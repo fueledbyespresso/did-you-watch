@@ -94,7 +94,7 @@ func getDbURL() string {
 		if err != nil {
 			panic(err)
 		}
-		return "postgres://postgres:" + fmt.Sprintf("%v", jsonMap["password"]) + endpoint + ":5432/did_you_watch"
+		return "postgres://postgres:" + fmt.Sprintf("%v", jsonMap["password"]) + "@" + endpoint + ":5432/did_you_watch"
 	}
 }
 
