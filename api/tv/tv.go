@@ -11,7 +11,6 @@ import (
 	"log"
 	"net/http"
 	"net/url"
-	"strconv"
 )
 
 // Routes All the routes created by the package nested in
@@ -20,7 +19,7 @@ func Routes(r *gin.RouterGroup, db *database.DB) {
 	r.GET("/search/tv/:query", searchForTV(db))
 	r.GET("/tv/:id", getTVShow(db))
 	r.GET("/tv/:id/season/:season", getSeason(db))
-	r.PUT("/tv/:id/:status/:count", addToWatchlist(db))
+	r.PUT("/tv/:id/:status/", addToWatchlist(db))
 	r.DELETE("/tv/:id", removeFromWatchlist(db))
 }
 
@@ -103,11 +102,7 @@ func addToWatchlist(db *database.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tvID := c.Param("id")
 		status := c.Param("status")
-		episodesWatched, err := strconv.Atoi(c.Param("count"))
-		if err != nil {
-			c.AbortWithStatusJSON(http.StatusBadRequest, "Invalid episode count")
-			return
-		}
+
 		if status != "plan-to-watch" && status != "completed" && status != "started" && status != "dropped" && status != "rewatching" {
 			c.AbortWithStatusJSON(http.StatusBadRequest, "Invalid status")
 			return
@@ -157,17 +152,10 @@ func addToWatchlist(db *database.DB) gin.HandlerFunc {
 		if user == nil {
 			return
 		}
-		if episodesWatched > totalEpisodes {
-			c.AbortWithStatusJSON(http.StatusBadRequest, "Episodes watched cannot exceed total episodes")
-			return
-		}
-		if episodesWatched < 0 {
-			c.AbortWithStatusJSON(http.StatusBadRequest, "Episodes watched cannot be less than 0")
-			return
-		}
-		err = db.Db.QueryRow(`INSERT INTO tv_user_bridge (tv_id, user_id, status, episodes_watched) VALUES ($1, $2, $3, $4) 
+
+		err = db.Db.QueryRow(`INSERT INTO tv_user_bridge (tv_id, user_id, status) VALUES ($1, $2, $3) 
 										ON CONFLICT (tv_id, user_id) DO UPDATE SET status=$3, episodes_watched=$4
-										returning status, episodes_watched`, tvID, user.UID, status, episodesWatched).Scan(&status, &episodesWatched)
+										returning status`, tvID, user.UID, status).Scan(&status)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, "Unable to add to watchlist")
 			return
@@ -181,7 +169,7 @@ func addToWatchlist(db *database.DB) gin.HandlerFunc {
 			Overview:        returnedOverview,
 			BackdropPath:    backdropPath,
 			TotalEpisodes:   totalEpisodes,
-			EpisodesWatched: episodesWatched,
+			EpisodesWatched: 0,
 		})
 	}
 }
