@@ -93,12 +93,15 @@ func getDbURL() string {
 			SecretId: aws.String(RDSSecretName),
 		}
 
-		RDSLoginStr, err := svc.GetSecretValue(input)
-		fmt.Println(RDSSecretName, RDSLoginStr)
+		RDSLoginSecret, err := svc.GetSecretValue(input)
+		if err != nil {
+			return ""
+		}
+		fmt.Println(RDSSecretName, RDSLoginSecret.SecretString)
 		if err != nil {
 			panic(err)
 		}
-		err = json.Unmarshal([]byte(RDSLoginStr.String()), &jsonMap)
+		err = json.Unmarshal([]byte(*RDSLoginSecret.SecretString), &jsonMap)
 		if err != nil {
 			panic(err)
 		}
