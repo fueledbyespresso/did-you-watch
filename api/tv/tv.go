@@ -19,7 +19,7 @@ func Routes(r *gin.RouterGroup, db *database.DB) {
 	r.GET("/search/tv/:query", searchForTV(db))
 	r.GET("/tv/:id", getTVShow(db))
 	r.GET("/tv/:id/season/:season", getSeason(db))
-	r.PUT("/tv/:id/:status/", addToWatchlist(db))
+	r.PUT("/tv/:id/:status", addToWatchlist(db))
 	r.DELETE("/tv/:id", removeFromWatchlist(db))
 }
 
@@ -154,7 +154,7 @@ func addToWatchlist(db *database.DB) gin.HandlerFunc {
 		}
 
 		err = db.Db.QueryRow(`INSERT INTO tv_user_bridge (tv_id, user_id, status) VALUES ($1, $2, $3) 
-										ON CONFLICT (tv_id, user_id) DO UPDATE SET status=$3, episodes_watched=$4
+										ON CONFLICT (tv_id, user_id, timestamp) DO UPDATE SET status=$3
 										returning status`, tvID, user.UID, status).Scan(&status)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, "Unable to add to watchlist")
