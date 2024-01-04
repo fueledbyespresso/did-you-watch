@@ -14,6 +14,7 @@ import (
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "github.com/lib/pq"
 	"log"
+	"net/url"
 	"os"
 )
 
@@ -82,7 +83,7 @@ func getDbURL() string {
 		if err != nil {
 			panic(err)
 		}
-		return "postgres://postgres:" + fmt.Sprintf("%v", jsonMap["password"]) + "@" + endpoint + ":5432/did_you_watch"
+		return "postgres://postgres:" + url.QueryEscape(fmt.Sprintf("%v", jsonMap["password"])) + "@" + endpoint + ":5432/did_you_watch"
 	}
 }
 
