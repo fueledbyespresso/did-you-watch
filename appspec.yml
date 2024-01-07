@@ -8,8 +8,7 @@ permissions:
   - object: /usr/local/sbin/deployment
     mode: 755
     pattern: "**"
-    owner: ubuntu
-    group: ubuntu
+    owner: ec2-user
 hooks:
   BeforeInstall:
     - location: deployment/ApplicationStop.sh
