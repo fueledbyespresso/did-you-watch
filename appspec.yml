@@ -2,10 +2,12 @@ version: 0.0
 os: linux
 files:
   - source: /
-    destination: /opt
+    destination: /usr/local/sbin
 hooks:
   ApplicationStop:
-    - location: /opt/deployment/ApplicationStop.sh
+    - location: /deployment/ApplicationStop.sh
   ApplicationStart:
-    - location: /opt/deployment/ApplicationStart.sh
+    - location: /deployment/ApplicationStart.sh
       runas: root
+  ValidateService:
+    - location: /deployment/ValidateService.sh
