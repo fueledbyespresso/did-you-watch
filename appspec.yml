@@ -3,6 +3,7 @@ os: linux
 files:
   - source: /
     destination: /usr/local/sbin
+file_exists_behavior: OVERWRITE
 permissions:
   - object: /usr/local/sbin/deployment
     mode: 755
