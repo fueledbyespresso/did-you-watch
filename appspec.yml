@@ -3,9 +3,16 @@ os: linux
 files:
   - source: /
     destination: /usr/local/sbin
+permissions:
+  - object: /usr/local/sbin/deployment
+    mode: 755
+    pattern: "**"
+    owner: ubuntu
+    group: ubuntu
 hooks:
   ApplicationStop:
     - location: deployment/ApplicationStop.sh
+      runas: root
   ApplicationStart:
     - location: deployment/ApplicationStart.sh
       runas: root
