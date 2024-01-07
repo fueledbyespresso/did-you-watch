@@ -5,7 +5,7 @@ files:
     destination: /opt
 hooks:
   ApplicationStop:
-    - location: deployment/ApplicationStop.sh
+    - location: /opt/deployment/ApplicationStop.sh
   ApplicationStart:
-    - location: deployment/ApplicationStart.sh
+    - location: /opt/deployment/ApplicationStart.sh
       runas: root
