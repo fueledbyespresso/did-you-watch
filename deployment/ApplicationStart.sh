@@ -1,2 +1,2 @@
 #!/bin/bash
-systemctl restart dywserver
+systemctl start dywserver

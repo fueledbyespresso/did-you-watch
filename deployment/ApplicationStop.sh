@@ -1,3 +1,2 @@
 #!/bin/bash
-sudo killall main
-exit 0
+sudo systemctl stop dywserver
