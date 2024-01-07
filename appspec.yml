@@ -5,9 +5,9 @@ files:
     destination: /usr/local/sbin
 hooks:
   ApplicationStop:
-    - location: /deployment/ApplicationStop.sh
+    - location: deployment/ApplicationStop.sh
   ApplicationStart:
-    - location: /deployment/ApplicationStart.sh
+    - location: deployment/ApplicationStart.sh
       runas: root
   ValidateService:
-    - location: /deployment/ValidateService.sh
+    - location: deployment/ValidateService.sh
