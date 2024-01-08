@@ -9,7 +9,7 @@ export function MoviePage() {
 
     function getShowByID() {
         setDisplayAllCast(false)
-        fetch(process.env.REACT_APP_HOST + "/api/v1/movie/" + id, {
+        fetch("https://api.themoviedb.org/3/movie/" + id + "?api_key=" + process.env.REACT_APP_TMDB_KEY + "&append_to_response=credits", {
             method: "GET",
         })
             .then((res) => {

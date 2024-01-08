@@ -17,7 +17,7 @@ export function TVShowPage() {
 
     function getShowByID() {
         setDisplayAllCast(false)
-        fetch(process.env.REACT_APP_HOST + "/api/v1/tv/" + id, {
+        fetch("https://api.themoviedb.org/3/tv/" + id +"?api_key=" + process.env.REACT_APP_TMDB_KEY + "&append_to_response=aggregate_credits", {
             method: "GET",
         })
             .then((res) => {
@@ -47,7 +47,7 @@ export function TVShowPage() {
     }
 
     function getSeasonByID(seasonID: any) {
-        fetch(process.env.REACT_APP_HOST + "/api/v1/tv/" + id +"/season/" + seasonID, {
+        fetch("https://api.themoviedb.org/3/tv/" + id + "/season/" + seasonID + "?api_key=" + process.env.REACT_APP_TMDB_KEY, {
             method: "GET",
         })
             .then((res) => {
