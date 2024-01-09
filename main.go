@@ -9,11 +9,7 @@ import (
 	"did-you-watch/api/tv"
 	"did-you-watch/api/users"
 	"did-you-watch/database"
-	"github.com/gin-gonic/autotls"
 	"github.com/gin-gonic/gin"
-	"golang.org/x/crypto/acme/autocert"
-	"log"
-	"os"
 )
 
 // CORSMiddleware Cannot use gin-gonic cors since pre-flight does not include
@@ -50,16 +46,8 @@ func createServer(dbConnection *database.DB) {
 		c.JSON(200, "Healthy")
 	})
 
-	if os.Getenv("ENV") == "DEV" {
-		_ = r.Run()
-	} else {
-		m := autocert.Manager{
-			Prompt:     autocert.AcceptTOS,
-			HostPolicy: autocert.HostWhitelist("backend.didyou.watch"),
-			Cache:      autocert.DirCache("/var/www/.cache"),
-		}
-		log.Fatal(autotls.RunWithManager(r, &m))
-	}
+	_ = r.Run()
+
 }
 
 func main() {
