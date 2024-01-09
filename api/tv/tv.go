@@ -148,14 +148,14 @@ func addToWatchlist(db *database.DB) gin.HandlerFunc {
 			fmt.Println(err)
 			return
 		}
-		user := account.GetUserRecord(c, db)
-		if user == nil {
+		UID := account.GetUID(c, db)
+		if UID == "" {
 			return
 		}
 
 		err = db.Db.QueryRow(`INSERT INTO tv_user_bridge (tv_id, user_id, status) VALUES ($1, $2, $3) 
 										ON CONFLICT (tv_id, user_id, timestamp) DO UPDATE SET status=$3
-										returning status`, tvID, user.UID, status).Scan(&status)
+										returning status`, tvID, UID, status).Scan(&status)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, "Unable to add to watchlist")
 			return
@@ -177,12 +177,12 @@ func addToWatchlist(db *database.DB) gin.HandlerFunc {
 func removeFromWatchlist(db *database.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id := c.Param("id")
-		user := account.GetUserRecord(c, db)
-		if user == nil {
+		UID := account.GetUID(c, db)
+		if UID == "" {
 			return
 		}
 
-		_, err := db.Db.Query("DELETE FROM tv_user_bridge WHERE user_id=$1 AND tv_id=$2", user.UID, id)
+		_, err := db.Db.Query("DELETE FROM tv_user_bridge WHERE user_id=$1 AND tv_id=$2", UID, id)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusBadRequest, "Unable to remove from watchlist")
 			return

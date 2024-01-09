@@ -57,6 +57,21 @@ func Routes(r *gin.RouterGroup, db *database.DB) {
 	r.GET("/avatars", getAvatars(db))
 }
 
+func GetUID(c *gin.Context, db *database.DB) string {
+	idToken := c.GetHeader("AuthToken")
+	if idToken == "" {
+		c.AbortWithStatusJSON(400, "Missing AuthToken header")
+		return ""
+	}
+
+	token, err := db.FireAuth.VerifyIDTokenAndCheckRevoked(c, idToken)
+	if err != nil {
+		c.AbortWithStatusJSON(500, "Error verifying token")
+		return ""
+	}
+	return token.UID
+}
+
 func GetUserRecord(c *gin.Context, db *database.DB) *auth.UserRecord {
 	idToken := c.GetHeader("AuthToken")
 	if idToken == "" {
@@ -67,7 +82,6 @@ func GetUserRecord(c *gin.Context, db *database.DB) *auth.UserRecord {
 
 	token, err := db.FireAuth.VerifyIDTokenAndCheckRevoked(c, idToken)
 	if err != nil {
-		fmt.Println(err)
 		c.AbortWithStatusJSON(500, "Error verifying token")
 
 		return nil
@@ -75,7 +89,6 @@ func GetUserRecord(c *gin.Context, db *database.DB) *auth.UserRecord {
 
 	user, err := db.FireAuth.GetUser(c, token.UID)
 	if err != nil {
-		fmt.Println(err)
 		c.AbortWithStatusJSON(500, "Error getting user")
 
 		return nil

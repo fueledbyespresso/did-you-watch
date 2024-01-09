@@ -110,14 +110,14 @@ func addToWatchlist(db *database.DB) gin.HandlerFunc {
 			fmt.Println(err)
 			return
 		}
-		user := account.GetUserRecord(c, db)
-		if user == nil {
+		UID := account.GetUID(c, db)
+		if UID == "" {
 			return
 		}
 
 		err = db.Db.QueryRow(`INSERT INTO movie_user_bridge (movie_id, user_id, status, timestamp) VALUES ($1, $2, $3, default) 
 									  ON CONFLICT (movie_id, user_id, timestamp) DO UPDATE SET status=$3
-									  RETURNING status`, movieID, user.UID, status).Scan(&status)
+									  RETURNING status`, movieID, UID, status).Scan(&status)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, "Unable to add to watchlist")
 			return
@@ -137,13 +137,12 @@ func addToWatchlist(db *database.DB) gin.HandlerFunc {
 func removeFromWatchlist(db *database.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id := c.Param("id")
-		user := account.GetUserRecord(c, db)
-		if user == nil {
-			c.AbortWithStatusJSON(http.StatusBadRequest, "Unable to remove from watchlist")
+		UID := account.GetUID(c, db)
+		if UID == "" {
 			return
 		}
 
-		_, err := db.Db.Query("DELETE FROM movie_user_bridge WHERE user_id=$1 AND movie_id=$2", user.UID, id)
+		_, err := db.Db.Query("DELETE FROM movie_user_bridge WHERE user_id=$1 AND movie_id=$2", UID, id)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusBadRequest, "Unable to remove from watchlist")
 			return
@@ -161,12 +160,12 @@ func getWatchHistory(db *database.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id := c.Param("id")
 
-		user := account.GetUserRecord(c, db)
-		if user == nil {
-			c.AbortWithStatusJSON(http.StatusBadRequest, "Unable to remove from watchlist")
+		UID := account.GetUID(c, db)
+		if UID == "" {
 			return
 		}
-		query, err := db.Db.Query(`SELECT timestamp, status FROM movie_user_bridge WHERE user_id=$1 AND movie_id=$2 ORDER BY timestamp DESC`, user.UID, id)
+
+		query, err := db.Db.Query(`SELECT timestamp, status FROM movie_user_bridge WHERE user_id=$1 AND movie_id=$2 ORDER BY timestamp DESC`, UID, id)
 		if err != nil {
 			c.AbortWithStatusJSON(500, "Could not get movie watch history")
 			return
