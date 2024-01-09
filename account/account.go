@@ -2,11 +2,9 @@ package account
 
 import (
 	"did-you-watch/database"
-	firebase "firebase.google.com/go/v4"
 	"firebase.google.com/go/v4/auth"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"google.golang.org/api/option"
 	"log"
 	"regexp"
 	"strconv"
@@ -59,24 +57,15 @@ func Routes(r *gin.RouterGroup, db *database.DB) {
 	r.GET("/avatars", getAvatars(db))
 }
 
-func GetUserRecord(c *gin.Context) *auth.UserRecord {
+func GetUserRecord(c *gin.Context, db *database.DB) *auth.UserRecord {
 	idToken := c.GetHeader("AuthToken")
 	if idToken == "" {
 		c.AbortWithStatusJSON(400, "Missing AuthToken header")
 
 		return nil
 	}
-	opt := option.WithCredentialsJSON([]byte(database.GetEnvOrParam("FIREBASE_CREDS", "FIREBASE_CREDS")))
 
-	app, err := firebase.NewApp(c, nil, opt)
-
-	client, err := app.Auth(c)
-	if err != nil {
-		c.AbortWithStatusJSON(500, "Error getting Auth Client")
-		return nil
-	}
-
-	token, err := client.VerifyIDTokenAndCheckRevoked(c, idToken)
+	token, err := db.FireAuth.VerifyIDTokenAndCheckRevoked(c, idToken)
 	if err != nil {
 		fmt.Println(err)
 		c.AbortWithStatusJSON(500, "Error verifying token")
@@ -84,7 +73,7 @@ func GetUserRecord(c *gin.Context) *auth.UserRecord {
 		return nil
 	}
 
-	user, err := client.GetUser(c, token.UID)
+	user, err := db.FireAuth.GetUser(c, token.UID)
 	if err != nil {
 		fmt.Println(err)
 		c.AbortWithStatusJSON(500, "Error getting user")
@@ -105,7 +94,7 @@ func userExists(uid string, db *database.DB) bool {
 
 func handleLogin(db *database.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		user := GetUserRecord(c)
+		user := GetUserRecord(c, db)
 		if user == nil {
 			c.AbortWithStatusJSON(500, "Unable to verify token")
 			return
@@ -137,12 +126,9 @@ func handleLogin(db *database.DB) gin.HandlerFunc {
 func createUserIfNotExist(user *auth.UserRecord, c *gin.Context, db *database.DB) error {
 	if _, ok := user.CustomClaims["synced"]; !ok {
 		//todo generate new random username on conflict
-		opt := option.WithCredentialsJSON([]byte(database.GetEnvOrParam("FIREBASE_CREDS", "FIREBASE_CREDS")))
-		app, err := firebase.NewApp(c, nil, opt)
-		client, err := app.Auth(c)
 		if userExists(user.UID, db) {
 			// User is present in database but not marked in firebase. Weird.
-			err = client.SetCustomUserClaims(c, user.UID, map[string]interface{}{"synced": true})
+			err := db.FireAuth.SetCustomUserClaims(c, user.UID, map[string]interface{}{"synced": true})
 			return err
 		} else {
 			newUsername := getRandomName()
@@ -150,7 +136,7 @@ func createUserIfNotExist(user *auth.UserRecord, c *gin.Context, db *database.DB
 			if len(formattedDisplayName) > 20 {
 				formattedDisplayName = formattedDisplayName[:20]
 			}
-			err = createUser(user.UID, user.Email, formattedDisplayName, newUsername, db)
+			err := createUser(user.UID, user.Email, formattedDisplayName, newUsername, db)
 			if err != nil {
 				return err
 			}
@@ -158,7 +144,7 @@ func createUserIfNotExist(user *auth.UserRecord, c *gin.Context, db *database.DB
 			if err != nil {
 				return err
 			}
-			_ = client.SetCustomUserClaims(c, user.UID, map[string]interface{}{"synced": true})
+			_ = db.FireAuth.SetCustomUserClaims(c, user.UID, map[string]interface{}{"synced": true})
 		}
 	}
 
@@ -192,16 +178,12 @@ func handleSignUp(db *database.DB) gin.HandlerFunc {
 			return
 		}
 
-		opt := option.WithCredentialsJSON([]byte(database.GetEnvOrParam("FIREBASE_CREDS", "FIREBASE_CREDS")))
-		app, err := firebase.NewApp(c, nil, opt)
-		client, err := app.Auth(c)
-
 		params := (&auth.UserToCreate{}).
 			Email(requestBody.Email).
 			EmailVerified(false).
 			Password(requestBody.Password).
 			Disabled(false)
-		user, err := client.CreateUser(c, params)
+		user, err := db.FireAuth.CreateUser(c, params)
 		if err != nil {
 			c.AbortWithStatusJSON(400, err)
 		}
@@ -209,7 +191,7 @@ func handleSignUp(db *database.DB) gin.HandlerFunc {
 		if err != nil {
 			c.AbortWithStatusJSON(500, "User could not be saved to database after creation. Deleting user.")
 
-			err = client.DeleteUser(c, user.UID)
+			err = db.FireAuth.DeleteUser(c, user.UID)
 			if err != nil {
 				log.Fatalf("User was created in Firebase. User was not able to be saved in database. "+
 					"User was not able to be removed from database. "+
@@ -217,8 +199,8 @@ func handleSignUp(db *database.DB) gin.HandlerFunc {
 			}
 			return
 		}
-		_ = client.SetCustomUserClaims(c, user.UID, map[string]interface{}{"synced": true})
-		token, err := client.CustomToken(c, user.UID)
+		_ = db.FireAuth.SetCustomUserClaims(c, user.UID, map[string]interface{}{"synced": true})
+		token, err := db.FireAuth.CustomToken(c, user.UID)
 		if err != nil {
 			c.AbortWithStatusJSON(400, "User created but custom token could not be minted")
 			return
@@ -304,7 +286,7 @@ func GetUser(uid string, db *database.DB) (string, string, string, []Movie, []TV
 
 func toggleDarkMode(db *database.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		user := GetUserRecord(c)
+		user := GetUserRecord(c, db)
 		if user == nil {
 			c.AbortWithStatusJSON(500, "Unable to verify token")
 			return
@@ -335,7 +317,7 @@ func handleChangeUsername(db *database.DB) gin.HandlerFunc {
 			return
 		}
 
-		user := GetUserRecord(c)
+		user := GetUserRecord(c, db)
 		if user == nil {
 			c.AbortWithStatusJSON(500, "Unable to verify token")
 			return
@@ -379,7 +361,7 @@ func handleChangeDisplayName(db *database.DB) gin.HandlerFunc {
 			return
 		}
 
-		user := GetUserRecord(c)
+		user := GetUserRecord(c, db)
 		if user == nil {
 			c.AbortWithStatusJSON(500, "Unable to verify token")
 			return
@@ -449,7 +431,7 @@ func handleChangeAvatar(db *database.DB) gin.HandlerFunc {
 			return
 		}
 
-		user := GetUserRecord(c)
+		user := GetUserRecord(c, db)
 		if user == nil {
 			c.AbortWithStatusJSON(500, "Unable to verify token")
 			return

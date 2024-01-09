@@ -148,7 +148,7 @@ func addToWatchlist(db *database.DB) gin.HandlerFunc {
 			fmt.Println(err)
 			return
 		}
-		user := account.GetUserRecord(c)
+		user := account.GetUserRecord(c, db)
 		if user == nil {
 			return
 		}
@@ -177,7 +177,7 @@ func addToWatchlist(db *database.DB) gin.HandlerFunc {
 func removeFromWatchlist(db *database.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id := c.Param("id")
-		user := account.GetUserRecord(c)
+		user := account.GetUserRecord(c, db)
 		if user == nil {
 			return
 		}

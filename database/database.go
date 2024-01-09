@@ -3,6 +3,7 @@ package database
 import (
 	"database/sql"
 	"encoding/json"
+	"firebase.google.com/go/v4/auth"
 	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -19,7 +20,8 @@ import (
 )
 
 type DB struct {
-	Db *sql.DB
+	Db       *sql.DB
+	FireAuth *auth.Client
 }
 
 // InitDBConnection Initialize a database connection using the environment variable DATABASE_URL
@@ -87,16 +89,22 @@ func getDbURL() string {
 	}
 }
 
+var cache = make(map[string]string)
+
 func GetEnvOrParam(envKey string, paramKey string) string {
+	if v, ok := cache[paramKey]; ok {
+		return v
+	}
 	if os.Getenv("ENV") == "DEV" {
 		return os.Getenv(envKey)
 	} else {
 		ssmsvc := NewSSMClient()
-		TMDBKey, err := ssmsvc.Param(paramKey, true).GetValue()
+		paramValue, err := ssmsvc.Param(paramKey, true).GetValue()
 		if err != nil {
 			panic(err)
 		}
-		return TMDBKey
+		cache[paramKey] = paramValue
+		return paramValue
 	}
 }
 

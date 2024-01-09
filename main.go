@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"did-you-watch/account"
 	"did-you-watch/api/actors"
 	"did-you-watch/api/movies"
@@ -9,7 +10,10 @@ import (
 	"did-you-watch/api/tv"
 	"did-you-watch/api/users"
 	"did-you-watch/database"
+	firebase "firebase.google.com/go/v4"
 	"github.com/gin-gonic/gin"
+	"google.golang.org/api/option"
+	"log"
 )
 
 // CORSMiddleware Cannot use gin-gonic cors since pre-flight does not include
@@ -55,8 +59,14 @@ func main() {
 	db := database.InitDBConnection()
 	defer db.Close()
 
+	opt := option.WithCredentialsJSON([]byte(database.GetEnvOrParam("FIREBASE_CREDS", "FIREBASE_CREDS")))
+	app, err := firebase.NewApp(context.Background(), nil, opt)
+	client, err := app.Auth(context.Background())
+	if err != nil {
+		log.Fatal("Unable to get firebase auth running")
+	}
 	// Run a background goroutine to clean up expired sessions from the database.
-	dbConnection := &database.DB{Db: db}
+	dbConnection := &database.DB{Db: db, FireAuth: client}
 
 	createServer(dbConnection)
 }

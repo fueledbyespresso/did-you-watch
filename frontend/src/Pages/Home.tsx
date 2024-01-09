@@ -10,7 +10,7 @@ export function Home() {
     }, [])
 
     function getTrending() {
-        fetch(process.env.REACT_APP_HOST + "/api/v1/trending", {
+        fetch("https://api.themoviedb.org/3/trending/all/week?api_key="+process.env.REACT_APP_TMDB_KEY, {
             method: "GET",
         })
             .then((res) => {
