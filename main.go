@@ -9,7 +9,11 @@ import (
 	"did-you-watch/api/tv"
 	"did-you-watch/api/users"
 	"did-you-watch/database"
+	"github.com/gin-gonic/autotls"
 	"github.com/gin-gonic/gin"
+	"golang.org/x/crypto/acme/autocert"
+	"log"
+	"os"
 )
 
 // CORSMiddleware Cannot use gin-gonic cors since pre-flight does not include
@@ -30,7 +34,7 @@ func CORSMiddleware() gin.HandlerFunc {
 		c.Next()
 	}
 }
-func createServer(dbConnection *database.DB) *gin.Engine {
+func createServer(dbConnection *database.DB) {
 	r := gin.Default()
 	r.Use(CORSMiddleware())
 	account.Routes(r.Group("account/v1"), dbConnection)
@@ -46,7 +50,16 @@ func createServer(dbConnection *database.DB) *gin.Engine {
 		c.JSON(200, "Healthy")
 	})
 
-	return r
+	if os.Getenv("ENV") == "DEV" {
+		_ = r.Run()
+	} else {
+		m := autocert.Manager{
+			Prompt:     autocert.AcceptTOS,
+			HostPolicy: autocert.HostWhitelist("backend.didyou.watch"),
+			Cache:      autocert.DirCache("/var/www/.cache"),
+		}
+		log.Fatal(autotls.RunWithManager(r, &m))
+	}
 }
 
 func main() {
@@ -57,7 +70,5 @@ func main() {
 	// Run a background goroutine to clean up expired sessions from the database.
 	dbConnection := &database.DB{Db: db}
 
-	r := createServer(dbConnection)
-
-	_ = r.Run()
+	createServer(dbConnection)
 }
