@@ -2,7 +2,7 @@ import {Link} from "react-router-dom";
 import React, {useState} from "react";
 import {MovieStatusCard} from "./MovieStatusCard";
 import {Movie} from "../../Types/Movie";
-import {RootState, set, UserState} from "../../Store/userSlice";
+import {RootState, UserState} from "../../Store/userSlice";
 import {useSelector} from "react-redux";
 
 export function WatchlistSMovieCard(props: {

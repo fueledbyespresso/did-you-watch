@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 
 import {NavLink, useLocation, useNavigate} from 'react-router-dom';
-import {getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup} from 'firebase/auth';
+import {getAuth, GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup} from 'firebase/auth';
 
 const Login = () => {
     const navigate = useNavigate();
