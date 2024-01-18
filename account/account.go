@@ -75,6 +75,20 @@ func GetUID(c *gin.Context, db *database.DB) string {
 	return token.UID
 }
 
+func getToken(c *gin.Context, db *database.DB) *auth.Token {
+	idToken := c.GetHeader("AuthToken")
+	if idToken == "" {
+		c.AbortWithStatusJSON(400, "Missing AuthToken header")
+		return nil
+	}
+
+	token, err := db.FireAuth.VerifyIDToken(c, idToken)
+	if err != nil {
+		c.AbortWithStatusJSON(500, "Error verifying token")
+		return nil
+	}
+	return token
+}
 func GetUserRecord(c *gin.Context, db *database.DB) *auth.UserRecord {
 	uid := GetUID(c, db)
 
@@ -97,7 +111,7 @@ func userExists(uid string, db *database.DB) bool {
 
 func handleLogin(db *database.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		user := GetUserRecord(c, db)
+		user := getToken(c, db)
 		if user == nil {
 			c.AbortWithStatusJSON(500, "Unable to verify token")
 			return
@@ -188,21 +202,27 @@ func (ls *tvArray) Scan(src any) error {
 	return json.Unmarshal(data, ls)
 }
 
-func createUserIfNotExist(user *auth.UserRecord, c *gin.Context, db *database.DB) error {
-	if _, ok := user.CustomClaims["synced"]; !ok {
+func createUserIfNotExist(token *auth.Token, c *gin.Context, db *database.DB) error {
+	if _, ok := token.Claims["synced"]; !ok {
+
 		// Executes if user has not been marked at synced in Firebase
 		//todo generate new random username on conflict
-		if userExists(user.UID, db) {
+		if userExists(token.UID, db) {
 			// User is present in database but not marked in firebase. Weird.
-			err := db.FireAuth.SetCustomUserClaims(c, user.UID, map[string]interface{}{"synced": true})
+			err := db.FireAuth.SetCustomUserClaims(c, token.UID, map[string]interface{}{"synced": true})
 			return err
 		} else {
+			user, err := db.FireAuth.GetUser(c, token.UID)
+			if err != nil {
+				c.AbortWithStatusJSON(500, "Error getting user")
+				return err
+			}
 			newUsername := getRandomName()
 			formattedDisplayName := user.DisplayName
 			if len(formattedDisplayName) > 20 {
 				formattedDisplayName = formattedDisplayName[:20]
 			}
-			err := createUser(user.UID, user.Email, formattedDisplayName, newUsername, db)
+			err = createUser(user.UID, user.Email, formattedDisplayName, newUsername, db)
 			if err != nil {
 				return err
 			}
