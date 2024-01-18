@@ -133,7 +133,7 @@ func optUser(uid string, db *database.DB) (User, error) {
           FROM account a
                    JOIN (SELECT movie_id, user_id, MAX(status) as status, MAX(timestamp) as timestamp FROM movie_user_bridge GROUP BY (movie_id, user_id)) mub on mub.user_id = a.uid
                    JOIN movie on mub.movie_id = movie.id
-          WHERE a.uid='BqzjYxPN1zuEh7rrvWoQBvazpnGM' ORDER BY a.uid
+          WHERE a.uid=$1 ORDER BY a.uid
          ) atts) as movieList,
     (SELECT jsonb_agg(shows)
             FROM (select jsonb_build_object(
@@ -153,6 +153,7 @@ func optUser(uid string, db *database.DB) (User, error) {
              ) atts) as tvList
 FROM account a
          JOIN avatar ava on ava.id = a.profile_picture_url
+         WHERE a.uid=$1
 
 group by username, display_name, uid, dark_mode, ava.image_url
 `, uid).Scan(&userObj.Username, &userObj.DisplayName, &userObj.UID, &userObj.ProfilePicURL, &userObj.DarkMode, &userObj.MovieList, &userObj.TVList)
