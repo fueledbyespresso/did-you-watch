@@ -2,6 +2,7 @@ package account
 
 import (
 	"did-you-watch/database"
+	"encoding/json"
 	"firebase.google.com/go/v4/auth"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -16,14 +17,16 @@ type Error struct {
 }
 
 type User struct {
-	UID           string  `json:"uid"`
-	Username      string  `json:"username"`
-	DisplayName   string  `json:"displayName"`
-	ProfilePicURL string  `json:"profilePicURL"`
-	MovieList     []Movie `json:"movieList"`
-	TVList        []TV    `json:"tvList"`
-	DarkMode      bool    `json:"darkMode"`
+	UID           string     `json:"uid"`
+	Username      string     `json:"username"`
+	DisplayName   string     `json:"displayName"`
+	ProfilePicURL string     `json:"profilePicURL"`
+	MovieList     movieArray `json:"movieList"`
+	TVList        tvArray    `json:"tvList"`
+	DarkMode      bool       `json:"darkMode"`
 }
+type movieArray []Movie
+type tvArray []TV
 
 type Movie struct {
 	ID           int    `json:"id"`
@@ -64,7 +67,7 @@ func GetUID(c *gin.Context, db *database.DB) string {
 		return ""
 	}
 
-	token, err := db.FireAuth.VerifyIDTokenAndCheckRevoked(c, idToken)
+	token, err := db.FireAuth.VerifyIDToken(c, idToken)
 	if err != nil {
 		c.AbortWithStatusJSON(500, "Error verifying token")
 		return ""
@@ -73,24 +76,11 @@ func GetUID(c *gin.Context, db *database.DB) string {
 }
 
 func GetUserRecord(c *gin.Context, db *database.DB) *auth.UserRecord {
-	idToken := c.GetHeader("AuthToken")
-	if idToken == "" {
-		c.AbortWithStatusJSON(400, "Missing AuthToken header")
+	uid := GetUID(c, db)
 
-		return nil
-	}
-
-	token, err := db.FireAuth.VerifyIDTokenAndCheckRevoked(c, idToken)
-	if err != nil {
-		c.AbortWithStatusJSON(500, "Error verifying token")
-
-		return nil
-	}
-
-	user, err := db.FireAuth.GetUser(c, token.UID)
+	user, err := db.FireAuth.GetUser(c, uid)
 	if err != nil {
 		c.AbortWithStatusJSON(500, "Error getting user")
-
 		return nil
 	}
 	return user
@@ -118,26 +108,88 @@ func handleLogin(db *database.DB) gin.HandlerFunc {
 			return
 		}
 
-		username, displayName, profilePicURL, movieList, tvList, darkMode := GetUser(user.UID, db)
-		if username == "" {
-			c.AbortWithStatusJSON(500, "Unable to get user")
-			return
+		userData, err := optUser(user.UID, db)
+		if err != nil {
+			c.AbortWithStatusJSON(500, "Something went wrong?")
 		}
-
-		c.JSON(200, User{
-			UID:           user.UID,
-			Username:      username,
-			DisplayName:   displayName,
-			ProfilePicURL: profilePicURL,
-			MovieList:     movieList,
-			TVList:        tvList,
-			DarkMode:      darkMode,
-		})
+		c.JSON(200, userData)
 	}
+}
+func optUser(uid string, db *database.DB) (User, error) {
+	var userObj User
+	userObj.MovieList = []Movie{}
+	userObj.TVList = []TV{}
+
+	err := db.Db.QueryRow(`select username, display_name, uid, ava.image_url, dark_mode,
+   (SELECT jsonb_agg(movies)
+    FROM (select     jsonb_build_object(
+                             'id', movie.id,
+                             'original_title', movie.name,
+                             'poster_path', COALESCE(movie.poster_path, ''),
+                             'overview', COALESCE(movie.overview, ''),
+                             'status',mub.status,
+                             'backdrop_path', COALESCE(movie.backdrop_path, '')
+                     ) movies
+          FROM account a
+                   JOIN (SELECT movie_id, user_id, MAX(status) as status, MAX(timestamp) as timestamp FROM movie_user_bridge GROUP BY (movie_id, user_id)) mub on mub.user_id = a.uid
+                   JOIN movie on mub.movie_id = movie.id
+          WHERE a.uid='BqzjYxPN1zuEh7rrvWoQBvazpnGM' ORDER BY a.uid
+         ) atts) as movieList,
+    (SELECT jsonb_agg(shows)
+            FROM (select jsonb_build_object(
+                'id', tv.id,
+                'original_name', tv.name,
+                'status', tub.status,
+                'poster_path', COALESCE(tv.poster_path, ''),
+                'overview', COALESCE(tv.overview, ''),
+                'episodes_watched', 0,
+                'total_episodes', tv.total_episodes,
+                'backdrop_path', tv.backdrop_path
+            ) shows
+            FROM account a
+                JOIN (SELECT tv_id, user_id, MAX(status) as status, MAX(timestamp) as timestamp FROM tv_user_bridge GROUP BY (tv_id, user_id)) tub on tub.user_id = a.uid
+                JOIN tv on tub.tv_id = tv.id
+                WHERE a.uid=$1 ORDER BY a.uid
+             ) atts) as tvList
+FROM account a
+         JOIN avatar ava on ava.id = a.profile_picture_url
+
+group by username, display_name, uid, dark_mode, ava.image_url
+`, uid).Scan(&userObj.Username, &userObj.DisplayName, &userObj.UID, &userObj.ProfilePicURL, &userObj.DarkMode, &userObj.MovieList, &userObj.TVList)
+	return userObj, err
+}
+
+func (ls *movieArray) Scan(src any) error {
+	var data []byte
+	if src == nil {
+		return nil
+	}
+	switch v := src.(type) {
+	case string:
+		data = []byte(v)
+	case []byte:
+		data = v
+	}
+	return json.Unmarshal(data, ls)
+}
+
+func (ls *tvArray) Scan(src any) error {
+	var data []byte
+	if src == nil {
+		return nil
+	}
+	switch v := src.(type) {
+	case string:
+		data = []byte(v)
+	case []byte:
+		data = v
+	}
+	return json.Unmarshal(data, ls)
 }
 
 func createUserIfNotExist(user *auth.UserRecord, c *gin.Context, db *database.DB) error {
 	if _, ok := user.CustomClaims["synced"]; !ok {
+		// Executes if user has not been marked at synced in Firebase
 		//todo generate new random username on conflict
 		if userExists(user.UID, db) {
 			// User is present in database but not marked in firebase. Weird.
@@ -232,7 +284,6 @@ func usernameIsUnique(username string, db *database.DB) bool {
 }
 
 func createUser(uid string, email string, displayName string, username string, db *database.DB) error {
-
 	insert, err := db.Db.Prepare(`INSERT INTO account (uid, email, profile_picture_url, username, display_name) 
 											VALUES ($1, $2, default, $3, $4)`)
 	if err != nil {
@@ -255,8 +306,8 @@ func GetUser(uid string, db *database.DB) (string, string, string, []Movie, []TV
 	var displayName string
 	var profilePicURL string
 	var darkMode bool
-	movieList := []Movie{}
-	tvList := []TV{}
+	var movieList []Movie
+	var tvList []TV
 
 	err := db.Db.QueryRow(`SELECT username, display_name, a.image_url, dark_mode FROM account
        JOIN avatar a on a.id = account.profile_picture_url
