@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"did-you-watch/account"
-	"did-you-watch/api/actors"
 	"did-you-watch/api/movies"
 	"did-you-watch/api/search"
 	"did-you-watch/api/trending"
@@ -44,7 +43,6 @@ func createServer(dbConnection *database.DB) {
 	tv.Routes(v1, dbConnection)
 	users.Routes(v1, dbConnection)
 	trending.Routes(v1)
-	actors.Routes(v1)
 	search.Routes(v1, dbConnection)
 	r.GET("/health-check", func(c *gin.Context) {
 		c.JSON(200, "Healthy")

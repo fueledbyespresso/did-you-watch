@@ -44,7 +44,6 @@ type TV struct {
 	Status          string `json:"status"`
 	Overview        string `json:"overview"`
 	EpisodesWatched int    `json:"episodes_watched"`
-	TotalEpisodes   int    `json:"total_episodes"`
 	BackdropPath    string `json:"backdrop_path"`
 }
 
@@ -124,7 +123,9 @@ func handleLogin(db *database.DB) gin.HandlerFunc {
 
 		userData, err := optUser(user.UID, db)
 		if err != nil {
+			fmt.Println(err)
 			c.AbortWithStatusJSON(500, "Something went wrong?")
+			return
 		}
 		c.JSON(200, userData)
 	}
@@ -157,7 +158,6 @@ func optUser(uid string, db *database.DB) (User, error) {
                 'poster_path', COALESCE(tv.poster_path, ''),
                 'overview', COALESCE(tv.overview, ''),
                 'episodes_watched', 0,
-                'total_episodes', tv.total_episodes,
                 'backdrop_path', tv.backdrop_path
             ) shows
             FROM account a
@@ -352,14 +352,14 @@ func GetUser(uid string, db *database.DB) (string, string, string, []Movie, []TV
 		movieList = append(movieList, movie)
 	}
 
-	query, err = db.Db.Query(`SELECT tv.id, tv.name, COALESCE(poster_path, ''), COALESCE(tv.overview, '') , status, total_episodes, COALESCE(backdrop_path, '')
+	query, err = db.Db.Query(`SELECT tv.id, tv.name, COALESCE(poster_path, ''), COALESCE(tv.overview, '') , status, COALESCE(backdrop_path, '')
 										FROM tv JOIN (SELECT tv_id, user_id, MAX(status) as status, MAX(timestamp) as timestamp FROM tv_user_bridge GROUP BY (tv_id, user_id)) mub on tv.id = mub.tv_id
 										JOIN account a on a.uid = mub.user_id
 											WHERE uid=$1 ORDER BY tv.name`, uid)
 	PanicOnErr(err)
 	for query.Next() {
 		var show TV
-		err = query.Scan(&show.ID, &show.Name, &show.PosterPath, &show.Overview, &show.Status, &show.TotalEpisodes, &show.BackdropPath)
+		err = query.Scan(&show.ID, &show.Name, &show.PosterPath, &show.Overview, &show.Status, &show.BackdropPath)
 		if err != nil {
 			return "", "", "", []Movie{}, []TV{}, false
 		}

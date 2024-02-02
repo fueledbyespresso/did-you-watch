@@ -10,7 +10,7 @@ alter table movie_user_bridge
 
 
 alter table tv_user_bridge
-    drop constraint if exists  tv_user_bridge_pk;
+    drop constraint if exists tv_user_bridge_pk;
 
 alter table tv_user_bridge
     drop column if exists timestamp;
