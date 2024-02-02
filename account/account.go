@@ -38,13 +38,12 @@ type Movie struct {
 }
 
 type TV struct {
-	ID              int    `json:"id"`
-	Name            string `json:"original_name"`
-	PosterPath      string `json:"poster_path"`
-	Status          string `json:"status"`
-	Overview        string `json:"overview"`
-	EpisodesWatched int    `json:"episodes_watched"`
-	BackdropPath    string `json:"backdrop_path"`
+	ID           int    `json:"id"`
+	Name         string `json:"original_name"`
+	PosterPath   string `json:"poster_path"`
+	Status       string `json:"status"`
+	Overview     string `json:"overview"`
+	BackdropPath string `json:"backdrop_path"`
 }
 
 // Routes All the routes created by the package nested in
@@ -121,7 +120,7 @@ func handleLogin(db *database.DB) gin.HandlerFunc {
 			return
 		}
 
-		userData, err := optUser(user.UID, db)
+		userData, err := GetUser(user.UID, db)
 		if err != nil {
 			fmt.Println(err)
 			c.AbortWithStatusJSON(500, "Something went wrong?")
@@ -130,7 +129,7 @@ func handleLogin(db *database.DB) gin.HandlerFunc {
 		c.JSON(200, userData)
 	}
 }
-func optUser(uid string, db *database.DB) (User, error) {
+func GetUser(uid string, db *database.DB) (User, error) {
 	var userObj User
 	userObj.MovieList = []Movie{}
 	userObj.TVList = []TV{}
@@ -319,54 +318,6 @@ func createUser(uid string, email string, displayName string, username string, d
 		return err
 	}
 	return nil
-}
-
-func GetUser(uid string, db *database.DB) (string, string, string, []Movie, []TV, bool) {
-	// Prepare the sql query for later
-	var username string
-	var displayName string
-	var profilePicURL string
-	var darkMode bool
-	var movieList []Movie
-	var tvList []TV
-
-	err := db.Db.QueryRow(`SELECT username, display_name, a.image_url, dark_mode FROM account
-       JOIN avatar a on a.id = account.profile_picture_url
-       WHERE uid = $1`, uid).Scan(&username, &displayName, &profilePicURL, &darkMode)
-	PanicOnErr(err)
-
-	query, err := db.Db.Query(`SELECT movie.id, movie.name, COALESCE(poster_path, ''), COALESCE(movie.overview, ''), status, COALESCE(backdrop_path, '')
-										FROM movie JOIN (SELECT movie_id, user_id, MAX(status) as status, MAX(timestamp) as timestamp FROM movie_user_bridge GROUP BY (movie_id, user_id)) mub on movie.id = mub.movie_id
-										JOIN account a on a.uid = mub.user_id
-											WHERE uid=$1 ORDER BY name`, uid)
-	if err != nil {
-		return "", "", "", []Movie{}, []TV{}, false
-	}
-	for query.Next() {
-		var movie Movie
-		err = query.Scan(&movie.ID, &movie.Name, &movie.PosterPath, &movie.Overview, &movie.Status, &movie.BackdropPath)
-		if err != nil {
-			return "", "", "", []Movie{}, []TV{}, false
-		}
-
-		movieList = append(movieList, movie)
-	}
-
-	query, err = db.Db.Query(`SELECT tv.id, tv.name, COALESCE(poster_path, ''), COALESCE(tv.overview, '') , status, COALESCE(backdrop_path, '')
-										FROM tv JOIN (SELECT tv_id, user_id, MAX(status) as status, MAX(timestamp) as timestamp FROM tv_user_bridge GROUP BY (tv_id, user_id)) mub on tv.id = mub.tv_id
-										JOIN account a on a.uid = mub.user_id
-											WHERE uid=$1 ORDER BY tv.name`, uid)
-	PanicOnErr(err)
-	for query.Next() {
-		var show TV
-		err = query.Scan(&show.ID, &show.Name, &show.PosterPath, &show.Overview, &show.Status, &show.BackdropPath)
-		if err != nil {
-			return "", "", "", []Movie{}, []TV{}, false
-		}
-		tvList = append(tvList, show)
-	}
-
-	return username, displayName, profilePicURL, movieList, tvList, darkMode
 }
 
 func toggleDarkMode(db *database.DB) gin.HandlerFunc {

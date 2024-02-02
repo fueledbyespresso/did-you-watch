@@ -3,7 +3,6 @@ package users
 import (
 	"did-you-watch/account"
 	"did-you-watch/database"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -16,21 +15,16 @@ func handleGetUserByUID(db *database.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		uid := c.Param("uid")
 
-		username, displayName, profilePicURL, movieList, tvList, darkMode := account.GetUser(uid, db)
-		fmt.Println(movieList)
-		if username == "" {
+		User, err := account.GetUser(uid, db)
+		if err != nil {
+			c.AbortWithStatusJSON(500, "Unable to get user")
+			return
+		}
+		if User.Username == "" {
 			c.AbortWithStatusJSON(http.StatusBadRequest, "User does not exist")
 		}
 
-		c.JSON(http.StatusOK, account.User{
-			UID:           uid,
-			Username:      username,
-			DisplayName:   displayName,
-			ProfilePicURL: profilePicURL,
-			DarkMode:      darkMode,
-			MovieList:     movieList,
-			TVList:        tvList,
-		})
+		c.JSON(http.StatusOK, User)
 	}
 }
 

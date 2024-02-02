@@ -132,13 +132,12 @@ func addToWatchlist(db *database.DB) gin.HandlerFunc {
 		}
 
 		c.JSON(http.StatusOK, account.TV{
-			ID:              returnedID,
-			Name:            returnedName,
-			PosterPath:      returnedPosterPath,
-			Status:          status,
-			Overview:        returnedOverview,
-			BackdropPath:    backdropPath,
-			EpisodesWatched: 0,
+			ID:           returnedID,
+			Name:         returnedName,
+			PosterPath:   returnedPosterPath,
+			Status:       status,
+			Overview:     returnedOverview,
+			BackdropPath: backdropPath,
 		})
 	}
 }
