@@ -38,12 +38,15 @@ type Movie struct {
 }
 
 type TV struct {
-	ID           int    `json:"id"`
-	Name         string `json:"original_name"`
-	PosterPath   string `json:"poster_path"`
-	Status       string `json:"status"`
-	Overview     string `json:"overview"`
-	BackdropPath string `json:"backdrop_path"`
+	ID                      int    `json:"id"`
+	Name                    string `json:"original_name"`
+	PosterPath              string `json:"poster_path"`
+	Status                  string `json:"status"`
+	Overview                string `json:"overview"`
+	BackdropPath            string `json:"backdrop_path"`
+	MostRecentEpisodeSeason int    `json:"last_episode_season"`
+	MostRecentEpisodeNumber int    `json:"last_episode_number"`
+	MostRecentEpisodeTitle  string `json:"last_episode_title"`
 }
 
 // Routes All the routes created by the package nested in
@@ -135,41 +138,49 @@ func GetUser(uid string, db *database.DB) (User, error) {
 	userObj.TVList = []TV{}
 
 	err := db.Db.QueryRow(`select username, display_name, uid, ava.image_url, dark_mode,
-   (SELECT jsonb_agg(movies)
-    FROM (select     jsonb_build_object(
-                             'id', movie.id,
-                             'original_title', movie.name,
-                             'poster_path', COALESCE(movie.poster_path, ''),
-                             'overview', COALESCE(movie.overview, ''),
-                             'status',mub.status,
-                             'backdrop_path', COALESCE(movie.backdrop_path, '')
-                     ) movies
-          FROM account a
-                   JOIN (SELECT movie_id, user_id, MAX(status) as status, MAX(timestamp) as timestamp FROM movie_user_bridge GROUP BY (movie_id, user_id)) mub on mub.user_id = a.uid
-                   JOIN movie on mub.movie_id = movie.id
-          WHERE a.uid=$1 ORDER BY a.uid
-         ) atts) as movieList,
-    (SELECT jsonb_agg(shows)
-            FROM (select jsonb_build_object(
-                'id', tv.id,
-                'original_name', tv.name,
-                'status', tub.status,
-                'poster_path', COALESCE(tv.poster_path, ''),
-                'overview', COALESCE(tv.overview, ''),
-                'episodes_watched', 0,
-                'backdrop_path', tv.backdrop_path
-            ) shows
-            FROM account a
-                JOIN (SELECT tv_id, user_id, MAX(status) as status, MAX(timestamp) as timestamp FROM tv_user_bridge GROUP BY (tv_id, user_id)) tub on tub.user_id = a.uid
-                JOIN tv on tub.tv_id = tv.id
-                WHERE a.uid=$1 ORDER BY a.uid
-             ) atts) as tvList
-FROM account a
-         JOIN avatar ava on ava.id = a.profile_picture_url
-         WHERE a.uid=$1
-
-group by username, display_name, uid, dark_mode, ava.image_url
-`, uid).Scan(&userObj.Username, &userObj.DisplayName, &userObj.UID, &userObj.ProfilePicURL, &userObj.DarkMode, &userObj.MovieList, &userObj.TVList)
+					   (SELECT jsonb_agg(movies)
+						FROM (select jsonb_build_object(
+												 'id', movie.id,
+												 'original_title', movie.name,
+												 'poster_path', COALESCE(movie.poster_path, ''),
+												 'overview', COALESCE(movie.overview, ''),
+												 'status',mub.status,
+												 'backdrop_path', COALESCE(movie.backdrop_path, '')
+										 ) movies
+							  FROM account a
+									   JOIN (SELECT movie_id, user_id, MAX(status) as status, MAX(timestamp) as timestamp 
+									         FROM movie_user_bridge GROUP BY (movie_id, user_id)) mub on mub.user_id = a.uid
+									   JOIN movie on mub.movie_id = movie.id
+							  WHERE a.uid=$1 ORDER BY a.uid
+							 ) atts) as movieList,
+						(SELECT jsonb_agg(shows)
+						FROM (select jsonb_build_object(
+							'id', tv.id,
+							'original_name', tv.name,
+							'status', tub.status,
+							'poster_path', COALESCE(tv.poster_path, ''),
+							'overview', COALESCE(tv.overview, ''),
+							'backdrop_path', tv.backdrop_path,
+							'last_episode_season', eub.season_number,
+							'last_episode_number', eub.episode_number,
+							'last_episode_title', episode.title
+							) shows
+							FROM account a
+									JOIN (SELECT tv_id, user_id, MAX(status) as status, MAX(timestamp) as timestamp
+										 FROM tv_user_bridge GROUP BY (tv_id, user_id)) tub on tub.user_id = a.uid
+									JOIN tv on tub.tv_id = tv.id
+									LEFT JOIN (SELECT DISTINCT ON (tv_id, user_id)
+											 season_number, episode_number, tv_id, user_id, timestamp
+										 FROM episode_user_bridge
+										 ORDER BY tv_id, user_id, timestamp desc) as eub on eub.tv_id=tv.id
+									FULL OUTER JOIN episode on eub.episode_number=episode.episode_number AND eub.season_number=episode.season_number AND eub.tv_id=episode.tv_id
+							WHERE a.uid=$1 ORDER BY a.uid
+						) atts) as tvList
+						FROM account a
+								 JOIN avatar ava on ava.id = a.profile_picture_url
+								 WHERE a.uid=$1
+					group by username, display_name, uid, dark_mode, ava.image_url`,
+		uid).Scan(&userObj.Username, &userObj.DisplayName, &userObj.UID, &userObj.ProfilePicURL, &userObj.DarkMode, &userObj.MovieList, &userObj.TVList)
 	return userObj, err
 }
 
@@ -444,6 +455,7 @@ func getAvatars(db *database.DB) gin.HandlerFunc {
 			}
 			avatars[id] = url
 		}
+		_ = query.Close()
 
 		c.JSON(200, avatars)
 	}

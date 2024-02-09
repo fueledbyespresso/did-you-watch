@@ -16,7 +16,7 @@ import (
 // api/v1/*
 func Routes(r *gin.RouterGroup, db *database.DB) {
 	r.GET("/search/tv/:query", searchForTV(db))
-	r.GET("/tv/:id/season/:season", getSeason(db))
+	r.GET("/tv/:id/season/:season", getAllEpisodes(db))
 	r.PUT("/tv/:id/:status", addToWatchlist(db))
 	r.PUT("/tv/:id/season/:season/episode/:episode", markWatched(db))
 	r.DELETE("/tv/:id", removeFromWatchlist(db))
@@ -40,31 +40,6 @@ func searchForTV(db *database.DB) gin.HandlerFunc {
 			log.Println(err)
 		}
 
-		c.JSON(http.StatusOK, dataJSON)
-	}
-}
-
-func getSeason(db *database.DB) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		id := c.Param("id")
-		season := c.Param("season")
-
-		resp, err := http.Get("https://api.themoviedb.org/3/tv/" + url.QueryEscape(id) + "/season/" + url.QueryEscape(season) + "?api_key=" + database.GetEnvOrParam("TMDB_API_KEY", "TMDB_API_KEY"))
-		if err != nil {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, "Could not retrieve show.")
-			return
-		}
-		contents, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, "Could not retrieve show.")
-			return
-		}
-		var dataJSON map[string]any
-		err = json.Unmarshal(contents, &dataJSON)
-		if err != nil {
-			log.Println(err)
-		}
-		/* TODO: Update cached season data*/
 		c.JSON(http.StatusOK, dataJSON)
 	}
 }
@@ -150,12 +125,12 @@ func removeFromWatchlist(db *database.DB) gin.HandlerFunc {
 			return
 		}
 
-		_, err := db.Db.Query("DELETE FROM tv_user_bridge WHERE user_id=$1 AND tv_id=$2", UID, id)
+		err := db.Db.QueryRow("DELETE FROM tv_user_bridge WHERE user_id=$1 AND tv_id=$2", UID, id).Scan()
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusBadRequest, "Unable to remove show from watchlist")
 			return
 		}
-		_, err = db.Db.Query("DELETE FROM episode_user_bridge WHERE user_id=$1 AND tv_id=$2", UID, id)
+		err = db.Db.QueryRow("DELETE FROM episode_user_bridge WHERE user_id=$1 AND tv_id=$2", UID, id).Scan()
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusBadRequest, "Unable to remove episodes for show from watchlist")
 			return
@@ -175,7 +150,8 @@ func markUnwatched(db *database.DB) gin.HandlerFunc {
 			return
 		}
 
-		_, err := db.Db.Query("DELETE FROM episode_user_bridge WHERE user_id=$1 AND episode_number=$2 AND season_number AND tv_id", UID, episodeNum, seasonNum, tvID)
+		rows, err := db.Db.Query("DELETE FROM episode_user_bridge WHERE user_id=$1 AND episode_number=$2 AND season_number=$3 AND tv_id=$4", UID, episodeNum, seasonNum, tvID)
+		defer rows.Close()
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusBadRequest, "Unable to remove from watchlist")
 			return
@@ -192,38 +168,44 @@ func markWatched(db *database.DB) gin.HandlerFunc {
 
 		UID := account.GetUID(c, db)
 		if UID == "" {
+			c.AbortWithStatusJSON(400, "Invalid user")
 			return
 		}
-		episodeData, err := getTMDBEndpointAsJSON("https://api.themoviedb.org/3/tv/" + tvID +
+		showData, err := getTMDBEndpointAsJSON("https://api.themoviedb.org/3/tv/" + url.QueryEscape(tvID) +
 			"?api_key=" + database.GetEnvOrParam("TMDB_API_KEY", "TMDB_API_KEY") +
 			"&append_to_response=season/" + seasonNum + "/episode/" + episodeNum + "&language=en-US")
 		if err != nil {
 			c.AbortWithStatusJSON(500, err.Error())
+			return
 		}
-		if _, ok := episodeData["season/"+seasonNum+"/episode/"+episodeNum]; !ok {
+		if _, ok := showData["season/"+seasonNum+"/episode/"+episodeNum]; !ok {
 			c.AbortWithStatusJSON(http.StatusNotFound, "episode not found")
 			return
 		}
-		_, err = db.Db.Query(`INSERT INTO tv (id, name, poster_path, overview, backdrop_path) VALUES ($1,$2,$3,$4,$5) 
+
+		_ = db.Db.QueryRow(`INSERT INTO tv (id, name, poster_path, overview, backdrop_path) VALUES ($1,$2,$3,$4,$5) 
 										ON CONFLICT (id) DO UPDATE SET name=$2, poster_path=$3, overview=$4, backdrop_path=$5`,
-			episodeData["id"], episodeData["name"], episodeData["poster_path"], episodeData["overview"], episodeData["backdrop_path"])
+			showData["id"], showData["name"], showData["poster_path"], showData["overview"], showData["backdrop_path"]).Scan()
 		if err != nil {
 			fmt.Println(err)
 			c.AbortWithStatusJSON(http.StatusInternalServerError, "Unable to add show to cache")
 			return
 		}
-		_, err = db.Db.Query("INSERT INTO episode (title, season, episode_number, tv_id)  VALUES ($1,$2,$3, $4) ON CONFLICT (season, episode_number, tv_id) DO UPDATE SET title=$1", episodeData["name"], seasonNum, episodeNum, tvID)
+		var episodeData = showData["season/"+seasonNum+"/episode/"+episodeNum].(map[string]any)
+
+		_ = db.Db.QueryRow("INSERT INTO episode (title, season_number, episode_number, tv_id)  VALUES ($1,$2,$3, $4) ON CONFLICT (season_number, episode_number, tv_id) DO UPDATE SET title=$1", episodeData["name"], seasonNum, episodeNum, tvID).Scan()
 		if err != nil {
 			fmt.Println(err)
 			c.AbortWithStatusJSON(http.StatusBadRequest, "Unable to mark as watched")
 			return
 		}
-		_, err = db.Db.Query("INSERT INTO episode_user_bridge (season_number, episode_number, tv_id, user_id) VALUES ($1, $2, $3, $4) on conflict do nothing ", seasonNum, episodeNum, tvID, UID)
+		_ = db.Db.QueryRow("INSERT INTO episode_user_bridge (season_number, episode_number, tv_id, user_id) VALUES ($1, $2, $3, $4) on conflict do nothing ", seasonNum, episodeNum, tvID, UID).Scan()
 		if err != nil {
 			fmt.Println(err)
 			c.AbortWithStatusJSON(http.StatusBadRequest, "Unable to mark as watched")
 			return
 		}
+
 		c.JSON(http.StatusOK, "Success")
 	}
 }
@@ -247,4 +229,34 @@ func getTMDBEndpointAsJSON(endpoint string) (map[string]any, error) {
 	}
 
 	return dataJSON, nil
+}
+
+func getAllEpisodes(db *database.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		seasonNum := c.Param("season")
+		tvID := c.Param("id")
+		UID := account.GetUID(c, db)
+		if UID == "" {
+			return
+		}
+		query, err := db.Db.Query(`SELECT episode_number from episode_user_bridge WHERE user_id=$1 AND tv_id=$2 AND season_number=$3`, UID, tvID, seasonNum)
+		if err != nil {
+			c.AbortWithStatusJSON(400, "Invalid user")
+			return
+		}
+		episodeNumbers := []int{}
+		for query.Next() {
+			var episode int
+			err = query.Scan(&episode)
+			if err != nil {
+				c.AbortWithStatusJSON(500, "Could not connect to database")
+				return
+			}
+			episodeNumbers = append(episodeNumbers, episode)
+		}
+		_ = query.Close()
+
+		fmt.Println(episodeNumbers)
+		c.JSON(http.StatusOK, episodeNumbers)
+	}
 }
