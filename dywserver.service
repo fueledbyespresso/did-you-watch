@@ -1,0 +1,13 @@
+[Unit]
+Description=didyouwatch server service
+After=network.target
+[Service]
+StartLimitIntervalSec=0[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=root
+WorkingDirectory=/usr/local/sbin
+ExecStart=/usr/local/sbin/main
+[Install]
+WantedBy=multi-user.target
